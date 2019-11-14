@@ -27,7 +27,6 @@ RUN_DEPENDS=	bind-tools>=0:dns/bind-tools \
 		dpinger>=0:net/dpinger \
 		expiretable>=0:security/expiretable \
 		filterdns>=0:net/filterdns \
-		filterlog>=0:sysutils/filterlog \
 		hostapd>=0:net/hostapd \
 		igmpproxy>=0:net/igmpproxy \
 		ipmitool>=0:sysutils/ipmitool \
