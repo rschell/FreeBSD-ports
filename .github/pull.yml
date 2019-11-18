@@ -2,4 +2,4 @@ version: "1"
 rules:
   - base: build-local
     upstream: pfsense:devel
-    mergeMethod: rebase
+    mergeMethod: merge
