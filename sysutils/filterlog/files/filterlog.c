@@ -108,11 +108,7 @@ decode_packet(u_char *user __unused, const struct pcap_pkthdr *pkthdr, const u_c
 		sbuf_printf(&sbuf, "[pflog: invalid header length!]");
 		goto printsbuf;
 	}
-<<<<<<< HEAD
 	hdrlen = BPF_WORDALIGN(hdr->length);
-=======
-	hdrlen = PFLOG_HDRLEN;
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
 
 	if (caplen < hdrlen) {
 		sbuf_printf(&sbuf, "[|pflog]");
@@ -196,10 +192,7 @@ main(int argc, char **argv)
 		exit(-1);
 	}
 
-<<<<<<< HEAD
 	closefrom(3);
-=======
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
 	if (filterlog_pcap_file == NULL)
 		daemon(0, 0);
 
