@@ -3,7 +3,7 @@
  * freeradius.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2017 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013 Alexander Wilke <nachtfalkeaw@web.de>
  * Copyright (c) 2013 Marcello Coutinho
  * All rights reserved.
@@ -1159,8 +1159,7 @@ EOD;
 	}
 
 
-	// This is for the pfsense cert manager.
-	// Depends on freeradius_get_server_certs() and freeradius_get_ca_certs()
+	// For pfSense cert manager
 	$ca_cert = lookup_ca($eapconf["ssl_ca_cert"]);
 	if ($ca_cert == false) {
 		if (!is_array($config['ca'])) {
@@ -1602,20 +1601,6 @@ EOD;
 }
 
 // Gets started from freeradiuseapconf.xml
-function freeradius_get_ca_certs() {
-	global $config;
-	$ca_arr = array();
-	$ca_arr[] = array('refid' => 'none', 'descr' => 'none (auto)');
-
-	if (is_array($config['ca'])) {
-		foreach ($config['ca'] as $ca) {
-			$ca_arr[] = array('refid' => $ca['refid'], 'descr' => $ca['descr']);
-		}
-	}
-	return $ca_arr;
-}
-
-// Gets started from freeradiuseapconf.xml
 function freeradius_get_ca_crl() {
 	global $config;
 	$crl_arr = array();
@@ -1627,20 +1612,6 @@ function freeradius_get_ca_crl() {
 		}
 	}
 	return $crl_arr;
-}
-
-// Gets started from freeradiuseapconf.xml
-function freeradius_get_server_certs() {
-	global $config;
-	$cert_arr = array();
-	$cert_arr[] = array('refid' => 'none', 'descr' => 'none (auto)');
-
-	if (is_array($config['cert'])) {
-		foreach ($config['cert'] as $cert) {
-			$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
-		}
-	}
-	return $cert_arr;
 }
 
 function freeradius_sqlconf_resync() {

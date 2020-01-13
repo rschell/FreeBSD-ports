@@ -8,7 +8,7 @@
  * zabbix-proxy.xml
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013 Danilo G. Baio
  * Copyright (c) 2013 Marcello Coutinho
  * All rights reserved.
@@ -201,7 +201,7 @@
 			<fieldname>tlscafile</fieldname>
 			<description>Top-level CA certificate for peer certificate verification.</description>
 			<type>select_source</type>
-			<source><![CDATA[$config['ca']]]></source>
+			<source><![CDATA[zabbix_proxy_certca('ca')]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 			<show_disable_value>none</show_disable_value>
@@ -229,7 +229,7 @@
 			<fieldname>tlscertfile</fieldname>
 			<description>Agent certificate.</description>
 			<type>select_source</type>
-			<source><![CDATA[$config['cert']]]></source>
+			<source><![CDATA[zabbix_proxy_certca('cert')]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 			<show_disable_value>none</show_disable_value>

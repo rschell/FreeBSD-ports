@@ -8,7 +8,7 @@
  * stunnel.xml
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2016 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,7 +61,7 @@
 		</columnitem>
 		<columnitem>
 			<fielddescr>Certificate</fielddescr>
-			<fieldname>certificatelink</fieldname>
+			<fieldname>certname</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Redirects to IP</fielddescr>
@@ -108,7 +108,7 @@
 			<fieldname>certificate</fieldname>
 			<description>Select server certificate to use for this tunnel.</description>
 			<type>select_source</type>
-			<source><![CDATA[$config['cert']]]></source>
+			<source><![CDATA[cert_build_list('cert', 'IPsec', true)]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 			<show_disable_value>default</show_disable_value>

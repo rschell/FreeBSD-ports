@@ -8,7 +8,7 @@
  * squid_auth.xml
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2017 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2012-2014 Marcello Coutinho
  * All rights reserved.
  *
@@ -179,6 +179,18 @@
 				<option><name>2</name><value>2</value></option>
 				<option><name>3</name><value>3</value></option>
 			</options>
+		</field>
+		<field>
+                        <fielddescr>Transport</fielddescr>
+			<fieldname>ldap_urltype</fieldname>
+			<type>select</type>
+			<default_value>standard</default_value>
+			<options>
+				<option><name>TCP - Standard</name><value>standard</value></option>
+				<option><name>TCP - STARTTLS</name><value>starttls</value></option>
+				<option><name>SSL - Encrypted</name><value>ssl</value></option>
+			</options>
+			<description>If 'SSL Encrypted' or 'TCP - STARTTLS' is selected, the CA certificate of the LDAP server must be trusted by the Operating System Trust Store. This is automatic for certificates signed by globally trusted CAs such as Let's Encrypt; self-signed CAs can optionally be added to the Trust Store on pfSense 2.5.</description>
 		</field>
 		<field>
 			<fielddescr>LDAP Server User DN</fielddescr>

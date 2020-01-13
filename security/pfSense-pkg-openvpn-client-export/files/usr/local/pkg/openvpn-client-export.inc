@@ -3,7 +3,7 @@
  * openvpn-client-export.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2016-2020 Rubicon Communications, LLC (Netgate)
  * Copyright (C) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -308,7 +308,9 @@ EOF;
 			$conf .= "pkcs11-id '{$pkcs11id}'{$nl}";
 		} elseif ($usetoken) {
 			$conf .= "ca {$cafile}{$nl}";
-			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"{$nl}";
+			$crt = openssl_x509_parse(base64_decode($cert['crt']));
+			$subj = implode(', ', $crt['subject']);
+			$conf .= "cryptoapicert \"SUBJ:{$subj}\"{$nl}";
 		} elseif (substr($expformat, 0, 6) != "inline") {
 			$conf .= "pkcs12 {$prefix}.p12{$nl}";
 		}

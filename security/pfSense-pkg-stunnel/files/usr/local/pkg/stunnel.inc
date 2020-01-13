@@ -3,7 +3,7 @@
  * stunnel.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2016 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +44,7 @@ function stunnel_save() {
 	$in_use_certs = array();
 	$in_use_certs[] = 'stunnel.pem';
 
-	foreach ($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
+	foreach ($config['installedpackages']['stunnel']['config'] as $num => $pkgconfig) {
 		fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
 		if ($pkgconfig['client']) {
 			fwrite($fout, "client = yes" . "\n");
@@ -57,7 +57,9 @@ function stunnel_save() {
 					trim(base64_decode($cert['crt'])) . "\n" .
 					ca_chain($cert));
 				fwrite($fout, "cert = " . STUNNEL_ETCDIR . "/{$pkgconfig['certificate']}.pem\n");
+				chmod(STUNNEL_ETCDIR . "/{$pkgconfig['certificate']}.pem", 0600);
 				$in_use_certs[] = "{$pkgconfig['certificate']}.pem";
+				$config['installedpackages']['stunnel']['config'][$num]['certname'] = $cert['descr'];
 			}
 		} else {
 			stunnel_make_default_cert();
@@ -77,6 +79,7 @@ function stunnel_save() {
 		fwrite($fout, base64_decode($pkgconfig['custom_options']) . "\n");
 	}
 	fclose($fout);
+	write_config('stunnel configuration changed');
 
 	// Clean up certs that are no longer in use.
 	foreach (glob(STUNNEL_ETCDIR . "/*.pem") as $file) {
@@ -143,4 +146,5 @@ function stunnel_deinstall() {
 	rmdir_recursive("/var/tmp/stunnel");
 	rmdir_recursive(STUNNEL_ETCDIR);
 }
+
 ?>

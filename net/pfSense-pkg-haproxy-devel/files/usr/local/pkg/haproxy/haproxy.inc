@@ -3,7 +3,7 @@
  * haproxy.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2009 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2009-2020 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013-2016 PiBa-NL
  * All rights reserved.
  *
@@ -407,7 +407,7 @@ global $haproxy_version;
 function haproxy_version() {
 	global $haproxy_version;
 	if (empty($haproxy_version)) {
-		$haproxy_version = shell_exec("haproxy -v | head -n 1 | awk '{ print $3 }'");
+		$haproxy_version = shell_exec("/usr/local/sbin/haproxy -v | head -n 1 | awk '{ print $3 }'");
 	}
 	return $haproxy_version;
 }
