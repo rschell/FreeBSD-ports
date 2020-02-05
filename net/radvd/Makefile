@@ -3,7 +3,7 @@
 
 PORTNAME=	radvd
 PORTVERSION=	2.18
-PORTREVISION=	2
+PORTREVISION=	5
 CATEGORIES=	net
 MASTER_SITES=	http://www.litech.org/radvd/dist/
 
