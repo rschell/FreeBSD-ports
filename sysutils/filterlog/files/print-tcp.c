@@ -86,16 +86,11 @@ const struct tok ipproto_values[] = {
 #define TCPOPT_CCECHO           13      /* T/TCP CC options (rfc1644) */
 #define TCPOPT_SIGNATURE        19      /* Keyed MD5 (rfc2385) */
 #define    TCPOLEN_SIGNATURE            18
-<<<<<<< HEAD
 #define TCPOPT_SCPS             20      /* SCPS-TP (CCSDS 714.0-B-2) */
 #define TCPOPT_UTO              28      /* tcp user timeout (rfc5482) */
 #define TCPOPT_AUTH             29      /* Enhanced AUTH option (TCP-AO) (rfc5925) */
 
 /* https://www.iana.org/assignments/tcp-parameters/tcp-parameters.xhtml */
-=======
-#define TCPOPT_AUTH             20      /* Enhanced AUTH option */
-#define TCPOPT_UTO              28      /* tcp user timeout (rfc5482) */
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
 
 struct tok tcp_option_values[] = {
         { TCPOPT_EOL, "eol" },
@@ -111,14 +106,9 @@ struct tok tcp_option_values[] = {
         { TCPOPT_CCNEW, "ccnew" },
         { TCPOPT_CCECHO, "" },
         { TCPOPT_SIGNATURE, "md5" },
-<<<<<<< HEAD
         { TCPOPT_SCPS, "scps" },
         { TCPOPT_UTO, "uto" },
         { TCPOPT_AUTH, "enhanced auth" },
-=======
-        { TCPOPT_AUTH, "enhanced auth" },
-        { TCPOPT_UTO, "uto" },
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
         { 0, NULL }
 };
 
@@ -197,7 +187,6 @@ tcp_print(struct sbuf *sbuf, register const u_char *bp, register u_int length,
          */
         if (hlen > sizeof(*tp)) {
                 register const u_char *cp;
-<<<<<<< HEAD
 
                 hlen -= sizeof(*tp);
                 cp = (const u_char *)tp + sizeof(*tp);
@@ -205,14 +194,6 @@ tcp_print(struct sbuf *sbuf, register const u_char *bp, register u_int length,
 		while (hlen > 0) {
 			register u_int opt, len;
 
-=======
-                register u_int opt, datalen;
-                register u_int len;
-
-                hlen -= sizeof(*tp);
-                cp = (const u_char *)tp + sizeof(*tp);
-                while (hlen > 0) {
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
                         if (ch != '\0')
                                 sbuf_printf(sbuf, "%c", ch);
                         opt = *cp++;
@@ -225,31 +206,18 @@ tcp_print(struct sbuf *sbuf, register const u_char *bp, register u_int length,
                                 --hlen;		/* account for length byte */
                         }
                         --hlen;			/* account for type byte */
-<<<<<<< HEAD
 			register u_int datalen = 0;
-=======
-                        datalen = 0;
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
 
                         sbuf_printf(sbuf, "%s", code2str(tcp_option_values, "Unknown Option %u", opt));
 
 			switch (opt) {
                         case TCPOPT_MAXSEG:
-<<<<<<< HEAD
                         case TCPOPT_UTO:
-=======
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
                                 datalen = 2;
                                 break;
                         case TCPOPT_WSCALE:
                                 datalen = 1;
                                 break;
-<<<<<<< HEAD
-=======
-                        case TCPOPT_SACK:
-                                datalen = len - 2;
-                                break;
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
                         case TCPOPT_CC:
                         case TCPOPT_CCNEW:
                         case TCPOPT_CCECHO:
@@ -263,26 +231,10 @@ tcp_print(struct sbuf *sbuf, register const u_char *bp, register u_int length,
                         case TCPOPT_SIGNATURE:
                                 datalen = TCP_SIGLEN;
                                 break;
-<<<<<<< HEAD
                         case TCPOPT_EOL:
                         case TCPOPT_NOP:
                         case TCPOPT_SACKOK:
 				/* No data follows option */
-=======
-                        case TCPOPT_AUTH:
-                                datalen = len - 3;
-                                break;
-                        case TCPOPT_EOL:
-                        case TCPOPT_NOP:
-                        case TCPOPT_SACKOK:
-                                /*
-                                 * Nothing interesting.
-                                 * fall through
-                                 */
-                                break;
-                        case TCPOPT_UTO:
-                                datalen = 2;
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
                                 break;
                         default:
                                 datalen = len - 2;
@@ -293,25 +245,12 @@ tcp_print(struct sbuf *sbuf, register const u_char *bp, register u_int length,
                         cp += datalen;
                         hlen -= datalen;
 
-<<<<<<< HEAD
-=======
-                        /* Check specification against observed length */
-                        ++datalen;			/* option octet */
-                        if (!ZEROLENOPT(opt))
-                                ++datalen;		/* size octet */
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
                         ch = ';';
                         if (opt == TCPOPT_EOL)
                                 break;
                 }
         }
 
-<<<<<<< HEAD
-=======
-        if (length <= 0)
-                return;
-
->>>>>>> b4c24bbd324d... Importing sysutils/filterlog from pfPorts
         return;
  bad:
         sbuf_printf(sbuf, "[bad opt],");
