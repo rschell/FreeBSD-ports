@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	tome4
-DISTVERSION?=	1.6.5
+DISTVERSION?=	1.7.2
 PORTREVISION?=	0
 CATEGORIES=	games
 MASTER_SITES=	https://te4.org/dl/t-engine/ \
@@ -10,7 +10,7 @@ DISTFILES=	t-engine4-src-${DISTVERSION}${EXTRACT_SUFX} \
 		${PORTNAME}.png:icons
 EXTRACT_ONLY=	t-engine4-src-${DISTVERSION}${EXTRACT_SUFX}
 
-MAINTAINER=	lifanov@FreeBSD.org
+MAINTAINER=	pkubaj@FreeBSD.org
 COMMENT=	Epic tactical turn-based roguelike adventure
 
 LICENSE=	GPLv3+
@@ -26,7 +26,6 @@ USE_GL=		gl glu
 USE_CSTD=	gnu89
 SUB_FILES=	tome4
 
-LLD_UNSAFE=	yes
 MAKE_JOBS_UNSAFE=	yes
 
 DESKTOP_ENTRIES="ToME 4" "" "${PORTNAME}" \
@@ -35,12 +34,13 @@ DESKTOP_ENTRIES="ToME 4" "" "${PORTNAME}" \
 PLIST_SUB=	PORTVERSION=${PORTVERSION}
 WRKSRC=		${WRKDIR}/t-engine4-src-${DISTVERSION}
 MAKE_ARGS+=	config=release verbose=yes ARCH="" CC=${CC} CXX=${CXX}
+LDFLAGS_i386=	-Wl,-znotext
 
 .include <bsd.port.pre.mk>
 
 pre-build:
 	@${REINPLACE_CMD} 's|%%LOCALBASE%%|${LOCALBASE}|' ${WRKSRC}/premake4.lua
-.if ${ARCH} == aarch64 || ${ARCH} == powerpc64
+.if ${ARCH} == aarch64 || ${ARCH:Mpowerpc64*}
 	(cd ${WRKSRC} && premake4 --lua=default gmake)
 .else
 	(cd ${WRKSRC} && premake4 gmake)

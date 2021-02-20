@@ -3,11 +3,11 @@
 
 PORTNAME=	lttng-tools
 PORTVERSION=	2.9.3
-PORTREVISION=	3
+PORTREVISION=	5
 CATEGORIES=	sysutils
 MASTER_SITES=	http://lttng.org/files/${PORTNAME}/
 
-MAINTAINER=	mmokhi@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Set of tools to control LTTng tracing
 
 LICENSE=		LGPL21 GPLv2

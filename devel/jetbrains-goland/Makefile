@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	goland
-PORTVERSION=	2019.3
+PORTVERSION=	2020.2.4
 CATEGORIES=	devel java
 MASTER_SITES=	https://download-cf.jetbrains.com/go/
 PKGNAMEPREFIX=	jetbrains-
@@ -15,7 +15,8 @@ LICENSE_NAME=	Subscription license agreement for business and organizations
 LICENSE_TEXT=	See: https://www.jetbrains.com/store/license.html
 LICENSE_PERMS=	dist-mirror pkg-mirror auto-accept
 
-RUN_DEPENDS=	intellij-fsnotifier>0:java/intellij-fsnotifier
+RUN_DEPENDS=	intellij-fsnotifier>0:java/intellij-fsnotifier \
+		lsof:sysutils/lsof
 
 USES=		python:run shebangfix
 
@@ -26,10 +27,16 @@ SHEBANG_FILES=	bin/printenv.py bin/restart.py
 
 NO_ARCH=	yes
 NO_BUILD=	yes
+SUB_FILES=	goland goland.desktop pkg-message
 
 WRKSRC=		${WRKDIR}/GoLand-${PORTVERSION}
 
-SUB_FILES=	goland goland.desktop pkg-message
+OPTIONS_DEFINE_amd64=	DELVE
+OPTIONS_DEFAULT_amd64=	DELVE
+
+DELVE_DESC=	Debugger for the Go programming language
+
+DELVE_RUN_DEPENDS=	delve>0:devel/delve
 
 do-install:
 # Linux/Windows/OS X only so remove them
@@ -37,6 +44,7 @@ do-install:
 		${WRKSRC}/bin/fsnotifier-arm \
 		${WRKSRC}/bin/fsnotifier64 \
 		${WRKSRC}/lib/pty4j-native \
+		${WRKSRC}/plugins/go/lib/dlv \
 		${WRKSRC}/plugins/performanceTesting/bin
 # Remove bundled linux JetBrains Runtime and OpenJDK
 	@${RM} -r ${WRKSRC}/jbr ${WRKSRC}/jre64
@@ -52,5 +60,8 @@ do-install:
 # Fix slow render
 	${ECHO} "-Dsun.java2d.xrender=false" >> ${STAGEDIR}${DATADIR}/bin/goland.vmoptions
 	${ECHO} "-Dsun.java2d.xrender=false" >> ${STAGEDIR}${DATADIR}/bin/goland64.vmoptions
+
+do-install-DELVE-on:
+	${ECHO} "dlv.path=${PREFIX}/bin/dlv" >> ${STAGEDIR}${DATADIR}/bin/idea.properties
 
 .include <bsd.port.mk>

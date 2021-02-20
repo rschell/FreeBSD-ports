@@ -2,8 +2,7 @@
 
 PORTNAME=	tvm
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.6.0
-PORTREVISION=	2
+DISTVERSION=	0.6.1
 CATEGORIES=	misc # machine-learning
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
@@ -19,7 +18,7 @@ RUN_DEPENDS=	${PYNUMPY} \
 		${PYTHON_PKGNAMEPREFIX}decorator>0:devel/py-decorator@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}psutil>0:sysutils/py-psutil@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_GITHUB=	yes
 GH_ACCOUNT=	apache
 GH_PROJECT=	incubator-tvm

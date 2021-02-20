@@ -5,12 +5,12 @@ PORTNAME=	yap
 PORTVERSION=	6.2.2
 PORTREVISION=	9
 CATEGORIES=	lang
-MASTER_SITES=	http://www.dcc.fc.up.pt/~vsc/Yap/
+MASTER_SITES=	https://mirrors.dotsrc.org/mirrors/exherbo/	\
+		http://ftp.lyx.org/pub/minix/distfiles/backup/	\
+		http://tenampak.izt.uam.mx/programas/
 
 MAINTAINER=	danilo@FreeBSD.org
 COMMENT=	High-performance Prolog compiler
-
-BROKEN=		unfetchable
 
 LIB_DEPENDS=	libgmp.so:math/gmp
 

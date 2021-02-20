@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	libsass
-DISTVERSION=	0.19.4
+DISTVERSION=	0.20.1
 CATEGORIES=	www python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -16,12 +16,9 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 LIB_DEPENDS=	libsass.so:textproc/libsass
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}six>0:devel/py-six@${PY_FLAVOR}
 
-USES=		compiler:c++11-lang localbase python
+USES=		compiler:c++11-lang localbase python:3.6+
 USE_PYTHON=	autoplist distutils
 
 MAKE_ENV=	SYSTEM_SASS=1
-
-post-install:
-	@${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/_sass.so
 
 .include <bsd.port.mk>

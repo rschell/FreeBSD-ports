@@ -19,6 +19,7 @@ include/KF5/KWidgetsAddons/KDualAction
 include/KF5/KWidgetsAddons/KEditListWidget
 include/KF5/KWidgetsAddons/KFontAction
 include/KF5/KWidgetsAddons/KFontChooser
+include/KF5/KWidgetsAddons/KFontChooserDialog
 include/KF5/KWidgetsAddons/KFontRequester
 include/KF5/KWidgetsAddons/KFontSizeAction
 include/KF5/KWidgetsAddons/KGradientSelector
@@ -27,6 +28,7 @@ include/KF5/KWidgetsAddons/KLed
 include/KF5/KWidgetsAddons/KMessageBox
 include/KF5/KWidgetsAddons/KMessageBoxDontAskAgainInterface
 include/KF5/KWidgetsAddons/KMessageBoxNotifyInterface
+include/KF5/KWidgetsAddons/KMessageDialog
 include/KF5/KWidgetsAddons/KMessageWidget
 include/KF5/KWidgetsAddons/KMimeTypeChooser
 include/KF5/KWidgetsAddons/KMimeTypeChooserDialog
@@ -52,6 +54,7 @@ include/KF5/KWidgetsAddons/KPixmapSequenceWidget
 include/KF5/KWidgetsAddons/KPopupFrame
 include/KF5/KWidgetsAddons/KRatingPainter
 include/KF5/KWidgetsAddons/KRatingWidget
+include/KF5/KWidgetsAddons/KRecentFilesMenu
 include/KF5/KWidgetsAddons/KRuler
 include/KF5/KWidgetsAddons/KSelectAction
 include/KF5/KWidgetsAddons/KSelector
@@ -94,6 +97,7 @@ include/KF5/KWidgetsAddons/kdualaction.h
 include/KF5/KWidgetsAddons/keditlistwidget.h
 include/KF5/KWidgetsAddons/kfontaction.h
 include/KF5/KWidgetsAddons/kfontchooser.h
+include/KF5/KWidgetsAddons/kfontchooserdialog.h
 include/KF5/KWidgetsAddons/kfontrequester.h
 include/KF5/KWidgetsAddons/kfontsizeaction.h
 include/KF5/KWidgetsAddons/kguiitem.h
@@ -101,6 +105,7 @@ include/KF5/KWidgetsAddons/kled.h
 include/KF5/KWidgetsAddons/kmessagebox.h
 include/KF5/KWidgetsAddons/kmessageboxdontaskagaininterface.h
 include/KF5/KWidgetsAddons/kmessageboxnotifyinterface.h
+include/KF5/KWidgetsAddons/kmessagedialog.h
 include/KF5/KWidgetsAddons/kmessagewidget.h
 include/KF5/KWidgetsAddons/kmimetypechooser.h
 include/KF5/KWidgetsAddons/kmimetypeeditor.h
@@ -122,6 +127,7 @@ include/KF5/KWidgetsAddons/kpixmapsequencewidget.h
 include/KF5/KWidgetsAddons/kpopupframe.h
 include/KF5/KWidgetsAddons/kratingpainter.h
 include/KF5/KWidgetsAddons/kratingwidget.h
+include/KF5/KWidgetsAddons/krecentfilesmenu.h
 include/KF5/KWidgetsAddons/kruler.h
 include/KF5/KWidgetsAddons/kselectaction.h
 include/KF5/KWidgetsAddons/kselector.h
@@ -158,6 +164,8 @@ share/kf5/kcharselect/kcharselect-data
 share/locale/af/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/ar/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/as/LC_MESSAGES/kwidgetsaddons5_qt.qm
+share/locale/ast/LC_MESSAGES/kwidgetsaddons5_qt.qm
+share/locale/az/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/be/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/be@latin/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/bg/LC_MESSAGES/kwidgetsaddons5_qt.qm
@@ -254,3 +262,4 @@ share/locale/xh/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/zh_CN/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/zh_HK/LC_MESSAGES/kwidgetsaddons5_qt.qm
 share/locale/zh_TW/LC_MESSAGES/kwidgetsaddons5_qt.qm
+share/qlogging-categories5/kwidgetsaddons.categories

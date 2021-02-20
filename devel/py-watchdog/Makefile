@@ -16,12 +16,12 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}argh>=0.26.1:devel/py-argh@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}pathtools>=0.1.2:devel/py-pathtools@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}yaml>=3.11:devel/py-yaml@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_GITHUB=	yes
 USE_PYTHON=	autoplist distutils
 
 DOCS_BUILD_DEPENDS=	${PYTHON_PKGNAMEPREFIX}pathtools>=0.1.2:devel/py-pathtools@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}sphinx>=1.4.4:textproc/py-sphinx@${PY_FLAVOR}
+		${PY_SPHINX}
 DOCSDIR=	${PREFIX}/share/doc/${PKGNAMEPREFIX}${PORTNAME}
 
 GH_ACCOUNT=	gorakhargosh

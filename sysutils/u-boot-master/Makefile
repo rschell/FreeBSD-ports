@@ -16,15 +16,15 @@ COMMENT=	Cross-build das u-boot for model ${MODEL}
 LICENSE=	GPLv2
 
 BUILD_DEPENDS+=	gsed:textproc/gsed \
-		swig3.0:devel/swig30 \
+		swig:devel/swig \
 		dtc>=1.4.1:sysutils/dtc \
 		mkimage:sysutils/u-boot-tools
 BUILD_DEPENDS+=	${COMPILER}:devel/${COMPILER}
 
-USES=		bison gmake python:2.7,build shebangfix tar:bz2
-BINARY_ALIAS=	bison=${LOCALBASE}/bin/bison dtc=${LOCALBASE}/bin/dtc sed=gsed swig=swig3.0 python2=python2.7
+USES=		bison gmake python:3.7+,build shebangfix tar:bz2
+BINARY_ALIAS=	bison=${LOCALBASE}/bin/bison dtc=${LOCALBASE}/bin/dtc sed=gsed python3=${PYTHON_CMD}
 
-SHEBANG_FILES=	tools/binman/binman.py arch/arm/mach-rockchip/make_fit_atf.py
+SHEBANG_FILES=	tools/binman/binman arch/arm/mach-rockchip/make_fit_atf.py
 SSP_UNSAFE=	yes
 UBOOT_DIR=	share/u-boot/${PORTNAME}${PKGNAMESUFFIX}
 INST=		${PREFIX}/${UBOOT_DIR}
@@ -71,8 +71,8 @@ UBOOT_PLIST_ALLWINNER64=${UBOOT_PLIST_ALLWINNER}
 UBOOT_ARCH_ALLWINNER64=aarch64
 UBOOT_METADATA_ALLWINNER64_FILES=	${UBOOT_PLIST_ALLWINNER64}
 UBOOT_METADATA_ALLWINNER64_METHOD=	raw
-UBOOT_METADATA_ALLWINNER64_RAW_OFFSET=	8
-UBOOT_METADATA_ALLWINNER64_RAW_BS=	1k
+UBOOT_METADATA_ALLWINNER64_RAW_OFFSET=	1
+UBOOT_METADATA_ALLWINNER64_RAW_BS=	128k
 
 # Overrides for Zynq 7000 family
 UBOOT_PLIST_ZYNQ_7000=u-boot.img boot.bin uEnv.txt
@@ -104,11 +104,14 @@ UBOOT_METADATA_ARMADA38X_METHOD=	raw
 UBOOT_METADATA_ARMADA38X_RAW_OFFSET=	1
 UBOOT_METADATA_ARMADA38X_RAW_BS=	512
 
+# Override for QEMU family
+UBOOT_PLIST_QEMU=	u-boot.bin
+
 # Uboot variables
 .if !defined(UBOOT_VERSION) && defined(UBOOT_VERSION_${FAMILY:tu})
 UBOOT_VERSION=${UBOOT_VERSION_${FAMILY:tu}}
 .endif
-UBOOT_VERSION?=	2019.10
+UBOOT_VERSION?=	2020.10
 
 # If a slave port defines a PORTREVISION use it
 .if defined(U_BOOT_SLAVE_PORTREVISION_${UBOOT_VERSION})
@@ -132,6 +135,9 @@ UBOOT_PLIST+=	boot.scr
 .elif ${UBOOT_ARCH} == aarch64
 CROSS_COMPILE=aarch64-none-elf-
 ARCHFLAGS=ARCH=arm
+.elif ${UBOOT_ARCH} == riscv64
+CROSS_COMPILE=riscv64-none-elf-
+ARCHFLAGS=ARCH=riscv
 .else
 # Best guess for other architectures
 CROSS_COMPILE=${UBOOT_ARCH}-none-elf-
@@ -145,8 +151,13 @@ UBOOT_MOVE=${UBOOT_MOVE_${FAMILY:tu}}
 
 # Per family dependancies
 .if defined(FAMILY) && ${FAMILY} == allwinner64
+.if defined(SUBFAMILY) && ${SUBFAMILY} == h6
+BUILD_DEPENDS+=	${LOCALBASE}/share/atf-sun50i_h6/bl31.bin:sysutils/atf-sun50i_h6
+MAKE_ENV+=	BL31=${LOCALBASE}/share/atf-sun50i_h6/bl31.bin
+.else
 BUILD_DEPENDS+=	${LOCALBASE}/share/atf-sun50i_a64/bl31.bin:sysutils/atf-sun50i_a64
 MAKE_ENV+=	BL31=${LOCALBASE}/share/atf-sun50i_a64/bl31.bin
+.endif
 .endif
 
 .if defined(FAMILY) && ${FAMILY} == rk3328
@@ -167,6 +178,13 @@ PLIST_FILES+=	${UBOOT_DIR}/${i}
 .endfor
 PLIST_FILES+=	${UBOOT_DIR}/README
 
+.if defined(PLIST_EXTRAS)
+.for i in ${PLIST_EXTRAS}
+PLIST_FILES+=	${UBOOT_DIR}/${i}
+.endfor
+.endif
+
+.if !defined(NO_METADATA)
 .if defined(UBOOT_METADATA_${FAMILY:tu}_METHOD)
 METADATA_METHOD=${UBOOT_METADATA_${FAMILY:tu}_METHOD}
 METADATA_FILES=${UBOOT_METADATA_${FAMILY:tu}_FILES}
@@ -178,6 +196,7 @@ METADATA_BS=${UBOOT_METADATA_${FAMILY:tu}_RAW_BS}
 .elif ${METADATA_METHOD} == "file"
 .else
 .error "Unsupported METADATA_METHOD"
+.endif
 .endif
 .endif
 

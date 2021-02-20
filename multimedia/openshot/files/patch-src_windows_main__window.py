@@ -1,6 +1,6 @@
---- src/windows/main_window.py.orig	2019-11-11 07:57:57 UTC
+--- src/windows/main_window.py.orig	2020-09-11 19:59:04 UTC
 +++ src/windows/main_window.py
-@@ -247,6 +247,8 @@ class MainWindow(QMainWindow, updates.UpdateWatcher):
+@@ -256,6 +256,8 @@ class MainWindow(QMainWindow, updates.UpdateWatcher):
                  # Format last log line based on OS (since each OS can be formatted differently)
                  if platform.system() == "Darwin":
                      last_log_line = "mac-%s" % last_log_line[58:].strip()

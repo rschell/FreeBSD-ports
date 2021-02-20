@@ -2,7 +2,7 @@
 
 PORTNAME=	marble
 DISTVERSION=	${KDE_APPLICATIONS_VERSION}
-CATEGORIES=	astro kde kde-applications
+CATEGORIES=	astro education kde kde-applications
 
 MAINTAINER=	kde@FreeBSD.org
 COMMENT=	Virtual globe and world atlas for KDE
@@ -10,7 +10,7 @@ COMMENT=	Virtual globe and world atlas for KDE
 LICENSE=	GPLv2+
 LICENSE_FILE=	${WRKSRC}/LICENSE.txt
 
-LIB_DEPENDS=	libquazip5.so:archivers/quazip
+LIB_DEPENDS=	libquazip1-qt5.so:archivers/quazip
 
 USES=		cmake compiler:c++11-lang desktop-file-utils gettext \
 		kde:5 qt:5 shared-mime-info tar:xz
@@ -32,8 +32,6 @@ OPTIONS_DEFINE=	GPS DOCS WEBENGINE
 OPTIONS_DEFAULT=GPS
 OPTIONS_DEFAULT_amd64=	WEBENGINE
 OPTIONS_DEFAULT_i386=	WEBENGINE
-OPTIONS_DEFAULT_powerpc64=	${OPTIONS_DEFAULT_powerpc64_${OSREL:R}}
-OPTIONS_DEFAULT_powerpc64_13=	WEBENGINE
 OPTIONS_SUB=	yes
 
 GPS_DESC=		Support for GPS position provider

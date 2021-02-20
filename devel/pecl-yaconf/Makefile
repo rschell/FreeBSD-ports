@@ -2,10 +2,10 @@
 # $FreeBSD$
 
 PORTNAME=	yaconf
-DISTVERSION=	1.0.8
+DISTVERSION=	1.1.0
 CATEGORIES=	devel
 
-MAINTAINER=	joneum@FreeBSD.org
+MAINTAINER=	miwi@FreeBSD.org
 COMMENT=	PHP Persistent Configurations Container
 
 LICENSE=	PHP301

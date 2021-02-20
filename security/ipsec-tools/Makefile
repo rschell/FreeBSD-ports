@@ -25,22 +25,20 @@ USE_RC_SUBR=	racoon
 GNU_CONFIGURE=	yes
 USE_LDCONFIG=	yes
 CONFIGURE_ARGS=	--enable-shared --sysconfdir=${PREFIX}/etc/racoon \
-		--localstatedir=${STATEDIR:S/\/racoon//} \
-		--with-pkgversion=freebsd-${PORTVERSION}
+		--localstatedir=${STATEDIR:S/\/racoon//}
 
 STATEDIR=	/var/db/racoon
 SUB_LIST+=	STATEDIR=${STATEDIR} REQUIREMOD=${REQUIREMOD}
 PLIST_SUB+=	STATEDIR=${STATEDIR}
 
-OPTIONS_DEFINE=	DEBUG IPV6 ADMINPORT STATS DPD NATT NATTF FRAG HYBRID PAM \
+OPTIONS_DEFINE=	IPV6 ADMINPORT STATS DPD NATT FRAG HYBRID PAM \
 		RADIUS LDAP GSSAPI SAUNSPEC RC5 IDEA DOCS EXAMPLES WCPSKEY
-OPTIONS_DEFAULT=	ADMINPORT DEBUG DPD NATT FRAG HYBRID WCPSKEY
+OPTIONS_DEFAULT=	ADMINPORT DPD NATT FRAG HYBRID WCPSKEY
 
 ADMINPORT_DESC=	Enable Admin port
 STATS_DESC=	Statistics logging function
 DPD_DESC=	Dead Peer Detection
 NATT_DESC=	NAT-Traversal
-NATTF_DESC=	require NAT-Traversal (fail without kernel-patch)
 FRAG_DESC=	IKE fragmentation payload support
 HYBRID_DESC=	Hybrid, Xauth and Mode-cfg support
 SAUNSPEC_DESC=	Unspecified SA mode
@@ -54,14 +52,11 @@ WCPSKEY_DESC=	Allow wildcard matching for pre-shared keys
 PORTDOCS=	*
 PORTEXAMPLES=	*
 
-DEBUG_CONFIGURE_ENABLE=	debug
 IPV6_CONFIGURE_ENABLE=	ipv6
 ADMINPORT_CONFIGURE_ENABLE=adminport
 STATS_CONFIGURE_ENABLE=	stats
 DPD_CONFIGURE_ENABLE=	dpd
-NATTF_VARS=		NATT=yes
-NATTF_VARS_OFF=		NATT=kernel
-NATT_CONFIGURE_ON=	--enable-natt=${NATT} --enable-natt-versions=rfc
+NATT_CONFIGURE_ON=	--enable-natt=yes --enable-natt-versions=rfc
 NATT_CONFIGURE_OFF=	--disable-natt
 FRAG_CONFIGURE_ENABLE=	frag
 HYBRID_CONFIGURE_ENABLE=hybrid
@@ -86,26 +81,8 @@ WCPSKEY_EXTRA_PATCHES=	${FILESDIR}/wildcard-psk.diff ${FILESDIR}/wildcard-psk-oa
 REQUIREMOD?=	ipsec
 .endif
 
-# Need to be patched for openssl-1.1.1 (default after 1200080)
-.if ${OPSYS} == FreeBSD
-.  if ${OSVERSION} >= 1200085 && ${SSL_DEFAULT} != openssl
-BUILD_DEPENDS+=	automake>=0:devel/automake
-.  endif
-.endif
-
 post-patch:
 	@${REINPLACE_CMD} -e "s/-Werror//g ; s/-R$$libdir/-Wl,-rpath=$$libdir/g" ${WRKSRC}/configure
-
-# Need to be patched for openssl-1.1.1 (default after 1200080)
-.if ${OPSYS} == FreeBSD
-.  if ${OSVERSION} >= 1200085 && ${SSL_DEFAULT} != openssl
-post-configure:
-	@${REINPLACE_CMD} -e "s/automake-1.14/automake-1.16/g" ${WRKSRC}/Makefile ${WRKSRC}/*/Makefile \
-				${WRKSRC}/*/*/Makefile
-	@${REINPLACE_CMD} -e "s/aclocal-1.14/aclocal-1.16/g" ${WRKSRC}/Makefile ${WRKSRC}/*/Makefile \
-				${WRKSRC}/*/*/Makefile
-.  endif
-.endif
 
 post-install:
 	@${MKDIR} ${STAGEDIR}/${PREFIX}/etc/racoon
@@ -125,7 +102,6 @@ post-install-DOCS-on:
 
 .if ${OPSYS} == FreeBSD
 .  if ${OSVERSION} >= 1200085 && ${SSL_DEFAULT} != openssl
-EXTRA_PATCHES+=	${FILESDIR}/extra-patch-aclocal.m4
 EXTRA_PATCHES+=	${FILESDIR}/extra-patch-ipsec-tools
 PLIST_FILES+=	include/racoon/openssl_compat.h
 .  endif

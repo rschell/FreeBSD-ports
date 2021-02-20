@@ -2,9 +2,10 @@
 # $FreeBSD$
 
 PORTNAME=	unit
-PORTVERSION=	1.14.0
+PORTVERSION=	1.21.0
+PORTREVISION=	4
 CATEGORIES=	www
-MASTER_SITES=	https://unit.nginx.org/download/
+MASTER_SITES?=	https://unit.nginx.org/download/
 
 MAINTAINER=	osa@FreeBSD.org
 COMMENT?=	Dynamic web application server
@@ -20,10 +21,20 @@ CPE_PRODUCT=	unit
 OPTIONS_DEFINE?=	\
 	DEBUG \
 	IPV6 \
+	SSL \
 	UNIXSOCK
-OPTIONS_DEFAULT?=UNIXSOCK
+OPTIONS_DEFAULT?=	IPV6 PCRE2 SSL UNIXSOCK
+
+OPTIONS_RADIO+=		REGEX
+OPTIONS_RADIO_REGEX=	NOPCRE PCRE PCRE2
 
 DEBUG_DESC=	Enable debug logging
+DEVKIT_DESC=	Install headers and library
+REGEX_DESC=	Support regular expressions
+NOPCRE_DESC=	No support for Regular Expressions
+PCRE_DESC=	Regular Expressions via devel/pcre
+PCRE2_DESC=	Regular Expressions via devel/pcre2
+SSL_DESC=	Enable SSL/TLS
 UNIXSOCK_DESC=	Enable unix sockets
 
 .include <bsd.port.options.mk>
@@ -31,27 +42,38 @@ UNIXSOCK_DESC=	Enable unix sockets
 HAS_CONFIGURE=	yes
 
 UNIT_VARDIR?=	/var
-UNIT_RUNDIR?=	${UNIT_VARDIR}/run/unit
 UNIT_LOGDIR?=	${UNIT_VARDIR}/log/${PORTNAME}
 UNIT_LOGFILE?=	${UNIT_LOGDIR}/${PORTNAME}.log
 UNIT_PIDFILE?=	${UNIT_RUNDIR}/${PORTNAME}.pid
+UNIT_RUNDIR?=	${UNIT_VARDIR}/run/unit
 UNIT_SOCK?=	${UNIT_RUNDIR}/control.unit.sock
+UNIT_TMPDIR?=	${UNIT_VARDIR}/tmp/unit
 
 CONFIGURE_ARGS=	--prefix=${PREFIX} \
-		--modules=libexec/unit/modules \
-		--state=libexec/unit \
+		--ld-opt="-L${LOCALBASE}/lib" \
 		--log=${UNIT_LOGFILE} \
+		--modules=libexec/unit/modules \
 		--pid=${UNIT_PIDFILE} \
-		--ld-opt="-L${LOCALBASE}/lib"
+		--state=libexec/unit \
+		--tmp=${UNIT_TMPDIR} \
+		--user=${WWWOWN} --group=${WWWGRP}
 
-PLIST_FILES?=	sbin/unitd
+USERS?=	${WWWOWN}
+GROUPS?=${WWWGRP}
+
+ALL_TARGET=
+
 PLIST_DIRS?=	libexec/unit/modules \
 		libexec/unit
+PLIST_FILES?=	sbin/unitd
 
 USE_RC_SUBR?=	unitd
-SUB_LIST=	UNIT_PIDFILE=${UNIT_PIDFILE} \
+SUB_LIST=	PREFIX=${PREFIX} \
+		UNIT_PIDFILE=${UNIT_PIDFILE} \
 		UNIT_SOCK=${UNIT_SOCK} \
-		PREFIX=${PREFIX}
+		UNIT_TMPDIR=${UNIT_TMPDIR} \
+		WWWOWN=${WWWOWN} \
+		WWWGRP=${WWWGRP}
 
 .if ${PORT_OPTIONS:MDEBUG}
 CONFIGURE_ARGS+=--debug
@@ -59,6 +81,24 @@ CONFIGURE_ARGS+=--debug
 
 .if empty(PORT_OPTIONS:MIPV6)
 CONFIGURE_ARGS+=--no-ipv6
+.endif
+
+.if ${PORT_OPTIONS:MNOPCRE}
+CONFIGURE_ARGS+=--no-regex
+.endif
+
+.if ${PORT_OPTIONS:MPCRE}
+CONFIGURE_ARGS+=--no-pcre2
+LIB_DEPENDS+=	libpcre.so:devel/pcre
+.endif
+
+.if ${PORT_OPTIONS:MPCRE2}
+LIB_DEPENDS+=	libpcre2-8.so:devel/pcre2
+.endif
+
+.if ${PORT_OPTIONS:MSSL}
+CONFIGURE_ARGS+=--openssl
+USES+=		ssl
 .endif
 
 .if empty(PORT_OPTIONS:MUNIXSOCK)
@@ -71,8 +111,10 @@ CONFIGURE_ARGS+=--control=unix:${UNIT_SOCK}
 post-install:
 	${MKDIR} ${STAGEDIR}${UNIT_LOGDIR}
 	${MKDIR} ${STAGEDIR}${UNIT_RUNDIR}
+	${MKDIR} ${STAGEDIR}${UNIT_TMPDIR}
 	${ECHO_CMD} @dir ${UNIT_LOGDIR} >> ${TMPPLIST}
 	${ECHO_CMD} @dir ${UNIT_RUNDIR} >> ${TMPPLIST}
+	${ECHO_CMD} @dir ${UNIT_TMPDIR} >> ${TMPPLIST}
 	${MKDIR} ${STAGEDIR}${PREFIX}/libexec/unit/modules
 .endif
 

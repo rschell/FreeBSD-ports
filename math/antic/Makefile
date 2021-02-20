@@ -1,7 +1,9 @@
 # $FreeBSD$
 
 PORTNAME=	antic
-DISTVERSION=	g20190211
+DISTVERSIONPREFIX=	v
+DISTVERSION=	0.2.3
+PORTEPOCH=	1
 CATEGORIES=	math
 
 MAINTAINER=	yuri@FreeBSD.org
@@ -17,10 +19,10 @@ LIB_DEPENDS=	libflint.so:math/flint2 \
 USES=		gmake
 GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--disable-static
+USE_LDCONFIG=	yes
+
 USE_GITHUB=	yes
 GH_ACCOUNT=	wbhart
-GH_TAGNAME=	6f99431
-USE_LDCONFIG=	yes
 
 PLIST_FILES=	include/antic/nf.h \
 		include/antic/nf_elem.h \

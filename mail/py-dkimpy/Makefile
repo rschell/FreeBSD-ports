@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	dkimpy
-DISTVERSION=	0.9.4
+DISTVERSION=	1.0.5
 CATEGORIES=	mail python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -17,8 +17,8 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}authres>=0:mail/py-authres@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}dnspython>=0:dns/py-dnspython@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}pynacl>=0:security/py-pynacl@${PY_FLAVOR}
 
-USES=		python
-USE_PYTHON=	distutils autoplist concurrent
+USES=		python:3.6+
+USE_PYTHON=	autoplist concurrent distutils
 NO_ARCH=	yes
 
 .include <bsd.port.mk>

@@ -2,7 +2,8 @@
 # $FreeBSD$
 
 PORTNAME?=	gimp-app
-PORTVERSION=	2.10.14
+PORTVERSION=	2.10.20
+PORTREVISION=	14
 PORTEPOCH?=	1
 CATEGORIES?=	graphics gnome
 MASTER_SITES=	GIMP/gimp/v${PORTVERSION:R}
@@ -40,6 +41,8 @@ LIB_DEPENDS+=	libjson-glib-1.0.so:devel/json-glib \
 LIB_DEPENDS_aarch64=	libunwind.so:devel/libunwind
 LIB_DEPENDS_amd64=	libunwind.so:devel/libunwind
 LIB_DEPENDS_i386=	libunwind.so:devel/libunwind
+LIB_DEPENDS_powerpc64=		libunwind.so:devel/libunwind
+LIB_DEPENDS_powerpc64le=	libunwind.so:devel/libunwind
 
 GNU_CONFIGURE=	yes
 USES+=		compiler:c++14-lang cpe gettext gmake gnome jpeg libtool \
@@ -54,6 +57,7 @@ TEST_TARGET=	check
 TEST_ENV=	XAUTHORITY=${HOME}/.Xauthority
 .endif
 CONFIGURE_ARGS?=--with-html-dir=${PREFIX}/share/doc/gimp \
+		--with-bug-report-url="https://bugs.freebsd.org/" \
 		--disable-gtk-doc \
 		--without-linux-input \
 		--with-print \

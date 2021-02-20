@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	artifacts
-PORTVERSION=	20190320
-PORTREVISION=	1
+PORTVERSION=	20201106
 CATEGORIES=	security python
 MASTER_SITES=	CHEESESHOP \
 		https://github.com/ForensicArtifacts/artifacts/releases/download/${PORTVERSION}/
@@ -19,7 +18,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}yaml>=3.11:devel/py-yaml@${PY_FLAVOR}
 TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}mock>=0:devel/py-mock@${PY_FLAVOR}
 
 NO_ARCH=	yes
-USES=		python
+USES=		python:3.5+
 USE_LOCALE=	en_US.UTF-8
 USE_PYTHON=	distutils autoplist concurrent
 DO_MAKE_TEST=	${SETENV} ${TEST_ENV} ${PYTHON_CMD}

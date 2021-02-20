@@ -2,14 +2,14 @@
 # $FreeBSD$
 
 PORTNAME=	gtk
-PORTVERSION=	2.24.32		# sync with graphics/gtk-update-icon-cache
+PORTVERSION=	2.24.33		# sync with graphics/gtk-update-icon-cache
 CATEGORIES=	x11-toolkits
 MASTER_SITES=	GNOME/sources/gtk+/${PORTVERSION:C/^([0-9]+\.[0-9]+).*/\1/}
 PKGNAMESUFFIX=	2
 DISTNAME=	gtk+-${PORTVERSION}
 DIST_SUBDIR=	gnome2
 
-MAINTAINER=	gnome@FreeBSD.org
+MAINTAINER=	desktop@FreeBSD.org
 COMMENT=	Gimp Toolkit for X11 GUI (previous stable version)
 
 LICENSE=	LGPL20
@@ -17,8 +17,6 @@ LICENSE=	LGPL20
 USES=		tar:xz
 
 PORTSCOUT=	limitw:0,even
-
-.if !defined(REFERENCE_PORT)
 
 RUN_DEPENDS+=	update-mime-database:misc/shared-mime-info \
 		${LOCALBASE}/share/icons/hicolor/index.theme:misc/hicolor-icon-theme
@@ -45,7 +43,7 @@ CUPS_CONFIGURE_ON=	--enable-cups=auto
 CUPS_CONFIGURE_OFF=	--disable-cups
 DEBUG_CONFIGURE_ON=	--enable-debug=yes
 
-PLIST_SUB+=	LIBGAILVER=18.0.1 LIBGVER=0.2400.32
+PLIST_SUB+=	LIBGAILVER=18.0.1 LIBGVER=0.2400.33
 
 post-patch:
 	@${REINPLACE_CMD} -e 's|[{]libdir[}]/locale|{datadir}/locale|g' \
@@ -67,5 +65,3 @@ post-install:
 	@${MKDIR} ${STAGEDIR}${PREFIX}/lib/gtk-2.0/${GTK2_VERSION}/modules
 
 .include <bsd.port.mk>
-
-.endif

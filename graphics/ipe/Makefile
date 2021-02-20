@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	ipe
-PORTVERSION=	7.2.13
+PORTVERSION=	7.2.21
 DISTVERSIONSUFFIX=	-src
 CATEGORIES=	graphics
 MASTER_SITES=	https://dl.bintray.com/otfried/generic/ipe/${PORTVERSION:R}/
@@ -13,15 +13,18 @@ COMMENT=	Extensible vector graphics editor with LaTeX support
 LICENSE=	GPLv3+
 
 RUN_DEPENDS=	xdg-open:devel/xdg-utils
-LIB_DEPENDS=	libpng.so:graphics/png \
-		libfreetype.so:print/freetype2
+LIB_DEPENDS=	libcurl.so:ftp/curl \
+		libfreetype.so:print/freetype2 \
+		libgsl.so:math/gsl \
+		libpng.so:graphics/png
 
-USES=		compiler:c++11-lib gmake gnome jpeg lua:52 pkgconfig qt:5
+USES=		compiler:c++11-lib gmake gnome jpeg lua:52 pkgconfig shebangfix qt:5
 USE_GNOME=	cairo
 USE_QT=		buildtools_build core gui qmake_build widgets
 USE_TEX=	pdftex
 
 WRKSRC=		${WRKDIR}/${PORTNAME}-${PORTVERSION}/src
+SHEBANG_FILES=	${WRKSRC}/ipecurl/ipecurl.sh
 
 MAKE_ENV=	DL_LIBS="" \
 		INSTALL_DIR="${MKDIR}" \
@@ -47,9 +50,6 @@ DESKTOP_ENTRIES="Ipe" "" "ipe" "ipe" "" ""
 OPTIONS_DEFINE=	DOCS
 
 post-patch:
-	@${REINPLACE_CMD} -e \
-		's|^INSTALL_|#INSTALL_| ; \
-		 /-O2/s|^|#|' ${WRKSRC}/common.mak
 	@${REINPLACE_CMD} -e \
 		's|\([[:blank:]]\)=|\1?=|' ${WRKSRC}/config.mak
 

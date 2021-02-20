@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	ncclient
-DISTVERSION=	0.6.6
+DISTVERSION=	0.6.7
 CATEGORIES=	net-mgmt python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -18,7 +18,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}lxml>=3.3.0:devel/py-lxml@${PY_FLAVOR} \
 
 py27_RUN_DEPENDS+=	${PYTHON_PKGNAMEPREFIX}selectors2>=2.0.1:devel/py-selectors2@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils autoplist
 
 NO_ARCH=	yes

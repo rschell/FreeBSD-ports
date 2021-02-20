@@ -1,10 +1,10 @@
 # $FreeBSD$
 
 PORTNAME=	plata-theme
-PORTVERSION=	0.9.1
+PORTVERSION=	0.9.9
 CATEGORIES=	x11-themes
 
-MAINTAINER=	tagattie@yandex.com
+MAINTAINER=	tagattie@FreeBSD.org
 COMMENT=	Gtk theme based on Material Design Refresh
 
 LICENSE=	GPLv2 CC-BY-SA-4.0
@@ -22,9 +22,8 @@ USES=		autoreconf gmake gnome pkgconfig shebangfix
 USE_GNOME=	gdkpixbuf2 gtk30 libxml2
 
 USE_GITLAB=	yes
-GL_SITE=	https://gitlab.com
 GL_ACCOUNT=	tista500
-GL_COMMIT=	71dbbc322e278b6a0f837733f76a089b7773d34a
+GL_COMMIT=	1dd0953f1d6a35777388d39f46e2428c038042be
 
 NO_ARCH=	yes
 

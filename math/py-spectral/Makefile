@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	spectral
-DISTVERSION=	0.20
+DISTVERSION=	0.22.1
 CATEGORIES=	math
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -14,8 +14,9 @@ LICENSE_FILE=	${WRKSRC}/LICENSE.txt
 
 RUN_DEPENDS=	${PYNUMPY}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils autoplist
+
 NO_ARCH=	yes
 
 .include <bsd.port.mk>

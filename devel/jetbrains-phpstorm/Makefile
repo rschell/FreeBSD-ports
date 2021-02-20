@@ -2,14 +2,14 @@
 # $FreeBSD$
 
 PORTNAME=	phpstorm
-PORTVERSION=	2019.3.1
+PORTVERSION=	2020.2.4
 CATEGORIES=	devel java
 MASTER_SITES=	https://download-cf.jetbrains.com/webide/
 PKGNAMEPREFIX=	jetbrains-
 DISTNAME=	PhpStorm-${PORTVERSION}
 DIST_SUBDIR=	jetbrains
 
-MAINTAINER=	pfg@FreeBSD.org
+MAINTAINER=	dmitry.wagin@ya.ru
 COMMENT=	JetBrains PhpStorm IDE
 
 LICENSE=	IntelliJ-PhpStorm
@@ -17,7 +17,8 @@ LICENSE_NAME=	Subscription license agreement for business and organizations
 LICENSE_TEXT=	See: https://www.jetbrains.com/store/license.html
 LICENSE_PERMS=	dist-mirror pkg-mirror auto-accept
 
-RUN_DEPENDS=	intellij-fsnotifier>0:java/intellij-fsnotifier
+RUN_DEPENDS=	intellij-fsnotifier>0:java/intellij-fsnotifier \
+		lsof:sysutils/lsof
 
 USES=		python:run shebangfix
 
@@ -28,10 +29,9 @@ SHEBANG_FILES=	bin/printenv.py bin/restart.py
 
 NO_ARCH=	yes
 NO_BUILD=	yes
-
-WRKSRC=		${WRKDIR}/PhpStorm-193.5662.63
-
 SUB_FILES=	phpstorm phpstorm.desktop pkg-message
+
+WRKSRC=		${WRKDIR}/PhpStorm-202.8194.11
 
 do-install:
 # Linux/Windows/OS X only so remove them

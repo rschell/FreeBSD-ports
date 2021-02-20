@@ -3,7 +3,7 @@
 # pfSense-upgrade
 #
 # part of pfSense (https://www.pfsense.org)
-# Copyright (c) 2015-2016 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2015-2021 Rubicon Communications, LLC (Netgate)
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,7 +80,6 @@ _exec() {
 		_echo ""
 		# Ref. https://stackoverflow.com/a/30658405
 		exec 4>&1
-		# Silence annoying pkg message of Major OS upgrade
 		# XXX locked packages message should be printed on stderr by pkg
 		local _result=$( \
 		    { { ${_cmd} 2>&1 3>&-; printf $? 1>&3; } 4>&- \
@@ -90,7 +89,6 @@ _exec() {
 	else
 		# Ref. https://stackoverflow.com/a/30658405
 		exec 4>&1
-		# Silence annoying pkg message of Major OS upgrade
 		# XXX locked packages message should be printed on stderr by pkg
 		local _result=$( \
 		    { { ${_cmd} >${_stdout} 2>&1 3>&-; printf $? 1>&3; } 4>&- \
@@ -181,11 +179,8 @@ fetch_upgrade_packages() {
 	pkg_with_pb "upgrade -F" "Downloading upgrade packages"
 
 	# Workaround for pkg bug https://github.com/freebsd/pkg/issues/1613
-	if pkg-static upgrade -Unq 2>&1 | \
-	    sed '/ will be affected/,/ be REINSTALLED:/ {; d; };' | \
-	    egrep -q '^[[:blank:]]*pkg-[0-9]'; then
-		pkg_with_pb "upgrade -fF pkg" "Downloading pkg"
-	fi
+	# *ALWAYS* download pkg itself to avoid being bitten by it again
+	pkg_with_pb "fetch -yU pkg" "Downloading pkg"
 }
 
 pkg_lock() {
@@ -254,18 +249,16 @@ abi_setup() {
 	local _freebsd_version=$(uname -r)
 	local _pkg_repo_conf="/usr/local/etc/pkg/repos/${product}.conf"
 
-	local _arch=$(uname -p)
-
-	CUR_ABI="FreeBSD:${_freebsd_version%%.*}:${_arch}"
+	CUR_ABI="FreeBSD:${_freebsd_version%%.*}:${arch}"
 	CUR_ALTABI="freebsd:${_freebsd_version%%.*}"
 
-	if [ "${_arch}" = "armv6" ]; then
-		CUR_ALTABI="${CUR_ALTABI}:${_arch}:32:el:eabi:hardfp"
-	elif [ "${_arch}" = "armv7" ]; then
-		CUR_ALTABI="${CUR_ALTABI}:${_arch}:32:el:eabi:softfp"
-	elif [ "${_arch}" = "aarch64" ]; then
-		CUR_ALTABI="${CUR_ALTABI}:${_arch}:64"
-	elif [ "${_arch}" = "i386" ]; then
+	if [ "${arch}" = "armv6" ]; then
+		CUR_ALTABI="${CUR_ALTABI}:${arch}:32:el:eabi:hardfp"
+	elif [ "${arch}" = "armv7" ]; then
+		CUR_ALTABI="${CUR_ALTABI}:${arch}:32:el:eabi:softfp"
+	elif [ "${arch}" = "aarch64" ]; then
+		CUR_ALTABI="${CUR_ALTABI}:${arch}:64"
+	elif [ "${arch}" = "i386" ]; then
 		CUR_ALTABI="${CUR_ALTABI}:x86:32"
 	else
 		CUR_ALTABI="${CUR_ALTABI}:x86:64"
@@ -294,7 +287,7 @@ abi_setup() {
 	echo "ALTABI=${ALTABI}" >> /usr/local/etc/pkg.conf
 
 	# XXX Replace it by a function that detect thoth hardware
-	if [ "${_arch}" = "aarch64" ]; then
+	if [ "${arch}" = "aarch64" ]; then
 		cat << EOF >> /usr/local/etc/pkg.conf
 PKG_ENV {
 	OPENSSL_CONF=/etc/thoth/openssl.cnf
@@ -319,9 +312,44 @@ EOF
 	export CUR_ABI CUR_ALTABI ABI ALTABI NEW_MAJOR
 }
 
+get_pkg_repo_url() {
+	local _url=$(_pkg -vv 2>&1 | \
+	    sed -e "/^ *${product}: *{/,/^ *}/!d" \
+		-e '/^ *url *:/!d' \
+		-e 's/^[^"]*"\(.*\)".*/\1/')
+
+	local _srv=""
+	if [ "${_url##pkg+}" != "${_url}" ]; then
+		_srv=1
+		_url=${_url##pkg+}
+	fi
+
+	local _host=${_url##https://}
+	_host=${_host##http://}
+	_host=${_host%%/*}
+
+	if [ -n "${_srv}" ]; then
+		local _n=$(host -t SRV _https._tcp.${_host} 2>/dev/null | wc -l)
+		if [ ${_n} -eq 0 ]; then
+			return 1
+		fi
+
+		local _real_host=$(host -t SRV _https._tcp.${_host} \
+		    2>/dev/null | sed -e "$(jot -r 1 1 ${_n})!d" \
+		    -e 's/^.* //; s/\.$//')
+
+		_url=$(echo "${_url}" | sed "s,${_host},${_real_host},")
+	fi
+
+	echo "${_url}"
+}
+
 pkg_update() {
 	local _force=""
-	local _mute=""
+	local _mute="off"
+	local _do_not_bootstrap="${3}"
+
+	local _pkg_binary="/usr/sbin/pkg"
 
 	[ "${1}" = "force" ] \
 	    && _force=" -f"
@@ -336,7 +364,45 @@ pkg_update() {
 	abi_setup
 
 	_exec "pkg-static update${_force}" "Updating repositories metadata" \
-	    ${_mute}
+	    ${_mute} "" do_not_exit
+
+	if [ $? -ne 0 -a -z "${_do_not_bootstrap}" ]; then
+		# Since pkg version 1.13 it moved to use repository metadata
+		# version 2, which cannot be processed by older pkg binaries
+		#
+		# Detect if remote repository has a meta.conf file available,
+		# what indicates it is using meta version 2, and in this case
+		# force to bootstrap pkg on local system
+		local _ver=$(_pkg query %v pkg)
+		local _cmp=$(_pkg version -t ${_ver} "1.13")
+		if [ "${_cmp}" != "<" ]; then
+			return
+		fi
+
+		# Make fetch to work with thoth
+		local _fetch_env=""
+		local _fetch_args=""
+		if [ "${arch}" = "aarch64" ]; then
+			_fetch_env="env OPENSSL_CONF=/etc/thoth/openssl.cnf"
+			_fetch_args="--cert=/etc/thoth/device.pem"
+			_fetch_args="${_fetch_args} --key=/etc/thoth/key.pem"
+			_fetch_args="${_fetch_args} --ca-cert=/etc/thoth/ca.pem"
+			_pkg_binary="/usr/local/sbin/pkg-static"
+		fi
+
+		local _url=$(get_pkg_repo_url)
+		if [ $? -ne 0 ]; then
+			return
+		fi
+
+		${_fetch_env} fetch ${_fetch_args} -o /dev/null \
+		    ${_url}/meta.conf >/dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			_exec "${_pkg_binary} bootstrap -f" \
+			    "Bootstrap pkg due to meta version change"
+			pkg_update "${force}" "${_mute}" _do_not_bootstrap
+		fi
+	fi
 }
 
 pkg_upgrade_repo() {
@@ -350,18 +416,6 @@ pkg_upgrade_repo() {
 	fi
 
 	local _repo_pkg="${product}-repo"
-
-	# Deprecated pa
-	if is_pkg_installed ${product}-repo-devel; then
-		_exec "pkg-static set -A 1 ${product}-repo-devel" \
-		    "Scheduling package ${product}-repo-devel for removal"
-		_exec "pkg-static install${dont_update} ${_repo_pkg}" \
-		    "Installing ${_repo_pkg}" mute
-		_exec "pkg-static delete ${product}-repo-devel" \
-		    "Removing ${product}-repo-devel" mute ignore_result
-		validate_repo_conf
-		pkg_update force
-	fi
 
 	case "$(compare_pkg_version ${_repo_pkg})" in
 		"<")
@@ -421,6 +475,15 @@ pkg_set_origin() {
 		    | sed "s/${_source}/${_target}/g")
 		_origin_source=$(_pkg query %o ${_pkg_source})
 		_origin_target=$(_pkg rquery -U %o ${_pkg_target})
+
+		# Don't try to change it when target package is not present
+		# anymore
+		if [ -z "${_origin_target}" ]; then
+			_exec "pkg-static set -A 1 ${_pkg_source}" \
+			    "Scheduling package ${_pkg_source} for removal"
+			continue
+		fi
+
 		_exec "pkg-static set -o ${_origin_source}:${_origin_target} \
 		    ${_pkg_source}" \
 		    "Update origin ${_origin_source} -> ${_origin_target}" \
@@ -437,14 +500,16 @@ pkg_upgrade() {
 	export kernel_pkg=$(_pkg query %n $(_pkg info \
 	    ${product}-kernel-\* | grep -v -- -debug-))
 
-	local _arch=$(uname -p)
 	local _model=$(/bin/kenv -q smbios.system.product 2>/dev/null)
 
 	SYSTEM=""
-	if [ "${_model}" = "mvebu_armada-37xx" ]; then
+	if [ "${_model}" = "mvebu_armada-37xx" -o "${_model}" = "SG-2100" ]
+	then
 		_type=$(/usr/sbin/ofwdump -P model -R / 2>/dev/null)
 		if [ "${_type}" = "Netgate SG-1100" ]; then
 			SYSTEM="SG-1100"
+		elif [ "${_type}" = "Netgate SG-2100" ]; then
+			SYSTEM="SG-2100"
 		fi
 	fi
 
@@ -460,7 +525,8 @@ pkg_upgrade() {
 		export uboot_bin=u-boot.img
 		export \
 		    uboot_update=/usr/local/share/u-boot/ufw/u-boot-update.sh
-	elif is_pkg_installed ${product}-u-boot-sg1100\*; then
+	elif [ "${SYSTEM}" = "SG-1100" ] && \
+	    is_pkg_installed ${product}-u-boot-sg1100\*; then
 		export uboot_pkg=$(_pkg query %n $(_pkg info \
 		    ${product}-u-boot-sg1100\*))
 		export \
@@ -472,6 +538,12 @@ pkg_upgrade() {
 		export uboot_bin=u-boot.bin
 		export \
 		    uboot_update=/usr/local/share/u-boot/sg3100/u-boot-update.sh
+	elif [ "${SYSTEM}" = "SG-2100" ] && \
+	    is_pkg_installed ${product}-u-boot-sg2100\*; then
+		export uboot_pkg=$(_pkg query %n $(_pkg info \
+		    ${product}-u-boot-sg2100\*))
+		export \
+		    uboot_update=/usr/local/share/u-boot/sg2100/u-boot-update.sh
 	fi
 
 	if [ -n "${uboot_pkg}" -a -n "${uboot_mntp}" -a \
@@ -496,7 +568,6 @@ pkg_upgrade() {
 
 	export next_stage=$(_pkg annotate -q -S ${kernel_pkg} next_stage)
 	export is_pkg_locked=$(_pkg annotate -q -S ${kernel_pkg} new_major)
-	export new_major_php=$(_pkg annotate -q -S ${kernel_pkg} new_major_php)
 
 	if [ -n "${next_stage}" -a -n "${booting}" -a -n "${boot_stage}" ]; then
 		if [ ${boot_stage} != ${next_stage} ]; then
@@ -520,13 +591,22 @@ pkg_upgrade() {
 			rm -f ${logfile}
 		fi
 
-		pkg_update
+		pkg_update force
 
 		# Lock pkg to avoid having pkg binary for version N+1 installed
 		# on N
 		if [ -n "${NEW_MAJOR}" ]; then
 			pkg_lock pkg
 			unlock_pkg=1
+		fi
+
+		# Before 2.4.5, pfSense-repo used to depend of pfSense-upgrade
+		# and then it is upgraded to latest version in pkg_upgrade_repo
+		# call below.  Detect when a new version is available early on
+		# old versions and make it to exit returning code 99
+		local _new_pfsense_upgrade=""
+		if [ "$(compare_pkg_version ${product}-upgrade)" != "=" ]; then
+			_new_pfsense_upgrade=1
 		fi
 
 		pkg_upgrade_repo
@@ -538,6 +618,12 @@ pkg_upgrade() {
 			_exec "pkg-static upgrade${dont_update} -f \
 			    ${product}-upgrade" "Upgrading ${product}-upgrade" \
 			    mute
+			_exit 99
+		fi
+
+		# If a new version of pfSense-upgrade was detected early and
+		# was upgraded together with pfSense-repo, exit 99
+		if [ -n "${_new_pfsense_upgrade}" ]; then
 			_exit 99
 		fi
 
@@ -609,6 +695,21 @@ pkg_upgrade() {
 			fi
 		fi
 
+		# Detect the move from suricata to suricata4
+		if is_pkg_installed ${product}-pkg-suricata \
+		    && _pkg rquery -U %n ${product}-pkg-suricata4 \
+		    >/dev/null 2>&1; then
+			pkg_set_origin ${product}-pkg-suricata \
+			    ${product}-pkg-suricata4
+			pkg_set_origin suricata suricata4
+		elif is_pkg_installed ${product}-pkg-suricata4 \
+		    && _pkg rquery -U %n ${product}-pkg-suricata \
+		    >/dev/null 2>&1; then
+			pkg_set_origin ${product}-pkg-suricata4 \
+			    ${product}-pkg-suricata
+			pkg_set_origin suricata4 suricata
+		fi
+
 		# Help users to fix fstab before risk moving to FreeBSD 11
 		if grep -q -E '/dev/ad[[:digit:]]' /etc/fstab; then
 			_exec "/usr/local/sbin/ufslabels.sh commit" \
@@ -622,13 +723,6 @@ pkg_upgrade() {
 		if [ -n "${NEW_MAJOR}" ]; then
 			pkg_unlock pkg
 			unlock_pkg=""
-		fi
-
-		local _new_php_pkg=$(_pkg rquery -U %dn ${_meta_pkg} \
-		    | egrep '^php[0-9]{2}$')
-
-		if [ "${cur_php_pkg}" != "${_new_php_pkg}" ]; then
-			pkg_set_origin ${cur_php_pkg} ${_new_php_pkg}
 		fi
 
 		# Download all upgrade packages first
@@ -654,17 +748,6 @@ pkg_upgrade() {
 				[ -f /tmp/loader.rc.local ] \
 				    && cp /tmp/loader.rc.local /boot 2>/dev/null
 			fi
-			# Save a copy of loader.conf and restore after kernel
-			# upgrade if it is removed. There was a bug that added
-			# a static copy of loader.conf on amd64 kernel package
-			# for a period of time in 2.4.4-devel that lead users
-			# to have no loader.conf after upgrade, we want to
-			# workaround it
-			rm -f /tmp/loader.conf.backup
-			if [ "${_arch}" = "amd64" ] && \
-			    [ -s /boot/loader.conf ]; then
-				cp -fp /boot/loader.conf /tmp/loader.conf.backup
-			fi
 			# Force upgrade pfSense-rc together with kernel. It's
 			# failing for some reason on armv[67] even with the
 			# proper dependency version registered
@@ -672,11 +755,18 @@ pkg_upgrade() {
 				_exec "pkg-static upgrade -U ${product}-rc" \
 				    "Upgrading ${product}-rc"
 			fi
+			# In the past /boot/loader.conf was part of kernel pkg
+			# and now it's an orphan file.  Check if current
+			# installation has it registered on kernel pkg and make
+			# a copy to preserve file across upgrade process
+			local _restore_loaderconf=""
+			if _pkg which -q /boot/loader.conf; then
+				_restore_loaderconf=1
+				cp -fp /boot/loader.conf /tmp/loader.conf.backup
+			fi
 			_exec "pkg-static upgrade -U ${kernel_pkg}" \
 			    "Upgrading ${product} kernel"
-			if [ "${_arch}" = "amd64" ] && \
-			    [ -s /tmp/loader.conf.backup ] && \
-			    [ ! -s /boot/loader.conf ]; then
+			if [ -n "${_restore_loaderconf}" ]; then
 				cp -fp /tmp/loader.conf.backup /boot/loader.conf
 			fi
 			if [ "${SYSTEM}" = "SG-1100" ]; then
@@ -686,9 +776,19 @@ pkg_upgrade() {
 				cp /boot/dtb/armada-3720-sg1100.dtb /boot/msdos
 				umount /boot/msdos >/dev/null 2>&1
 			fi
+			if [ "${SYSTEM}" = "SG-2100" ]; then
+				# Mount /boot/msdos and update the DTB in FAT
+				# slice.
+				mount /boot/msdos >/dev/null 2>&1
+				cp /boot/dtb/armada-3720-sg2100.dtb /boot/msdos
+				umount /boot/msdos >/dev/null 2>&1
+			fi
 		fi
 
-		if [ -n "${uboot_pkg}" ] && upgrade_available ${uboot_pkg}; then
+		# Do not upgrade u-boot when a new FreeBSD major version is
+		# available.  It requires new kernel and base to be in place.
+		if [ -z "${NEW_MAJOR}" -a -n "${uboot_pkg}" ] &&
+		    upgrade_available ${uboot_pkg}; then
 			_exec "pkg-static upgrade -U ${uboot_pkg}" \
 			    "Upgrading ${product} u-boot"
 			if [ -n "${uboot_update}" -a -x ${uboot_update} ]; then
@@ -718,11 +818,6 @@ pkg_upgrade() {
 
 		_pkg annotate -q -M ${kernel_pkg} next_stage 2
 		next_stage=2
-
-		if [ "${cur_php_pkg}" != "${_new_php_pkg}" ]; then
-			_pkg annotate -q -M ${kernel_pkg} new_major_php \
-			    ${_new_php_pkg}
-		fi
 
 		do_reboot
 		_exit 0
@@ -758,6 +853,19 @@ pkg_upgrade() {
 				# Upgrade base packages using pkg-static
 				_exec "pkg-static upgrade -r ${product}-core" \
 				    "Upgrading necessary core packages"
+
+				# Update the U-boot at stage 2 if it was not
+				# updated at the first stage because of a
+				# $MAJOR update.
+				if [ -n "${uboot_pkg}" ] &&
+				    upgrade_available ${uboot_pkg}; then
+					_exec "pkg-static upgrade -U ${uboot_pkg}" \
+					    "Upgrading ${product} u-boot"
+					if [ -n "${uboot_update}" -a \
+					    -x ${uboot_update} ]; then
+						${uboot_update}
+					fi
+				fi
 
 				# Make sure PHP setup is fine
 				/etc/rc.php_ini_setup >/dev/null 2>&1
@@ -800,10 +908,6 @@ pkg_upgrade() {
 
 		# Cleanup a possible crash report created during PHP upgrade
 		rm -f /tmp/PHP_errors.log
-
-		if [ -n "${new_major_php}" ]; then
-			_pkg annotate -q -D ${kernel_pkg} new_major_php
-		fi
 
 		_pkg annotate -q -D ${kernel_pkg} next_stage
 
@@ -1054,11 +1158,12 @@ do_reboot() {
 		_msg="in ${reboot_after} seconds."
 	fi
 
+	local _complete="System is going to be upgraded"
 	if [ -z "${dont_reboot}" ]; then
-		_echo "Upgrade is complete.  Rebooting ${_msg}"
-		echo "Upgrade is complete.  Rebooting ${_msg}" | wall
+		_echo "${_complete}.  Rebooting ${_msg}"
+		echo "${_complete}.  Rebooting ${_msg}" | wall
 		/etc/rc.notify_message -e -m \
-		    "Upgrade is complete.  Rebooting ${_msg}" >/dev/null 2>&1
+		    "${_complete}.  Rebooting ${_msg}" >/dev/null 2>&1
 		if [ "${_now}" = "now" ]; then
 			/etc/rc.reboot ${reboot_params}
 		else
@@ -1145,7 +1250,7 @@ export pkg_prefix=$(php -n /usr/local/sbin/read_global_var pkg_prefix \
 export platform=$(cat /etc/platform)
 
 USE_MFS_TMPVAR=$(read_xml_tag.sh boolean system/use_mfs_tmpvar)
-if [ "${USE_MFS_TMPVAR}" = "true" ]; then
+if [ "${USE_MFS_TMPVAR}" = "true" -a ! -e /conf/ram_disks_failed ]; then
 	export PKG_DBDIR=/root/var/db/pkg
 	export PKG_CACHEDIR=/root/var/cache/pkg
 fi
@@ -1326,7 +1431,17 @@ if [ -e "${progress_file}" ]; then
 	rm -f ${progress_file}
 fi
 
+arch=$(uname -p)
+
+# Initialize the Thoth certificates on ARM64
+if [ "${arch}" = "aarch64" ]; then
+	/usr/local/bin/ping-auth.sh > /dev/null
+fi
+
 abi_setup
+
+# Set itself as vital to prevent users ending up without upgrade script
+set_vital_flag ${product}-upgrade
 
 # figure out which PHP major version is running
 cur_php_pkg=$(_pkg query -x %n '^php[0-9]{2}-[0-9]')

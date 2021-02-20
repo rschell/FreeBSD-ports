@@ -1,8 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	thonny
-PORTVERSION=	3.2.5
-CATEGORIES=	devel python
+PORTVERSION=	3.3.1
+CATEGORIES=	devel education python
 MASTER_SITES=	CHEESESHOP
 PKGNAMESUFFIX=	${PYTHON_PKGNAMESUFFIX}
 
@@ -19,9 +19,9 @@ RUN_DEPENDS=	pylint:devel/pylint \
 		${PYTHON_PKGNAMEPREFIX}mypy>=0.470:devel/py-mypy@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}mypy_extensions>=0.4.0:devel/py-mypy_extensions@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}pyperclip>=1.5.27:devel/py-pyperclip@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}serial>=3.2.1:comms/py-serial@${PY_FLAVOR}
+		${PYTHON_PKGNAMEPREFIX}pyserial>=3.2.1:comms/py-pyserial@${PY_FLAVOR}
 
-USES=		python:3.5+
+USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
 
 .include <bsd.port.mk>

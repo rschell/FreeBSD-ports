@@ -34,9 +34,11 @@ MANPAGES_BUILD_DEPENDS=	sphinx-build:textproc/py-sphinx
 MANPAGES_CONFIGURE_ON=	HAVE_SPHINX=1
 MANPAGES_INSTALL_TARGET=	install-man
 
+PORTSCOUT=	limit:^[0-9\.]*$$
+
 # fake ./configure to avoid unneeded dependencies
 do-configure:
-	@${CP} ${WRKSRC}/version ${WRKSRC}/version.stamp
+	@${CP} ${WRKSRC}/version.txt ${WRKSRC}/version.stamp
 	@${ECHO_CMD} 'quiet=$$($$(word 1, $$(1)))' > ${WRKSRC}/Makefile.local
 	@${PRINTF} \
 		'%s\n' \
@@ -55,6 +57,8 @@ do-configure:
 		WITH_EMACS=1 \
 		${CONFIGURE_ARGS} \
 		> ${WRKSRC}/Makefile.config
+	@${PRINTF} "tags.add('WITH_EMACS')\nrsti_dir = '${WRKSRC}/emacs'\n" \
+		> ${WRKSRC}/sphinx.config
 
 post-install:
 	@${GZIP_CMD} ${STAGEDIR}${PREFIX}/${EMACS_SITE_LISPDIR}/*.el

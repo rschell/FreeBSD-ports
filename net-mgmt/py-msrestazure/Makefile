@@ -2,12 +2,12 @@
 # $FreeBSD$
 
 PORTNAME=	msrestazure
-DISTVERSION=	0.6.2
+DISTVERSION=	0.6.3
 CATEGORIES=	net-mgmt python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=	dbn@FreeBSD.org
+MAINTAINER=	dbaio@FreeBSD.org
 COMMENT=	Azure-specific AutoRest swagger generator Python client runtime
 
 LICENSE=	MIT
@@ -15,7 +15,7 @@ LICENSE=	MIT
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}msrest>0.6.0:net-mgmt/py-msrest@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}adal>0.6.0:net-mgmt/py-adal@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
 
 NO_ARCH=	yes

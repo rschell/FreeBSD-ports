@@ -1,27 +1,32 @@
 # $FreeBSD$
 
-PORTNAME=	libfmt
+PORTNAME=	fmt
 # Make sure to check devel/spdlog consumers too
-DISTVERSION=	6.1.2
+PORTVERSION=	7.1.3
+MASTER_SITES=	https://github.com/fmtlib/fmt/releases/download/${PORTVERSION}/
 CATEGORIES=	devel
+PKGNAMEPREFIX=	lib
 
-MAINTAINER=	tobik@FreeBSD.org
+MAINTAINER=	sunpoet@FreeBSD.org
 COMMENT=	Formatting library for C++
 
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE.rst
 
-USES=		cmake compiler:c++11-lang
-USE_GITHUB=	yes
-GH_ACCOUNT=	fmtlib
-GH_PROJECT=	fmt
+USES=		cmake compiler:c++11-lang zip
+
 USE_LDCONFIG=	yes
 
 CMAKE_OFF=	FMT_DOC FMT_TEST
 CMAKE_ON=	BUILD_SHARED_LIBS
 
-PLIST_SUB=	SHL1=${PORTVERSION:R:R} \
-		SHL3=${PORTVERSION}
+PLIST_SUB=	PORTVERSION=${PORTVERSION}
+
+OPTIONS_DEFINE=	FULL_CACHE_DRAGONBOX
+OPTIONS_DEFAULT=FULL_CACHE_DRAGONBOX
+FULL_CACHE_DRAGONBOX_DESC=	Use larger binary size for better performance
+
+FULL_CACHE_DRAGONBOX_CXXFLAGS=	-DFMT_USE_FULL_CACHE_DRAGONBOX=1
 
 do-test:
 	@cd ${BUILD_WRKSRC} && \

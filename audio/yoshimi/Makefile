@@ -1,11 +1,10 @@
 # $FreeBSD$
 
 PORTNAME=	yoshimi
-DISTVERSION=	1.6.1
-PORTREVISION=	1
+DISTVERSION=	1.7.3
 CATEGORIES=	audio
 
-MAINTAINER=	tobik@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Sophisticated software synthesizer
 
 LICENSE=	GPLv2+
@@ -24,9 +23,13 @@ USES=		cmake compiler:c++11-lang gnome ncurses pkgconfig readline:port
 USE_GITHUB=	yes
 GH_ACCOUNT=	Yoshimi
 USE_GNOME=	cairo
+INSTALLS_ICONS=	yes
 
 CMAKE_SOURCE_PATH=	${WRKSRC}/src
 LDFLAGS+=		-Wl,--as-needed
+
+PORTDATA=	*
+PORTDOCS=	*
 
 OPTIONS_DEFINE=	DOCS
 

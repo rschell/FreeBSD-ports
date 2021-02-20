@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	solidity
-PORTVERSION=	0.6.0
+PORTVERSION=	0.8.0
 CATEGORIES=	lang
 MASTER_SITES=	https://github.com/ethereum/solidity/releases/download/v${PORTVERSION}/
 DISTNAME=	${PORTNAME}_${PORTVERSION}
@@ -21,7 +21,7 @@ LIB_DEPENDS=	libjsoncpp.so:devel/jsoncpp
 USES=		cmake compiler:c++14-lang
 
 OPTIONS_DEFINE=	Z3 CVC4
-OPTIONS_DEFAULT=CVC4
+OPTIONS_DEFAULT=Z3 CVC4
 Z3_DESC=	SMT Checker via Z3
 CVC4_DESC=	SMT Checker via CVC4
 Z3_LIB_DEPENDS=		libz3.so:math/z3
@@ -33,11 +33,13 @@ CMAKE_ARGS+=	-DUSE_LD_GOLD=OFF -DTESTS=OFF \
 		-DJSONCPP_INCLUDE_DIR:STRING="${LOCALBASE}/include/jsoncpp" \
 		-DJSONCPP_LIB_DIR:STRING="${LOCALBASE}/lib"
 
-PLIST_FILES=	bin/solc
+PLIST_FILES=	bin/solc \
+		bin/solidity-upgrade \
+		bin/yul-phaser
+
 
 pre-patch:
 		@${CP} ${FILESDIR}/jsoncpp.cmake ${WRKSRC}/cmake/
 		@${REINPLACE_CMD} '/EthCcache/d' ${WRKSRC}/CMakeLists.txt
-		@${REINPLACE_CMD} '/-Werror/d' ${WRKSRC}/cmake/EthCompilerSettings.cmake
 
 .include <bsd.port.mk>

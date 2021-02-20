@@ -2,7 +2,6 @@
 
 PORTNAME=	messagelib
 DISTVERSION=	${KDE_APPLICATIONS_VERSION}
-PORTREVISION=	1
 CATEGORIES=	net kde kde-applications
 
 MAINTAINER=	kde@FreeBSD.org
@@ -15,10 +14,9 @@ LIB_DEPENDS=	libassuan.so:security/libassuan \
 		libgpg-error.so:security/libgpg-error \
 		libgpgme.so:security/gpgme \
 		libgpgmepp.so:security/gpgme-cpp \
-		libqgpgme.so:security/gpgme-qt5 \
-		libqca-qt5.so:devel/qca
+		libqgpgme.so:security/gpgme-qt5
 
-USES=		cmake compiler:c++11-lib gettext grantlee:5 kde:5 qt:5 tar:xz
+USES=		cmake compiler:c++11-lib gettext grantlee:5 kde:5 qca qt:5 tar:xz
 USE_KDE=	archive auth bookmarks codecs completion config configwidgets \
 		coreaddons ecm i18n iconthemes imap itemmodels itemviews jobwidgets \
 		kdewebkit kio service solid sonnet syntaxhighlighting \
@@ -26,7 +24,7 @@ USE_KDE=	archive auth bookmarks codecs completion config configwidgets \
 # pim components
 USE_KDE+=	akonadi akonadicontacts akonadimime akonadisearch calendarcore \
 		contacts grantleetheme gravatar identitymanagement \
-		kdepim-apps-libs ldap libkdepim libkleo mailtransport mbox \
+		ldap libkdepim libkleo mailtransport mbox \
 		mime pimcommon pimtextedit
 USE_QT=		concurrent core dbus declarative gui location network printsupport testlib \
 		uitools webchannel webengine widgets xml \

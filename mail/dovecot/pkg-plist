@@ -1,3 +1,4 @@
+@postunexec echo "If you are removing dovecot permanently, you should 'rm -rf /var/db/dovecot' to clear out any remaining data."
 %%DATADIR%%/stopwords/stopwords_da.txt
 %%DATADIR%%/stopwords/stopwords_de.txt
 %%DATADIR%%/stopwords/stopwords_en.txt
@@ -36,10 +37,10 @@
 %%ETCDIR%%/example-config/conf.d/auth-sql.conf.ext
 %%ETCDIR%%/example-config/conf.d/auth-static.conf.ext
 %%ETCDIR%%/example-config/conf.d/auth-system.conf.ext
-%%ETCDIR%%/example-config/conf.d/auth-vpopmail.conf.ext
 %%ETCDIR%%/example-config/dovecot-dict-auth.conf.ext
 %%ETCDIR%%/example-config/dovecot-dict-sql.conf.ext
 %%ETCDIR%%/example-config/dovecot-ldap.conf.ext
+%%ETCDIR%%/example-config/dovecot-oauth2.conf.ext
 %%ETCDIR%%/example-config/dovecot-sql.conf.ext
 %%ETCDIR%%/example-config/dovecot.conf
 %%ETCDIR%%/README
@@ -49,7 +50,6 @@
 %%LDAP%%lib/dovecot/libdovecot-ldap.so.0
 %%LDAP%%lib/dovecot/libdovecot-ldap.so.0.0.0
 %%LIBWRAP%%libexec/dovecot/tcpwrap
-libexec/dovecot/health-check.sh
 %%LUA%%%%LUA_LIBDIR%%/dovecot/%%LUA_LIBDIR%%01_mail_lua_plugin.a
 %%LUA%%%%LUA_LIBDIR%%/dovecot/%%LUA_LIBDIR%%01_mail_lua_plugin.so
 %%LUA%%%%LUA_LIBDIR%%/dovecot/%%LUA_LIBDIR%%22_push_notification_lua_plugin.a
@@ -66,6 +66,7 @@ libexec/dovecot/health-check.sh
 %%SOLR%%lib/dovecot/lib21_fts_solr_plugin.so
 bin/doveadm
 bin/doveconf
+bin/dovecot-sysreport
 bin/dsync
 include/dovecot/access-lookup.h
 include/dovecot/acl-api-private.h
@@ -91,6 +92,7 @@ include/dovecot/auth-master-connection.h
 include/dovecot/auth-master.h
 include/dovecot/auth-penalty.h
 include/dovecot/auth-policy.h
+include/dovecot/auth-request-handler-private.h
 include/dovecot/auth-request-handler.h
 include/dovecot/auth-request-stats.h
 include/dovecot/auth-request-var-expand.h
@@ -162,6 +164,8 @@ include/dovecot/dsync-brain.h
 include/dovecot/dsync-ibc.h
 include/dovecot/eacces-error.h
 include/dovecot/env-util.h
+include/dovecot/event-filter-parser.h
+include/dovecot/event-filter-private.h
 include/dovecot/event-filter.h
 include/dovecot/event-log.h
 include/dovecot/execv-const.h
@@ -467,8 +471,10 @@ include/dovecot/mdbox-settings.h
 include/dovecot/mdbox-storage-rebuild.h
 include/dovecot/mdbox-storage.h
 include/dovecot/mdbox-sync.h
-include/dovecot/mech-otp-skey-common.h
+include/dovecot/mech-digest-md5-private.h
+include/dovecot/mech-otp-common.h
 include/dovecot/mech-plain-common.h
+include/dovecot/mech-scram.h
 include/dovecot/mech.h
 include/dovecot/memarea.h
 include/dovecot/mempool.h
@@ -512,6 +518,7 @@ include/dovecot/ostream-null.h
 include/dovecot/ostream-private.h
 include/dovecot/ostream-rawlog.h
 include/dovecot/ostream-unix.h
+include/dovecot/ostream-wrapper.h
 include/dovecot/ostream-zlib.h
 include/dovecot/ostream.h
 include/dovecot/passdb-blocking.h
@@ -632,6 +639,7 @@ include/dovecot/submission-settings.h
 include/dovecot/subscription-file.h
 include/dovecot/syslog-util.h
 include/dovecot/test-common.h
+include/dovecot/test-subprocess.h
 include/dovecot/time-util.h
 include/dovecot/unichar.h
 include/dovecot/unix-socket-create.h
@@ -640,7 +648,6 @@ include/dovecot/unlink-old-files.h
 include/dovecot/uri-util.h
 include/dovecot/userdb-blocking.h
 include/dovecot/userdb-template.h
-include/dovecot/userdb-vpopmail.h
 include/dovecot/userdb.h
 include/dovecot/utc-mktime.h
 include/dovecot/utc-offset.h
@@ -786,6 +793,7 @@ libexec/dovecot/dns-client
 libexec/dovecot/doveadm-server
 libexec/dovecot/dovecot-lda
 libexec/dovecot/gdbhelper
+libexec/dovecot/health-check.sh
 libexec/dovecot/imap
 libexec/dovecot/imap-hibernate
 libexec/dovecot/imap-login
@@ -855,9 +863,9 @@ man/man1/doveadm-who.1.gz
 man/man1/doveadm.1.gz
 man/man1/doveconf.1.gz
 man/man1/dovecot-lda.1.gz
+man/man1/dovecot-sysreport.1.gz
 man/man1/dovecot.1.gz
 man/man1/dsync.1.gz
 man/man7/doveadm-search-query.7.gz
 sbin/dovecot
 share/aclocal/dovecot.m4
-@postunexec echo "If you are removing dovecot permanently, you should 'rm -rf /var/db/dovecot' to clear out any remaining data."

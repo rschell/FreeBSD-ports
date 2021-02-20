@@ -1,7 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	puppet
-PORTVERSION=	6.11.1
+PORTVERSION=	6.19.1
+PORTREVISION=	1
 CATEGORIES=	sysutils
 PKGNAMESUFFIX=	6
 
@@ -11,21 +12,15 @@ COMMENT=	Configuration management framework written in Ruby
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-BROKEN_aarch64=		fails to install: Could not load facter; cannot install
-
-BUILD_DEPENDS=	facter>=3.0:sysutils/facter \
+RUN_DEPENDS=	rubygem-concurrent-ruby>=1.0:devel/rubygem-concurrent-ruby \
 		rubygem-deep_merge>=1.0:devel/rubygem-deep_merge \
-		rubygem-hiera>=2.0:sysutils/rubygem-hiera \
-		rubygem-json_pure>=0:devel/rubygem-json_pure \
-		rubygem-semantic_puppet>=1:devel/rubygem-semantic_puppet
-RUN_DEPENDS=	facter>=3.0:sysutils/facter \
-		rubygem-concurrent-ruby>0:devel/rubygem-concurrent-ruby \
-		rubygem-deep_merge>0:devel/rubygem-deep_merge \
-		rubygem-gettext-setup>=0:devel/rubygem-gettext-setup \
-		rubygem-hiera>=2.0:sysutils/rubygem-hiera \
-		rubygem-hocon>=0:devel/rubygem-hocon \
-		rubygem-json_pure>=0:devel/rubygem-json_pure \
-		rubygem-ruby-augeas>=0:textproc/rubygem-ruby-augeas \
+		rubygem-fast_gettext1>=1.1:devel/rubygem-fast_gettext1 \
+		rubygem-ffi>=1.9.24:devel/rubygem-ffi \
+		rubygem-hiera>=3.2.1:sysutils/rubygem-hiera \
+		rubygem-httpclient>=2.8:www/rubygem-httpclient \
+		rubygem-locale>=2.1:devel/rubygem-locale \
+		rubygem-multi_json>=1.10:devel/rubygem-multi_json \
+		rubygem-puppet-resource_api>=0:devel/rubygem-puppet-resource_api \
 		rubygem-semantic_puppet>=1:devel/rubygem-semantic_puppet
 
 USES=		cpe
@@ -33,7 +28,7 @@ CPE_VENDOR=	puppetlabs
 USE_GITHUB=	yes
 GH_ACCOUNT=	puppetlabs
 
-CONFLICTS_INSTALL=	puppet4-* puppet5-*
+CONFLICTS_INSTALL=	puppet5-* puppet7-*
 PLIST_SUB=	PORTVERSION="${PORTVERSION}"
 NO_ARCH=	yes
 NO_BUILD=	yes
@@ -47,6 +42,18 @@ SUB_FILES+=	pkg-message
 SUB_LIST=	RUBY=${RUBY}
 
 OPTIONS_DEFINE=		DOCS EXAMPLES
+OPTIONS_DEFAULT=	CFACTER
+OPTIONS_RADIO=		FACTER
+OPTIONS_RADIO_FACTER=	CFACTER RFACTER
+
+RFACTER_DESC=	Use facter 4.x (future facter, written in Ruby)
+CFACTER_DESC=	Use facter 3.x (written in C++)
+
+RFACTER_BUILD_DEPENDS=	rubygem-facter>=4.0:sysutils/rubygem-facter
+RFACTER_RUN_DEPENDS=	rubygem-facter>=4.0:sysutils/rubygem-facter
+
+CFACTER_BUILD_DEPENDS=	facter>=3.0:sysutils/facter
+CFACTER_RUN_DEPENDS=	facter>=3.0:sysutils/facter
 
 post-patch:
 	@${REINPLACE_CMD} -e "s|/etc/puppetlabs/puppet|${ETCDIR}|" \

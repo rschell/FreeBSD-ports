@@ -3,8 +3,7 @@
 
 PORTNAME=	google-perftools
 DISTVERSIONPREFIX=	gperftools-
-DISTVERSION=	2.7
-PORTREVISION=	1
+DISTVERSION=	2.8.1
 CATEGORIES=	devel
 MASTER_SITES=	https://github.com/gperftools/gperftools/releases/download/gperftools-${PORTVERSION}/
 DISTNAME=	gperftools-${PORTVERSION}
@@ -15,7 +14,8 @@ COMMENT=	Fast, multi-threaded malloc() and nifty performance analysis tools
 LICENSE=	BSD3CLAUSE
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-DOCSDIR=	${PREFIX}/share/doc/gperftools
+BROKEN_aarch64=		fails to compile: src/stacktrace.cc:230:2: Cannot calculate stack trace: will need to write for your environment
+BROKEN_riscv64=		fails to compile: src/base/basictypes.h:387:5: Could not determine cache line length - unknown architecture
 
 USES=		compiler:c11 gmake libtool
 GNU_CONFIGURE=	yes
@@ -24,7 +24,7 @@ TEST_TARGET=	check
 
 LIBS+=		-lexecinfo
 
-PLIST_SUB=	SHL3=4.5.3 SHL1=4
+DOCSDIR=	${PREFIX}/share/doc/gperftools
 
 OPTIONS_DEFINE=		DOCS
 OPTIONS_SINGLE=		PAGESIZE ALIGN

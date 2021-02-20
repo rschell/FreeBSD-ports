@@ -14,10 +14,14 @@ COMMENT=	GNU Compiler Collection for bare metal arm cross-development
 LICENSE=	GPLv3 GPLv3RLE
 LICENSE_COMB=	multi
 
+BROKEN_mips=		configure: error: cannot compute suffix of object files: cannot compile
+BROKEN_mips64=		configure: error: cannot compute suffix of object files: cannot compile
+
 LIB_DEPENDS=	libgmp.so:math/gmp \
 		libmpfr.so:math/mpfr \
 		libmpc.so:math/mpc
-BUILD_DEPENDS=	${BU_PREFIX}-as:devel/binutils@${PKGNAMEPREFIX:C/-$//:C/-/_/g}
+BUILD_DEPENDS=	${BU_PREFIX}-as:devel/binutils@${PKGNAMEPREFIX:C/-$//:C/-/_/g} \
+		objdump:devel/binutils
 RUN_DEPENDS=	${BU_PREFIX}-as:devel/binutils@${PKGNAMEPREFIX:C/-$//:C/-/_/g}
 
 USES=	compiler gmake iconv libtool makeinfo tar:bzip2
@@ -67,9 +71,5 @@ post-install:
 .if ${COMPILER_TYPE} == clang
 MAKE_ARGS+=	CXXFLAGS=-fbracket-depth=512
 .endif
-
-BROKEN_aarch64=		fails to package
-BROKEN_mips=		configure: error: cannot compute suffix of object files: cannot compile
-BROKEN_mips64=		configure: error: cannot compute suffix of object files: cannot compile
 
 .include <bsd.port.post.mk>

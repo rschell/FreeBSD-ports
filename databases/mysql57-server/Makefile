@@ -2,14 +2,14 @@
 # $FreeBSD$
 
 PORTNAME?=	mysql
-PORTVERSION=	5.7.28
-PORTREVISION=	2
+PORTVERSION=	5.7.33
+PORTREVISION?=	0
 CATEGORIES=	databases
 MASTER_SITES=	MYSQL/MySQL-5.7
 PKGNAMESUFFIX?=	57-server
 DISTNAME=	${PORTNAME}-boost-${PORTVERSION}
 
-MAINTAINER=	mmokhi@FreeBSD.org
+MAINTAINER=	joneum@FreeBSD.org
 COMMENT?=	Multithreaded SQL database (server)
 
 LICENSE=	GPLv2
@@ -18,7 +18,7 @@ WRKSRC=		${WRKDIR}/${PORTNAME}-${PORTVERSION}
 
 SLAVEDIRS=	databases/mysql57-client
 USES=		bison:build cmake:noninja compiler:c11 compiler:c++11-lib \
-		cpe libedit localbase perl5 shebangfix ssl
+		cpe groff:run libedit localbase perl5 shebangfix ssl
 
 USE_PERL5=	run
 
@@ -91,7 +91,7 @@ CONFLICTS_INSTALL=	mysql5[0-68-9]-server-* \
 
 USE_RC_SUBR=	mysql-server
 
-SUB_FILES=	my.cnf.sample
+SUB_FILES=	my.cnf.sample pkg-message
 
 USERS=		mysql
 GROUPS=		mysql
@@ -161,6 +161,17 @@ CMAKE_ARGS+=		-DWITH_SSL=${OPENSSLBASE}
 
 .if ${CHOSEN_COMPILER_TYPE} == gcc
 CXXFLAGS+=	-fpermissive
+.endif
+
+# mysql57-server fails to compile with llvm11, which was imported to current in r364284
+# without a version increase (1300109 = r364274).
+# Until a proper fix is provided, simply use llvm from ports, which probably could be
+# a backport of amongst other tings:
+# https://github.com/mysql/mysql-server/commit/08f46b3c00ee70e7ed7825daeb91df2289f80f50
+.if ${CHOSEN_COMPILER_TYPE} == clang && ${OPSYS} == FreeBSD && ${OSVERSION} >= 1300109
+BUILD_DEPENDS+=	clang${LLVM_DEFAULT}:devel/llvm${LLVM_DEFAULT}
+CC=		${LOCALBASE}/bin/clang${LLVM_DEFAULT}
+CXX=		${LOCALBASE}/bin/clang++${LLVM_DEFAULT}
 .endif
 
 post-extract:

@@ -2,9 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	mysqlwsrep
-PORTVERSION?=	5.7.28
+PORTVERSION?=	5.7.31
 DISTVERSIONPREFIX?=	wsrep_
-DISTVERSIONSUFFIX?=	-25.20
+DISTVERSIONSUFFIX?=	-25.23
 PORTREVISION?=	0
 CATEGORIES=	databases
 MASTER_SITES+=	SF/boost/boost/1.59.0:boost
@@ -17,8 +17,6 @@ COMMENT=	MySQL database enhanced with Galera replication (server package)
 LICENSE=	GPLv2
 
 RUN_DEPENDS=	bash:shells/bash \
-		lsof:sysutils/lsof \
-		netcat:net/netcat \
 		rsync:net/rsync \
 		socat:net/socat
 LIB_DEPENDS=	libevent.so:devel/libevent liblz4.so:archivers/liblz4
@@ -46,9 +44,6 @@ GH_TUPLE?=	codership:mysql-wsrep:${DISTVERSIONPREFIX}${PORTVERSION}${DISTVERSION
 DATADIR=	${PREFIX}/share/mysql
 ETCDIR=		${PREFIX}/etc/mysql
 
-NOT_FOR_ARCHS=	i386 aarch64 armv6 armv7 powerpc64
-NOT_FOR_ARCHS_REASON=	Not supported platform
-
 CMAKE_ARGS+=	-DINSTALL_LAYOUT=FREEBSD \
 		-DINSTALL_PKGCONFIGDIR="${LOCALBASE}/libdata/pkgconfig" \
 		-DINSTALL_DOCDIR="share/doc/mysql" \
@@ -61,7 +56,6 @@ CMAKE_ARGS+=	-DINSTALL_LAYOUT=FREEBSD \
 		-DINSTALL_MYSQLDATADIR="${MY_DBDIR}" \
 		-DINSTALL_MYSQLKEYRINGDIR="etc/mysql/keyring" \
 		-DINSTALL_MYSQLSHAREDIR="share/mysql" \
-		-DINSTALL_MYSQLTESTDIR="share/mysql/tests" \
 		-DINSTALL_PLUGINDIR="lib/mysql/plugin" \
 		-DINSTALL_SBINDIR="libexec" \
 		-DINSTALL_SCRIPTDIR="bin" \
@@ -105,6 +99,7 @@ SUB_FILES=	my.cnf.sample
 USERS=		mysql
 GROUPS=		mysql
 
+USE_CXXSTD=     c++11
 USE_LDCONFIG+=	${PREFIX}/lib/mysql/plugin
 
 MMAN1=		my_print_defaults.1 \
@@ -184,8 +179,17 @@ CMAKE_ARGS+=		-DWITH_SSL=${OPENSSLBASE}
 # Also MySQL code itself needs -Wno-c++11-narrowing when Clang 6 is used.
 .if ${OSVERSION} >= 1200056
 CFLAGS+=	-DLZ4_DISABLE_DEPRECATE_WARNINGS
-CXXFLAGS+=	-DLZ4_DISABLE_DEPRECATE_WARNINGS -Wno-c++11-narrowing
+CXXFLAGS+=	-DLZ4_DISABLE_DEPRECATE_WARNINGS
 LDFLAGS+=	-L${LOCALBASE}/lib
+.  if ${CHOSEN_COMPILER_TYPE} == clang
+CXXFLAGS+=	-Wno-c++11-narrowing
+.  endif
+.endif
+
+# Plugin innodb_memcached requires -fcommon to avoid duplicate symbol linker
+# error with llmv11.
+.if ${CHOSEN_COMPILER_TYPE} == clang && ${OPSYS} == FreeBSD && ${OSVERSION} >= 1300109
+CFLAGS+=	-fcommon
 .endif
 
 post-extract:
@@ -200,9 +204,5 @@ post-install:
 	${MKDIR} ${STAGEDIR}${ETCDIR}/keyring
 	${MKDIR} ${STAGEDIR}${MY_SECDIR}
 	${MKDIR} ${STAGEDIR}${MY_TMPDIR}
-
-.if ${ARCH} == armv6 || ${ARCH} == armv7
-EXTRA_PATCHES+=		${FILESDIR}/extra-patch-config.h.cmake
-.endif
 
 .include <bsd.port.post.mk>

@@ -4,7 +4,7 @@
 PORTNAME=	envoy
 PORTVERSION=	1.10.0
 DISTVERSIONPREFIX=	v
-PORTREVISION=	8
+PORTREVISION=	16
 CATEGORIES=	www
 
 MAINTAINER=	danfe@FreeBSD.org
@@ -13,13 +13,12 @@ COMMENT=	Edge and service proxy for cloud-native applications
 LICENSE=	APACHE20
 
 BROKEN_i386=	makes a lot of 64-bit assumptions (patches welcome)
-BROKEN_SSL=	base openssl openssl111 libressl libressl-devel
+BROKEN_SSL=	base openssl libressl libressl-devel
 BROKEN_SSL_REASON=	requires BoringSSL
 
 BUILD_DEPENDS=	${LOCALBASE}/include/absl/base/thread_annotations.h:devel/abseil \
 		${LOCALBASE}/include/fmt/format.h:devel/libfmt \
 		${LOCALBASE}/include/rapidjson/document.h:devel/rapidjson \
-		${LOCALBASE}/include/spdlog/spdlog.h:devel/spdlog \
 		${LOCALBASE}/include/tclap/CmdLine.h:devel/tclap
 LIB_DEPENDS=	libcircllhist.so:devel/libcircllhist \
 		libevent.so:devel/libevent \
@@ -30,7 +29,8 @@ LIB_DEPENDS=	libcircllhist.so:devel/libcircllhist \
 		libyaml-cpp.so:devel/yaml-cpp \
 		libcares.so:dns/c-ares \
 		libhttp_parser.so:www/http-parser \
-		libnghttp2.so:www/libnghttp2
+		libnghttp2.so:www/libnghttp2 \
+		libspdlog.so:devel/spdlog
 
 USES=		compiler:c++14-lang gmake ssl
 USE_GITHUB=	yes

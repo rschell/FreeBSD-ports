@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	pendulum
-PORTVERSION=	2.0.5
+PORTVERSION=	2.1.1
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -19,7 +19,7 @@ USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
 
 post-install:
-	@${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/pendulum/_extensions/_helpers.so
-	@${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/pendulum/parsing/_iso8601.so
+	@${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/pendulum/_extensions/_helpers*.so
+	@${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/pendulum/parsing/_iso8601*.so
 
 .include <bsd.port.mk>

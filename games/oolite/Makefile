@@ -1,9 +1,8 @@
-# Created by: Andriy Gapon <avg@icyb.net.ua>
 # $FreeBSD$
 
 PORTNAME=		oolite
 PORTVERSION=		1.88
-PORTREVISION=	1
+PORTREVISION=		2
 CATEGORIES=		games gnustep
 MASTER_SITES=		https://github.com/OoliteProject/oolite/releases/download/1.88/
 DISTNAME=		${PORTNAME}-source-${PORTVERSION}
@@ -11,9 +10,6 @@ DIST_SUBDIR=		oolite
 
 MAINTAINER=		ports@FreeBSD.org
 COMMENT=		Trade and combat space simulator, clone of Elite
-
-DEPRECATED=	Unmaintained, uses EOLed python27
-EXPIRATION_DATE=	2020-01-27
 
 LICENSE=		CC-BY-NC-SA-3.0 GPLv2 ZLIB
 LICENSE_COMB=		multi
@@ -27,13 +23,15 @@ LIB_DEPENDS=		libespeak.so:audio/espeak \
 			libpng.so:graphics/png \
 			libminizip.so:archivers/minizip
 
-USES=			gl gnustep openal:al perl5 python:2.7,build sdl \
+USES=			gl gnustep openal:al perl5 python:3.5+,build sdl \
 			tar:bzip2 xorg
 USE_CXXSTD=		gnu++98
 USE_GL=			gl glu
 USE_SDL=		sdl
 USE_XORG=		x11
 USE_GNUSTEP=		base build
+
+MAKE_ENV=		ac_cv_path_PYTHON=${PYTHON_CMD}
 # Redefine DO_MAKE_BUILD, because current gnustep in USES overrides MAKEFILE
 # without possibility to change it, as it was done in the previous implementation
 DO_MAKE_BUILD=		${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_FLAGS} Makefile ${_MAKE_JOBS} ${MAKE_ARGS:C,^${DESTDIRNAME}=.*,,g}

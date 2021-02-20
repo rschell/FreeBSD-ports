@@ -3,9 +3,9 @@
  * snort_rules.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2004-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2004-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2008-2009 Robert Zelaya
- * Copyright (c) 2019 Bill Meeks
+ * Copyright (c) 2021 Bill Meeks
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -931,7 +931,7 @@ elseif ($_POST['apply']) {
 	// Sync to configured CARP slaves if any are enabled
 	snort_sync_on_changes();
 
-	if (snort_is_running($if_real))
+	if (snort_is_running($a_rule[$id]['uuid']))
 		$savemsg = gettext("Snort is 'live-reloading' the new rule set.");
 }
 
@@ -994,7 +994,6 @@ $menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
 	$tab_array[] = array($menu_iface . gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
-	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Logs"), false, "/snort/snort_interface_logs.php?id={$id}");
 display_top_tabs($tab_array, true, 'nav nav-tabs');
@@ -1215,11 +1214,15 @@ print($section);
 
 								// Apply rule state filters if filtering is enabled
 								if ($filterrules) {
-									if (isset($filterfieldsarray['show_disabled']) && $v['disabled'] == 0) {
-										continue;
+									if (isset($filterfieldsarray['show_disabled'])) {
+										if (($v['disabled'] == 0 || isset($enablesid[$gid][$sid])) && !isset($disablesid[$gid][$sid])) {
+											continue;
+										}
 									}
-									elseif (isset($filterfieldsarray['show_enabled']) && $v['disabled'] == 1) {
-										continue;
+									if (isset($filterfieldsarray['show_enabled'])) {
+										if ($v['disabled'] == 1 || isset($disablesid[$gid][$sid])) {
+											continue;
+										}
 									}
 								}
 
@@ -1407,17 +1410,21 @@ print($section);
 								foreach ($rules_map as $k1 => $rulem) {
 									foreach ($rulem as $k2 => $v) {
 										$ruleset = $currentruleset;
-										$sid = snort_get_sid($v['rule']);
-										$gid = snort_get_gid($v['rule']);
+										$sid = $k2;
+										$gid = $k1;
 										$style = "";
 
 										// Apply rule state filters if filtering is enabled
 										if ($filterrules) {
-											if (isset($filterfieldsarray['show_disabled']) && $v['disabled'] == 0) {
-												continue;
+											if (isset($filterfieldsarray['show_disabled'])) {
+												if (($v['disabled'] == 0 || isset($enablesid[$gid][$sid])) && !isset($disablesid[$gid][$sid])) {
+													continue;
+												}
 											}
-											elseif (isset($filterfieldsarray['show_enabled']) && $v['disabled'] == 1) {
-												continue;
+											if (isset($filterfieldsarray['show_enabled'])) {
+												if ($v['disabled'] == 1 || isset($disablesid[$gid][$sid])) {
+													continue;
+												}
 											}
 										}
 

@@ -3,7 +3,7 @@
  * softflowd.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2013-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2013-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +55,9 @@ function sync_package_softflowd() {
 			}
 			if (is_numericint($cf['hoplimit'])) {
 				$start .= " -L " . escapeshellarg($cf['hoplimit']);
+			}
+			if (is_numericint($cf['sample']) && ($cf['sample'] > 0)) {
+				$start .= " -s " . escapeshellarg($cf['sample']);
 			}
 			if ($cf['version'] != "") {
 				$start .= " -v " . escapeshellarg($cf['version']);
@@ -116,7 +119,7 @@ function validate_form_softflowd($post, &$input_errors) {
 	if (!is_port($post['port'])) {
 		$input_errors[] = "You must specify a valid port number in the 'Port' field";
 	}
-	if (!in_array($post['version'], array(1, 5, 9, 10))) {
+	if (!in_array($post['version'], array(1, 5, 9, 10, 'psamp'))) {
 		$input_errors[] = 'You must specify a netflow version';
 	}
 	if (!in_array($post['flowtracking'], array("ether", "vlan", "full", "proto", "ip"))) {

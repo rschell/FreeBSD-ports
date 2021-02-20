@@ -2,15 +2,15 @@
 
 PORTNAME=	llvm
 PORTVERSION=	${LLVM_MAJOR}.0.d${SNAPDATE}
-PORTREVISION=	1
+PORTREVISION=	0
 CATEGORIES=	devel lang
 PKGNAMESUFFIX=	${LLVM_SUFFIX}
 
 MAINTAINER=	brooks@FreeBSD.org
-COMMENT=	LLVM and Clang with support for the CHERI architecture
+COMMENT?=	LLVM and Clang with support for the CHERI architecture
 
 LICENSE_DIR=	${WRKSRC}/llvm
-.include "${.CURDIR}/../llvm-devel/Makefile.LICENSE"
+.include "${.PARSEDIR}/../llvm-devel/Makefile.LICENSE"
 LICENSE:=       ${LICENSE:NARM}
 LICENSE+=	LLVM2
 LICENSE_FILE_LLVM2=	${LICENSE_DIR}/LICENSE.TXT
@@ -19,7 +19,6 @@ LICENSE_PERMS_LLVM2=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
 NOT_FOR_ARCHS=		i386 armv6 armv7 powerpc mips
 NOT_FOR_ARCHS_REASON=	No one will develop CHERI from 32-bit
-BROKEN_powerpc64=	Does not build
 
 LLVM_SUFFIX?=	-cheri
 LLVM_PREFIX=	${PREFIX}/llvm${LLVM_SUFFIX}
@@ -44,33 +43,33 @@ SHEBANG_FILES=	llvm/utils/lit/lit.py \
 SUB_FILES=	llvm-wrapper.sh
 SUB_LIST=	LLVM_PREFIX="${LLVM_PREFIX}" LLVM_SUFFIX="${LLVM_SUFFIX}"
 
-SUB_FILES+=	mips-cheri-clang.mk
-SUB_LIST+=	STACK_ALIGN=${STACK_ALIGN}
-STACK_ALIGN?=	-mstack-alignment=32
-
 CMAKE_INSTALL_PREFIX=	${LLVM_PREFIX}
 CMAKE_SOURCE_PATH=	${WRKSRC}/llvm
 CMAKE_ARGS+=	-DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON
-CMAKEARGS+=	-DLLVM_DEFAULT_TARGET_TRIPLE=cheri-unknown-freebsd
 CMAKE_ARGS+=	-DCMAKE_INSTALL_MANDIR:PATH="share/man"
 CMAKE_ARGS+=	-DLLVM_PARALLEL_LINK_JOBS=1
 CMAKE_ARGS+=	-DLLVM_ENABLE_Z3_SOLVER=OFF
+CMAKE_ARGS+=	-DLLVM_TARGETS_TO_BUILD="${LLVM_TARGETS}"
 
+.ifndef MASTERDIR
 USE_GITHUB=	yes
 GH_PROJECT=	llvm-project
 GH_ACCOUNT=	CTSRD-CHERI
 GH_TAGNAME=	${LLVM_COMMIT}
+.endif
 
-.include "Makefile.snapshot"
+.sinclude "${.CURDIR}/Makefile.snapshot"
 
 OPTIONS_DEFINE=	CLANG DOCS LIT LLD
 OPTIONS_DEFAULT=	CLANG LIT LLD
 OPTIONS_SUB=	yes
 
-CLANG_DESC=	Build clang
+CLANG_DESC=		Build clang
 CLANG_PORTDOCS=		clang
+PLIST_FILES+=		share/toolchains/llvm${LLVM_SUFFIX}.mk
+SUB_FILES+=		xtoolchain.mk
 CLANG_USE=		GNOME=libxml2
-DOCS_BUILD_DEPENDS=	sphinx-build-${PYTHON_VER}:textproc/py-sphinx@${PY_FLAVOR} \
+DOCS_BUILD_DEPENDS=	${PY_SPHINX} \
 			${PYTHON_PKGNAMEPREFIX}recommonmark>=0.0.20180530:textproc/py-recommonmark@${PY_FLAVOR}
 DOCS_CMAKE_ON=		-DLLVM_ENABLE_SPHINX=ON \
 			-DSPHINX_EXECUTABLE=${LOCALBASE}/bin/sphinx-build-${PYTHON_VER} \
@@ -82,8 +81,9 @@ LIT_DESC=		Install lit and FileCheck test tools
 LLD_DESC=		Install lld linker
 LLD_PORTDOCS=		lld
 LLDB_DESC=		Install lldb, the LLVM debugger (ignore on 9.x)
-LLDB_BUILD_DEPENDS=	swig3.0:devel/swig30
-LLDB_BINARY_ALIAS=	swig=swig3.0
+LLDB_BUILD_DEPENDS=	swig:devel/swig
+
+LLVM_TARGETS?=		AArch64;ARM;Mips;PowerPC;RISCV;X86
 
 PLIST_SUB+=	COMMAND_SUFFIX=${COMMAND_SUFFIX} \
 		LLVM_MAJOR=${LLVM_MAJOR} \
@@ -113,7 +113,9 @@ COMMANDS=	bugpoint \
 		llvm-dwp \
 		llvm-exegesis \
 		llvm-extract \
+		llvm-gsymutil \
 		llvm-ifs \
+		llvm-install-name-tool \
 		llvm-jitlink \
 		llvm-lib \
 		llvm-link \
@@ -122,6 +124,7 @@ COMMANDS=	bugpoint \
 		llvm-lto2 \
 		llvm-mc \
 		llvm-mca \
+		llvm-ml \
 		llvm-modextract \
 		llvm-mt \
 		llvm-nm \
@@ -167,7 +170,10 @@ COMMANDS+=	clang \
 		clang++ \
 		clang-check \
 		clang-cpp \
+		clang-extdef-mapping \
 		clang-format \
+		clang-offload-bundler \
+		clang-offload-wrapper \
 		clang-refactor \
 		clang-rename \
 		clang-scan-deps \
@@ -183,7 +189,7 @@ USES+=		gnome
 
 .if ${PORT_OPTIONS:MLIT}
 MAN1SRCS+=	lit.1 FileCheck.1
-_USES_PYTHON=	python:2.7
+_USES_PYTHON=	python:3.6+
 LIT_COMMANDS=	lit llvm-lit FileCheck
 .endif
 
@@ -200,14 +206,14 @@ COMMANDS+=	argdumper \
 		lldb \
 		lldb-mi \
 		lldb-server
-_USES_PYTHON=	python:2.7
+_USES_PYTHON=	python:3.6+
 .endif
 
 .if defined(LLVM_ENABLE_PROJECTS)
 CMAKE_ARGS+=	-DLLVM_ENABLE_PROJECTS="${LLVM_ENABLE_PROJECTS:ts;}"
 .endif
 
-_USES_PYTHON?=	python:2.7,build
+_USES_PYTHON?=	python:3.6+,build
 USES+=		${_USES_PYTHON}
 
 MAN1SRCS+=	bugpoint.1 \
@@ -251,23 +257,20 @@ MAN1SRCS+=	bugpoint.1 \
 
 .include <bsd.port.pre.mk>
 
-.if ${OPSYS} == FreeBSD && ${CHOSEN_COMPILER_TYPE} != clang
-# Evil hack around gcc48 not providing a usable c++11 environment on 9.x
-PLIST_SUB:=	${PLIST_SUB:NLLDB=*} LLDB="@comment "
-.endif
-
 post-patch:
 	${REINPLACE_CMD} -e 's|import lit|import lit${LLVM_SUFFIX}|' \
 	    -e 's|from lit|from lit${LLVM_SUFFIX}|' \
 	    -e 's|lit\.|lit${LLVM_SUFFIX}.|' \
 	    ${WRKSRC}/llvm/utils/lit/lit.py ${WRKSRC}/llvm/utils/lit/lit/*.py
-	${REINPLACE_CMD} -e 's,/usr/local/,${LOCALBASE}/,' \
-	    ${WRKSRC}/llvm/CMakeLists.txt
+
+post-patch-LLD-on:
+		${REINPLACE_CMD} -e "s|'indexsidebar.html'|['indexsidebar.html']|" \
+			${PATCH_WRKSRC}/lld/docs/conf.py
 
 post-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/toolchains/
-	${INSTALL_DATA} ${WRKDIR}/mips-cheri-clang.mk \
-	    ${STAGEDIR}${PREFIX}/share/toolchains/mips${LLVM_SUFFIX}-clang.mk
+	${INSTALL_DATA} ${WRKDIR}/xtoolchain.mk \
+	    ${STAGEDIR}${PREFIX}/share/toolchains/llvm${LLVM_SUFFIX}.mk
 	${INSTALL_SCRIPT} ${WRKDIR}/llvm-wrapper.sh \
 	    ${STAGEDIR}${PREFIX}/bin/${COMMAND_PREFIX}${FIRST_COMMAND}${COMMAND_SUFFIX}
 .for command in ${COMMANDS:C/^/XXXX/1:NXXXX*}
@@ -329,7 +332,6 @@ do-test:
 
 build-plist:
 	${RM} ${PLIST} ${PLIST}.tmp
-	${ECHO_CMD} share/toolchains/mips%%LLVM_SUFFIX%%-clang.mk >> ${PLIST}.tmp
 .for command in ${COMMANDS}
 	${ECHO_CMD} bin/${COMMAND_PREFIX}${command}%%COMMAND_SUFFIX%% >> ${PLIST}.tmp
 .endfor

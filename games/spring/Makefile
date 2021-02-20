@@ -14,6 +14,8 @@ COMMENT=	Project aiming to create a new and versatile RTS Engine
 
 LICENSE=	GPLv2
 
+BROKEN=		fails to build
+
 LIB_DEPENDS=	libfreetype.so:print/freetype2 \
 		libboost_thread.so:devel/boost-libs \
 		libIL.so:graphics/devil \
@@ -30,7 +32,6 @@ USE_SDL=	sdl2
 USE_GL=		gl glu glew
 USE_XORG=	x11 xcursor
 USE_LDCONFIG=	yes
-LLD_UNSAFE=	yes
 DOS2UNIX_GLOB=	*.h *.hpp *.cpp
 
 USES=		cmake:insource compiler:c++11-lib dos2unix gl openal:al sdl \

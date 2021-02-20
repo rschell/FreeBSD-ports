@@ -1,8 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	pdf2djvu
-PORTVERSION=	0.9.13
-PORTREVISION=	1
+DISTVERSION=	0.9.17.1
+PORTREVISION=	5
 CATEGORIES=	converters
 MASTER_SITES=	https://github.com/jwilk/${PORTNAME}/releases/download/${PORTVERSION}/
 
@@ -44,13 +44,16 @@ NLS_CONFIGURE_ENABLE=	nls
 NLS_USES=		gettext-runtime
 
 MULTITHREADING_CONFIGURE_ENABLE=openmp
-MULTITHREADING_LIB_DEPENDS=	libomp.so:devel/openmp
 
 XMP_CONFIGURE_ENABLE=	xmp
 XMP_LIB_DEPENDS=	libexiv2.so:graphics/exiv2
 
 pre-configure:
 	@cd ${WRKSRC} && ${SH} ${FILESDIR}/bootstrap
+	# Poppler 20.12 no longer installs the pc file for this private backend.
+	# https://github.com/jwilk/pdf2djvu/issues/144
+	${REINPLACE_CMD} -e 's|poppler-splash|poppler|g' ${WRKSRC}/configure
+
 
 post-build-DOCS-on:
 	@cd ${WRKSRC}/doc && ${GMAKE}

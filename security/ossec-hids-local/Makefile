@@ -8,6 +8,9 @@ OSSEC_TYPE?=	local
 
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
+BROKEN_aarch64=		fails to compile: rootcheck/os_string.c:186:20: use of undeclared identifier '__LDPGSZ'
+BROKEN_riscv64=		fails to compile: rootcheck/os_string.c:186:20: use of undeclared identifier '__LDPGSZ'
+
 USES=		compiler gmake ssl
 
 .if ${OSSEC_TYPE} == local
@@ -175,7 +178,7 @@ PLIST_SUB=	OSSEC_HOME=${PORTNAME}
 PLIST_SUB=	OSSEC_HOME=${OSSEC_HOME}
 .endif
 PLIST=		${PKGDIR}/pkg-plist-${OSSEC_TYPE}
-DOCSFILES=	BUGS CHANGELOG CONTRIBUTORS LICENSE README.md SUPPORT.md
+DOCSFILES=	BUGS CHANGELOG.md CONTRIBUTORS LICENSE README.md SUPPORT.md
 PKGHELP=	${PKGDIR}/pkg-help-${OSSEC_TYPE}
 PKGMESSAGE=	${WRKDIR}/pkg-message
 PKGMSG_FILES=	message-header

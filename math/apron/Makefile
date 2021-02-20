@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	apron
-DISTVERSION=	0.9.11
+DISTVERSION=	0.9.12
 DISTVERSIONSUFFIX=	.r${SVN_REVISION}
 CATEGORIES=	math
 
@@ -10,6 +10,8 @@ COMMENT=	APRON numerical abstract domain library
 
 LICENSE=	LGPL21
 LICENSE_FILE=	${WRKSRC}/COPYING
+
+BROKEN_aarch64=	ld: error: ../apron/libapron_debug.so: undefined reference to fpsetround
 
 FETCH_DEPENDS=	svn:devel/subversion
 LIB_DEPENDS=	libgmp.so:math/gmp \

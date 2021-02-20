@@ -6,9 +6,10 @@ PKGNAMEPREFIX=	ruby-
 MAINTAINER=	lev@FreeBSD.org
 COMMENT=	Ruby bindings for version control system
 
+USES+=		compiler:c11
 USE_RUBY=	yes
 
-PORTREVISION_113=	0
+PORTREVISION_114=	0
 PORTREVISION_LTS=	0
 
 SVN_BUILD_BINDINGS=	yes

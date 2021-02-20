@@ -1,6 +1,4 @@
 bin/parley
-etc/xdg/parley-themes.knsrc
-etc/xdg/parley.knsrc
 share/applications/org.kde.parley.desktop
 share/config.kcfg/documentsettings.kcfg
 share/config.kcfg/languagesettings.kcfg
@@ -81,6 +79,8 @@ share/icons/oxygen/scalable/actions/practice-start.svgz
 share/icons/oxygen/scalable/actions/remove-duplicates.svgz
 share/icons/oxygen/scalable/actions/set-language.svgz
 share/icons/oxygen/scalable/actions/specific-setup.svgz
+share/knsrcfiles/parley-themes.knsrc
+share/knsrcfiles/parley.knsrc
 share/kxmlgui5/parley/dashboardui.rc
 share/kxmlgui5/parley/editorui.rc
 share/kxmlgui5/parley/parleyui.rc
@@ -116,6 +116,7 @@ share/locale/he/LC_MESSAGES/parley.mo
 share/locale/hi/LC_MESSAGES/parley.mo
 share/locale/hr/LC_MESSAGES/parley.mo
 share/locale/hu/LC_MESSAGES/parley.mo
+share/locale/ia/LC_MESSAGES/parley.mo
 share/locale/is/LC_MESSAGES/parley.mo
 share/locale/it/LC_MESSAGES/parley.mo
 share/locale/ja/LC_MESSAGES/parley.mo

@@ -1,8 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	sendmail
-PORTVERSION=	8.15.2
-PORTREVISION=	20
+PORTVERSION=	8.16.1
+PORTREVISION=	2
 CATEGORIES=	mail
 MASTER_SITES=	ftp://ftp.sendmail.org/pub/sendmail/
 DISTNAME=	${PORTNAME}.${PORTVERSION}
@@ -46,15 +46,16 @@ SENDMAIL=	${PREFIX}/sbin/sendmail
 BASEMAIL=	/usr/libexec/sendmail/sendmail
 MILTER_SOVER?=	6
 
-OPTIONS_DEFINE?=	SHMEM SEM LA NIS IPV6 TLS SASL SASLAUTHD LDAP BDB \
-			GDBM SOCKETMAP CYRUSLOOKUP BLACKLISTD SMTPUTF8 \
+OPTIONS_DEFINE?=	SHMEM SEM LA NIS IPV6 TLS DANE SASL SASLAUTHD LDAP \
+			BDB GDBM SOCKETMAP CYRUSLOOKUP BLACKLISTD SMTPUTF8 \
 			PICKY_HELO_CHECK MILTER DOCS
-OPTIONS_DEFAULT?=	SHMEM SEM LA NIS TLS SASL SASLAUTHD BDB1 \
+OPTIONS_DEFAULT?=	SHMEM SEM LA NIS TLS DANE SASL SASLAUTHD BDB1 \
 			BLACKLISTD PICKY_HELO_CHECK MILTER
 NO_OPTIONS_SORT=yes
 SHMEM_DESC=		System V shared memory support
 LA_DESC=		load averages support
 TLS_DESC=		SMTP-TLS and SMTPS support
+DANE_DESC=		Enable DANE support
 SASLAUTHD_DESC=		SASLAUTHD support
 BDB_DESC=		Berkeley DB version 4+ support
 GDBM_DESC=		GNU dbm library support (option COMPAT needed)
@@ -67,8 +68,10 @@ SMTPUTF8_DESC=		Enable unicode address support
 
 TLS_USES=	ssl
 SASL_LIB_DEPENDS=	libsasl2.so:security/cyrus-sasl2
-SASLAUTHD_RUN_DEPENDS=	${LOCALBASE}/sbin/saslauthd:security/cyrus-sasl2-saslauthd
+SASLAUTHD_RUN_DEPENDS=	saslauthd:security/cyrus-sasl2-saslauthd
+DANE_IMPLIES=	TLS
 LDAP_USE=	OPENLDAP=yes
+LDAP_PREVENTS=	DANE
 BDB_USES=	bdb
 GDBM_LIB_DEPENDS=	libgdbm.so:databases/gdbm
 GDBM_CONFIGURE_WITH=	compat
@@ -106,9 +109,6 @@ IGNORE=		option CYRUSLOOKUP requires option SOCKETMAP
 EXTRA_PATCHES+=	${FILESDIR}/cyruslookup.patch
 .endif
 .endif
-.if ${PORT_OPTIONS:MSMTPUTF8}
-EXTRA_PATCHES+=	${FILESDIR}/smtputf8.patch
-.endif
 .if ${PORT_OPTIONS:MTLS}
 TLS_SUFFIX?=	+tls
 CONFLICTS+=	sendmail-ldap-8.* sendmail-sasl2-8.*
@@ -129,6 +129,9 @@ CONFLICTS+=	${CONFLICTS2}
 SITE+=	${FILESDIR}/site.config.m4
 .if ${PORT_OPTIONS:MIPV6}
 SITE+=	${FILESDIR}/site.config.m4.ipv6
+.endif
+.if ${PORT_OPTIONS:MDANE}
+SITE+=	${FILESDIR}/site.config.m4.dane
 .endif
 .if ${PORT_OPTIONS:MSASL}
 SITE+=	${FILESDIR}/site.config.m4.sasl2

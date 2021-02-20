@@ -2,8 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	vice
-PORTVERSION=	3.3
-PORTREVISION=	5
+PORTVERSION=	3.5
+PORTREVISION=	0
 CATEGORIES=	emulators
 MASTER_SITES=	SF/vice-emu/releases
 
@@ -12,9 +12,8 @@ COMMENT=	Emulator for Commodore C64, C128, VIC20, PET, and CBM-II
 
 LICENSE=	GPLv2
 
-BUILD_DEPENDS=	bdftopcf:x11-fonts/bdftopcf \
-		mkfontscale:x11-fonts/mkfontscale \
-		xa65:devel/xa65
+BUILD_DEPENDS=	xa65:devel/xa65 \
+		xdg-open:devel/xdg-utils
 LIB_DEPENDS=	libpng.so:graphics/png \
 		libgif.so:graphics/giflib \
 		libportaudio.so:audio/portaudio \
@@ -30,25 +29,23 @@ LIB_DEPENDS=	libpng.so:graphics/png \
 		libgnutls.so:security/gnutls
 
 RESTRICTED=	ROMs are copyrighted by Commodore Business Machines
-USES=		compiler:c++11-lang gettext gmake iconv:wchar_t jpeg \
-		localbase:ldflags makeinfo pkgconfig readline xorg
+USES=		compiler:c++11-lang pkgconfig makeinfo localbase:ldflags \
+		gmake iconv:wchar_t jpeg readline gettext xorg
 USE_XORG=	xpm ice sm xext xv xt x11 xmu xxf86vm
 USE_XORG+=	xrender xinerama xi xrandr xcursor xcomposite xdamage xfixes
 HAS_CONFIGURE=	yes
-MAKE_ENV+=	MAKEINFOFLAGS="--no-split"
+MAKE_ENV+=	MAKEINFOFLAGS="--no-split" \
+		XDG_DATA_DIRS=${STAGEDIR}/${PREFIX}/share
+CFLAGS+=	-fcommon
 CONFIGURE_ARGS+=	--enable-ipv6 \
 			--enable-external-ffmpeg \
-			--mandir="${PREFIX}/man" \
+			--enable-x64 \
+			--disable-realdevice \
+			--disable-pdf-docs \
 			--infodir="${PREFIX}/${INFO_PATH}" \
 			--localedir="${LOCALBASE}/share/locale" \
-			--disable-dependency-tracking
-
-LMLINKS=	vice.1 x64.1 \
-		vice.1 x128.1 \
-		vice.1 xvic.1 \
-		vice.1 xpet.1 \
-		vice.1 xplus4.1 \
-		vice.1 xcbm2.1
+			--disable-dependency-tracking \
+			DOS2UNIX=true
 
 OPTIONS_DEFINE=	SDLSOUND ALSA PULSEAUDIO DOCS
 OPTIONS_SINGLE=	GUI
@@ -60,10 +57,11 @@ GTK3UI_DESC=	use GTK3 user interface
 SDLUI2_DESC=	use SDL2 user interface
 SDLSOUND_DESC=	build with SDL2 sound system support
 
-GTK3UI_CONFIGURE_ENABLE=	native-gtk3ui
-GTK3UI_BUILD_DEPENDS=		${LOCALBASE}/bin/bash:shells/bash
+GTK3UI_USES=			desktop-file-utils
+GTK3UI_CONFIGURE_ENABLE=	native-gtk3ui desktop-files
+GTK3UI_BUILD_DEPENDS=		bash:shells/bash
 SDLUI2_USES=			sdl
-SDLUI2_USE=			SDL=sdl2
+SDLUI2_USE=			SDL=sdl2 SDL=image2
 SDLUI2_CONFIGURE_ENABLE=	sdlui2
 SDLSOUND_USES=			sdl
 SDLSOUND_USE=			SDL=sdl2
@@ -87,7 +85,7 @@ __pmlinks1!=	${ECHO_CMD} '${LMLINKS:S/    / /}' | ${AWK} \
 .if ${PORT_OPTIONS:MGTK3UI}
 USES+=		gnome gl
 USE_GNOME+=	gtk30 vte3 cairo gdkpixbuf2 pango
-USE_GL+=	glu gl
+USE_GL+=	glu gl glew
 .endif
 
 .if ${PORT_OPTIONS:MDOCS}
@@ -95,24 +93,12 @@ INFO+=		vice
 .endif
 
 pre-configure:
-	${REINPLACE_CMD} -e "s|%%PREFIX%%|${PREFIX}|g" \
-		${WRKSRC}/man/vice.1
 .if ! ${PORT_OPTIONS:MDOCS}
 	${REINPLACE_CMD} -e 's| doc||' ${WRKSRC}/Makefile.in
 .endif
 
-pre-install:
-	${MKDIR} ${STAGEDIR}${PREFIX}/lib/vice/fonts
-	${INSTALL_DATA} ${WRKSRC}/data/fonts/vice-cbm.bdf \
-		${STAGEDIR}${PREFIX}/lib/vice/fonts/
-
-pre-install-DOCS-on:
-	${MKDIR} ${STAGEDIR}${DOCSDIR}
-
-post-install:
-	( cd ${STAGEDIR}${PREFIX}/man/man1 && ${__pmlinks1} )
-
-post-install-DOCS-on:
-	${LN} -sf vice_toc.html ${STAGEDIR}${DOCSDIR}/index.html
+# workaround for xdg-desktop-menu
+pre-install-GTK3UI-on:
+	${MKDIR} ${STAGEDIR}/${PREFIX}/share/desktop-directories
 
 .include <bsd.port.mk>

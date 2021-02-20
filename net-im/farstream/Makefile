@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	farstream
-PORTVERSION=	0.2.8
-PORTREVISION=	1
+PORTVERSION=	0.2.9
 CATEGORIES=	net-im devel
 MASTER_SITES=	http://freedesktop.org/software/farstream/releases/farstream/
 
@@ -23,5 +22,10 @@ USE_GSTREAMER1=	good bad
 
 GNU_CONFIGURE=	yes
 INSTALL_TARGET=	install-strip
+MAKE_JOBS_UNSAFE=	yes
+
+post-patch:
+	@${FIND} ${WRKSRC} -name Makefile.in -exec ${REINPLACE_CMD} \
+		'/foreach/s/\\#include/#include/' {} +
 
 .include <bsd.port.mk>

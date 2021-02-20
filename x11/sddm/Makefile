@@ -1,9 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	sddm
-PORTVERSION=	0.17.0
+PORTVERSION=	0.19.0
 DISTVERSIONPREFIX=	v
-PORTREVISION=	8
 CATEGORIES=	x11
 
 MAINTAINER=	kde@FreeBSD.org
@@ -28,10 +27,10 @@ USE_QT=		core declarative dbus gui network \
 		buildtools_build linguisttools_build qmake_build
 USE_XORG=	xcb
 
+CMAKE_ON=	BUILD_MAN_PAGES
 CMAKE_ARGS=	-DUID_MIN=1000 \
 		-DUID_MAX=65000 \
 		-DCMAKE_INSTALL_SYSCONFDIR:PATH=${LOCALBASE}/etc \
-		-DBUILD_MAN_PAGES=ON \
 		-DRST2MAN_EXECUTABLE=${LOCALBASE}/bin/rst2man.py-${PYTHON_VER}
 
 USE_RC_SUBR=	sddm
@@ -39,10 +38,6 @@ SUB_FILES=	xinitrc.desktop
 
 USERS=		sddm
 GROUPS=		sddm
-
-# There are multiple patches that apply to Display.cpp,
-# fixing CVE-2018-14345 and backported from 0.18.
-EXTRA_PATCHES=	${PATCHDIR}/git-patch-147cec38d ${PATCHDIR}/git-patch-b02b00559
 
 post-patch:
 	@${REINPLACE_CMD} -e 's#/etc/X11#${LOCALBASE}/etc/X11#' \
@@ -52,8 +47,6 @@ post-patch:
 		${WRKSRC}/src/common/Configuration.h
 
 post-install:
-	${MV} ${STAGEDIR}${PREFIX}/etc/sddm.conf \
-		${STAGEDIR}${PREFIX}/etc/sddm.conf.sample
 # Install xsession.desktop to launch .xinitrc via sddm.
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/xsessions
 	${INSTALL_DATA} ${WRKDIR}/xinitrc.desktop ${STAGEDIR}${PREFIX}/share/xsessions

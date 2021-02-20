@@ -2,7 +2,7 @@
  * filterdns.c
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2009-2018 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2009-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -710,7 +710,7 @@ merge_config(void *arg __unused) {
 				count++;
 			}
 			if (debug > 3)
-				syslog(LOG_INFO, "Copied %d actions to new\n",
+				syslog(LOG_INFO, "Copied %d actions tonew\n",
 				    count);
 		}
 
@@ -774,6 +774,12 @@ merge_config(void *arg __unused) {
 			if (check_hostname_create(thr, &g_attr) == -1)
 				errx(2, "could not start host thread for %s",
 				    thr->hostname);
+		}
+		/* Make check_hostname() run. */
+		TAILQ_FOREACH(thr, &thread_list, next) {
+			if (thr->state != THR_RUNNING)
+				continue;
+			pthread_cond_signal(&thr->cond);
 		}
 		pthread_rwlock_unlock(&main_lock);
 	}

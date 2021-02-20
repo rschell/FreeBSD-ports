@@ -3,7 +3,7 @@
  * zabbix-agent.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013 Danilo G. Baio
  * Copyright (c) 2013 Marcello Coutinho
  * All rights reserved.
@@ -46,24 +46,45 @@ function php_deinstall_zabbix_agent() {
 function validate_input_zabbix_agent($post, &$input_errors) {
 
 	if (isset($post['agentenabled'])) {
-		if (!preg_match("/\w+/", $post['server'])) {
+		if ($post['server'] != '') {
+			foreach (explode(",", $post['server']) as $srv) {
+				$srv = trim($srv);
+				if (!is_ipaddr($srv) && !is_hostname($srv)) {
+					$input_errors[] = htmlspecialchars($srv) .
+					" is not a valid IP address or hostname for 'Server'.";
+				}
+			}
+		} else {
 			$input_errors[] = "Server field is required.";
 		}
 
-		if (!preg_match("/\w+/", $post['hostname'])) {
+		if ($post['serveractive'] != '') {
+			foreach (explode(",", $post['serveractive']) as $sact) {
+				$sact = trim($sact);
+				if (!is_ipaddr($sact) && !is_hostname($sact) &&
+				    !is_ipaddrwithport($sact) && !is_hostnamewithport($sact)) {
+					$input_errors[] = htmlspecialchars($sact) .
+					" is not a valid IP address or hostname with port for 'Server Active'.";
+				}
+			}
+		}
+
+		if (!is_domain($post['hostname'])) {
 			$input_errors[] = "Hostname field is required.";
 		}
 
 		if ($post['listenip'] != '') {
-			if (!is_ipaddr_configured($post['listenip']) && !preg_match("/(127.0.0.1|0.0.0.0)/", $post['listenip'])) {
-				$input_errors[] = "'Listen IP' is not a configured IP address.";
+			foreach (explode(",", $post['listenip']) as $listip) {
+				$listip = trim($listip);
+				if (!is_ipaddr_configured($listip) && !preg_match("/(127.0.0.1|0.0.0.0|::1|::)/", $listip)) {
+					$input_errors[] = htmlspecialchars($listip) .
+					" is not a configured IP address for 'Listen IP'.";
+				}
 			}
 		}
 
 		if ($post['listenport'] != '') {
-			if (!is_numericint($post['listenport'])) {
-				$input_errors[] = "'Listen Port' value is not numeric.";
-			} elseif ($post['listenport'] < 1 || $post['listenport'] > 65535) {
+			if (!is_port($post['listenport'])) {
 				$input_errors[] = "You must enter a valid value for 'Listen Port'.";
 			}
 		}
@@ -268,13 +289,13 @@ EOF;
 
 	if [ ! -d /var/log/zabbix-agent ]; then
 		/bin/mkdir -p /var/log/zabbix-agent
-		/usr/sbin/chmod 755 /var/log/zabbix-agent
+		/bin/chmod 755 /var/log/zabbix-agent
 	fi
 	/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix-agent
 
 	if [ ! -d /var/run/zabbix-agent ]; then
 		/bin/mkdir -p /var/run/zabbix-agent
-		/usr/sbin/chmod 755 /var/run/zabbix-agent
+		/bin/chmod 755 /var/run/zabbix-agent
 	fi
 	/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix-agent
 

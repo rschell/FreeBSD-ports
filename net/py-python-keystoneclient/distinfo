@@ -1,3 +1,3 @@
-TIMESTAMP = 1527870405
-SHA256 (python-keystoneclient-3.15.0.tar.gz) = f82c43c1cde7453ee274090c2e816c27c8a4c1de88583a8a5a509719917396fa
-SIZE (python-keystoneclient-3.15.0.tar.gz) = 306850
+TIMESTAMP = 1607539807
+SHA256 (python-keystoneclient-4.2.0.tar.gz) = 0248426e483b95de395086482c077d48e45990d3b1a3e334b2ec8b2e108f5a8a
+SIZE (python-keystoneclient-4.2.0.tar.gz) = 324718

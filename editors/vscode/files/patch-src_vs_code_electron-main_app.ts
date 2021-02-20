@@ -1,6 +1,6 @@
---- src/vs/code/electron-main/app.ts.orig	2019-12-10 21:16:00 UTC
+--- src/vs/code/electron-main/app.ts.orig	2020-06-09 17:02:22 UTC
 +++ src/vs/code/electron-main/app.ts
-@@ -437,7 +437,7 @@ export class CodeApplication extends Disposable {
+@@ -445,7 +445,7 @@ export class CodeApplication extends Disposable {
  				services.set(IUpdateService, new SyncDescriptor(Win32UpdateService));
  				break;
  

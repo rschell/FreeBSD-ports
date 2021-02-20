@@ -2,12 +2,12 @@
 # $FreeBSD$
 
 PORTNAME=	pelican
-PORTVERSION=	4.1.0
+PORTVERSION=	4.2.0
 PORTREVISION=	1
 CATEGORIES=	www textproc python
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=	jlaffaye@FreeBSD.org
+MAINTAINER=	andreas@bilke.org
 COMMENT=	Static site generator written in Python
 
 LICENSE=	GPLv3
@@ -23,7 +23,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}docutils>0:textproc/py-docutils@${PY_FLAVOR}
 		${PYTHON_PKGNAMEPREFIX}dateutil>0:devel/py-dateutil@${PY_FLAVOR}
 TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}mock>0:devel/py-mock@${PY_FLAVOR}
 
-USES=		python shebangfix
+USES=		python:3.6+ shebangfix
 USE_GITHUB=	yes
 USE_PYTHON=	autoplist concurrent distutils
 
@@ -41,7 +41,7 @@ MARKDOWN_DESC=		Markdown markup language format support
 MARKDOWN_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}markdown>0:textproc/py-markdown@${PY_FLAVOR}
 
 SYNTAX_DESC=		Syntax Highlighting (via pygments)
-SYNTAX_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}pygments>=1.4:textproc/py-pygments@${PY_FLAVOR}
+SYNTAX_RUN_DEPENDS=	${PY_PYGMENTS}
 
 do-test:
 	@cd ${WRKSRC} && ${PYTHON_CMD} ${PYDISTUTILS_SETUP} test

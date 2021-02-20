@@ -3,7 +3,7 @@
  * status_mail_report_edit.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2011-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2011-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -94,7 +94,7 @@ if (isset($_POST['del'])) {
 		}
 	}
 	if ($need_save) {
-		write_config();
+		write_config("mailreport: Item deleted");
 	}
 	header("Location: status_mail_report_edit.php?id={$id}");
 	return;
@@ -120,7 +120,7 @@ if (isset($_POST['del'])) {
 		$need_save = true;
 	}
 	if ($need_save) {
-		write_config();
+		write_config("mailreport: Item saved");
 		header("Location: status_mail_report_edit.php?id={$id}");
 		return;
 	}
@@ -212,7 +212,7 @@ if ($_POST) {
 
 	// Fix up cron job(s)
 	set_mail_report_cron_jobs($a_mailreports);
-	write_config();
+	write_config("mailreport: Settings updated");
 	configure_cron();
 	header("Location: status_mail_report.php");
 	return;
@@ -231,6 +231,13 @@ $section->addInput(new Form_Input(
 	'text',
 	$pconfig['descr']
 ))->setHelp('Enter a description here for reference.');
+
+$section->addInput(new Form_Checkbox(
+	'skipifempty',
+	'Skip If No Content',
+	'Do not send the email if there is no content',
+	$pconfig['skipifempty']
+))->setHelp('If checked, email will only be sent if there is output from the commands or content in the log files.');
 
 $form->add($section);
 

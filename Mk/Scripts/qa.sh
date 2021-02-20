@@ -2,6 +2,8 @@
 # MAINTAINER: portmgr@FreeBSD.org
 # $FreeBSD$
 
+set -o pipefail
+
 if [ -z "${STAGEDIR}" -o -z "${PREFIX}" -o -z "${LOCALBASE}" ]; then
 	echo "STAGEDIR, PREFIX, LOCALBASE required in environment." >&2
 	exit 1
@@ -209,7 +211,7 @@ stripped() {
 	# files with spaces are kept intact.
 	# Using readelf -h ... /ELF Header:/ will match on all ELF files.
 	find ${STAGEDIR} -type f ! -name '*.a' ! -name '*.o' \
-	    -exec readelf -S {} + 2>/dev/null | awk '
+	    -exec sh -c 'readelf -S -- /dev/null "$@" || :' -- {} + 2>/dev/null | awk '
 	    /File:/ {sub(/File: /, "", $0); file=$0}
 	    /[[:space:]]\.debug_info[[:space:]]*PROGBITS/ {print file}' |
 	    while read -r f; do
@@ -420,6 +422,7 @@ proxydeps_suggest_uses() {
 	elif [ ${pkg} = "devel/libIDL" ]; then warn "you need USE_GNOME+=libidl"
 	elif [ ${pkg} = "x11-fm/nautilus" ]; then warn "you need USE_GNOME+=nautilus3"
 	elif [ ${pkg} = "devel/ORBit2" ]; then warn "you need USE_GNOME+=orbit2"
+	elif [ ${pkg} = "graphics/librsvg2-rust" ]; then warn "you need USE_GNOME+=librsvg2"
 	# mate
 	# grep LIB_DEPENDS= Mk/Uses/mate.mk |sed -e 's|\(.*\)_LIB_DEPENDS.*:\(.*\)\/\(.*\)|elif [ ${pkg} = "\2/\3" ]; then warn "you need USE_MATE+=\1"|'
 	elif [ ${pkg} = "x11-fm/caja" ]; then warn "you need USE_MATE+=caja"
@@ -441,7 +444,6 @@ proxydeps_suggest_uses() {
 	elif [ ${pkg} = "net/akonadi-calendar" ]; then warn "you need to use USE_KDE+=akonadicalendar"
 	elif [ ${pkg} = "net/akonadi-search" ]; then warn "you need to use USE_KDE+=akonadisearch"
 	elif [ ${pkg} = "net/kalarmcal" ]; then warn "you need to use USE_KDE+=alarmcalendar"
-	elif [ ${pkg} = "net/kblog" ]; then warn "you need to use USE_KDE+=blog"
 	elif [ ${pkg} = "net/calendarsupport" ]; then warn "you need to use USE_KDE+=calendarsupport"
 	elif [ ${pkg} = "net/kcalcore" ]; then warn "you need to use USE_KDE+=calendarcore"
 	elif [ ${pkg} = "net/kcalutils" ]; then warn "you need to use USE_KDE+=calendarutils"
@@ -456,7 +458,7 @@ proxydeps_suggest_uses() {
 	elif [ ${pkg} = "deskutils/kdepim-apps-libs" ]; then warn "you need to use USE_KDE+=kdepim-apps-libs"
 	elif [ ${pkg} = "net/kitinerary" ]; then warn "you need to use USE_KDE+=kitinerary"
 	elif [ ${pkg} = "net/kontactinterface" ]; then warn "you need to use USE_KDE+=kontactinterface"
-	elif [ ${pkg} = "net/kdav" ]; then warn "you need to use USE_KDE+=kpimdav"
+	elif [ ${pkg} = "net/kf5-kdav" ]; then warn "you need to use USE_KDE+=kdav"
 	elif [ ${pkg} = "security/kpkpass" ]; then warn "you need to use USE_KDE+=kpkpass"
 	elif [ ${pkg} = "net/ksmtp" ]; then warn "you need to use USE_KDE+=ksmtp"
 	elif [ ${pkg} = "net/kldap" ]; then warn "you need to use USE_KDE+=ldap"
@@ -590,7 +592,7 @@ proxydeps_suggest_uses() {
 	elif [ ${pkg} = "converters/libiconv" ]; then
 		warn "you need USES+=iconv, USES+=iconv:wchar_t, or USES+=iconv:translit depending on needs"
 	# jpeg
-	elif [ ${pkg} = "graphics/jpeg" -o ${pkg} = "graphics/jpeg-turbo" ]; then
+	elif [ ${pkg} = "graphics/jpeg-turbo" ]; then
 		warn "you need USES+=jpeg"
 	# libarchive
 	elif [ ${pkg} = "archivers/libarchive" ]; then
@@ -1004,15 +1006,28 @@ pkgmessage()
 	return 0
 }
 
+reinplace()
+{
+	if [ -f ${REWARNFILE} ]; then
+		warn "Possible REINPLACE_CMD issues:"
+		cat ${REWARNFILE}
+	fi
+}
+
 checks="shebang symlinks paths stripped desktopfileutils sharedmimeinfo"
 checks="$checks suidfiles libtool libperl prefixvar baselibs terminfo"
 checks="$checks proxydeps sonames perlcore no_arch gemdeps gemfiledeps flavors"
-checks="$checks license depends_blacklist pkgmessage"
+checks="$checks license depends_blacklist pkgmessage reinplace"
 
 ret=0
 cd ${STAGEDIR} || exit 1
 for check in ${checks}; do
-	${check} || ret=1
+	eval check_test="\$IGNORE_QA_$check"
+	if [ -z "${check_test}" ]; then
+		${check} || ret=1
+	else
+		warn "Ignoring $check QA test"
+	fi
 done
 
 exit ${ret}

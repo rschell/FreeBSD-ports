@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	digikam
-DISTVERSION=	6.4.0
+DISTVERSION=	7.1.0
 PORTREVISION=	2
 CATEGORIES=	graphics kde
 MASTER_SITES=	KDE/stable/${PORTNAME}/${PORTVERSION}
@@ -13,8 +13,7 @@ COMMENT=	KDE digital photo management application
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-LIB_DEPENDS=	libKF5KGeoMap.so:astro/libkgeomap \
-		libKF5Sane.so:graphics/libksane \
+LIB_DEPENDS=	libKF5Sane.so:graphics/libksane \
 		libboost_graph.so:devel/boost-libs \
 		libexiv2.so:graphics/exiv2 \
 		libexpat.so:textproc/expat2 \
@@ -42,8 +41,8 @@ USE_KDE=	archive auth bookmarks calendarcore codecs completion config \
 		kio marble libkipi notifications notifyconfig parts service \
 		solid sonnet textwidgets threadweaver unitconversion \
 		widgetsaddons windowsystem xmlgui
-USE_QT=		concurrent core dbus gui network opengl printsupport sql \
-		widgets x11extras xml xmlpatterns \
+USE_QT=		concurrent core dbus declarative gui location network opengl \
+		printsupport sql webchannel widgets x11extras xml xmlpatterns \
 		sql-sqlite3_run \
 		buildtools_build qmake_build
 USE_XORG=	ice sm x11 xext

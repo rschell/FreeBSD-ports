@@ -2,8 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	mbdyn
-PORTVERSION=	1.7.2
-PORTREVISION=	8
+PORTVERSION=	1.7.3
+PORTREVISION=	1
 CATEGORIES=	science
 MASTER_SITES=	https://www.mbdyn.org/userfiles/downloads/
 
@@ -13,7 +13,8 @@ COMMENT=	MultiBody Dynamics analysis system
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-BROKEN_powerpc=	Does not compile on powerpc
+BROKEN_powerpc=		Does not compile on powerpc
+BROKEN_powerpc64=	fails to compile: libraries/libmbutil/parser.h:275:3: error: expected identifier
 
 BUILD_DEPENDS=	libatomic_ops>0:devel/libatomic_ops
 LIB_DEPENDS=	libltdl.so:devel/libltdl \
@@ -52,14 +53,22 @@ GOTOBLAS_USES=	blaslapack:gotoblas
 METIS_CONFIGURE_ON=	--with-metis=yes
 METIS_CONFIGURE_OFF=	--with-metis=no
 METIS_CPPFLAGS=		-I${LOCALBASE}/include/metis
-METIS_LIB_DEPENDS=	libmetis.so:math/metis4
+METIS_LIB_DEPENDS=	libmetis.so:math/metis
 
 REFERENCE_CONFIGURE_ON=	--with-blas=blas
 REFERENCE_USES=	blaslapack:netlib
+
+.include <bsd.port.pre.mk>
+
+.if ${GCC_DEFAULT} >= 10
+# workaround for Type mismatch in argument 't' at (1); passed REAL(4) to INTEGER(4)
+# in theory, this should set FCFLAGS, but the port does not conform
+FFLAGS+=	-fallow-argument-mismatch
+.endif
 
 pre-configure:
 	${REINPLACE_CMD} -e '/try_lapack_LIBS=/s/-llapack/${LAPACKLIB}/' \
 		-e 's/ -lxerbla//; s/-lcholmod/-lcholmod ${BLASLIB} ${LAPACKLIB} -lsuitesparseconfig/'	\
 		${WRKSRC}/configure
 
-.include <bsd.port.mk>
+.include <bsd.port.post.mk>

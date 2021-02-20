@@ -2,7 +2,8 @@
 
 PORTNAME=	infamous-plugins
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.3.0
+DISTVERSION=	0.3.0-7
+DISTVERSIONSUFFIX=	-g778e591
 CATEGORIES=	audio
 PKGNAMESUFFIX=	-lv2
 
@@ -18,20 +19,10 @@ LIB_DEPENDS=	libfftw3f.so:math/fftw3-float \
 		libntk.so:x11-toolkits/ntk \
 		libzita-resampler.so:audio/zita-resampler
 
-USES=		cmake compiler gnome localbase pkgconfig
+USES=		cmake compiler:c11 gnome localbase pkgconfig
 USE_GITHUB=	yes
 GH_ACCOUNT=	ssj71
 GH_PROJECT=	infamousPlugins
 USE_GNOME=	cairo
 
-.include <bsd.port.pre.mk>
-
-post-patch:
-		@${REINPLACE_CMD} -e 's| -g"|"|' \
-			${WRKSRC}/src/*/CMakeLists.txt
-.if ${CHOSEN_COMPILER_TYPE} == gcc
-		@${REINPLACE_CMD} -e 's| -Og"|"|' \
-			${WRKSRC}/src/*/CMakeLists.txt
-.endif
-
-.include <bsd.port.post.mk>
+.include <bsd.port.mk>

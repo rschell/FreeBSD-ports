@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	abseil
-PORTVERSION=	g20190703
+PORTVERSION=	20200923.2
 PORTREVISION=	1
 CATEGORIES=	devel
 
@@ -14,12 +14,8 @@ LICENSE=	APACHE20
 USES=		cmake compiler:c++11-lang
 USE_GITHUB=	yes
 GH_PROJECT=	${PORTNAME}-cpp
-GH_TAGNAME=	74d9175
 
-post-install:
-# XXX: should fix CMakeLists.txt instead of removing empty directories
-	${RMDIR} ${STAGEDIR}${PREFIX}/include/absl/copts \
-		${STAGEDIR}${PREFIX}/include/absl/strings/testdata
-	${RM} -r ${STAGEDIR}${PREFIX}/include/absl/time/internal/cctz/testdata
+CMAKE_ARGS=	-DBUILD_SHARED_LIBS:BOOL=ON \
+		-DCMAKE_CXX_STANDARD=17 # force the same highest C++ standard because of ABI differences: see https://github.com/abseil/abseil-cpp/issues/819
 
 .include <bsd.port.mk>

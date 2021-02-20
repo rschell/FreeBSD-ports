@@ -3,7 +3,7 @@
  * syslog-ng.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2012 Lance Leger
  * All rights reserved.
  *
@@ -134,7 +134,7 @@ function syslogng_build_default_objects($settings) {
 	if ($settings['default_protocol'] == 'tls') {
 		safe_mkdir(SYSLOGNG_DIR);
 		safe_mkdir(SYSLOGNG_DIR . "/ca.d");
-		syslogng_build_cert();
+		syslogng_build_cert($settings);
 		$default_objects[0]['objectparameters'] .= " tls(
 		    key-file('/var/etc/syslog-ng/syslog-ng.key')
 		    cert-file('/var/etc/syslog-ng/syslog-ng.cert')
@@ -371,7 +371,7 @@ function syslogng_resync() {
 		}
 	}
 
-	write_config();
+	write_config("syslog-ng: Settings saved");
 	filter_configure();
 }
 
@@ -433,10 +433,9 @@ function syslogng_get_ca_or_certs($type, $consumer = 'IPsec') {
 	return $c_arr;
 }
 
-function syslogng_build_cert() {
+function syslogng_build_cert($settings) {
 	global $config;
 
-	$settings = $config['installedpackages']['syslogng']['config'][0];
 	$ca = lookup_ca($settings['dca']);
 	$cert = lookup_cert($settings['certificate']);
 
@@ -447,7 +446,10 @@ function syslogng_build_cert() {
 	}
 
 	if ($ca != false) {
-		file_put_contents(SYSLOGNG_DIR . "/ca.d/cacert.pem", base64_decode($ca['crt']));
+		$ca_content = base64_decode($ca['crt']);
+		$ca_details = openssl_x509_parse($ca_content);
+
+		file_put_contents(SYSLOGNG_DIR . "/ca.d/" . $ca_details['hash'] . ".0", $ca_content);
 	}
 }
 ?>

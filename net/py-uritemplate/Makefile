@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	uritemplate
-PORTVERSION=	3.0.0
+PORTVERSION=	3.0.1
 #PORTREVISION=	0
 CATEGORIES=	net
 MASTER_SITES=	CHEESESHOP
@@ -13,8 +13,8 @@ COMMENT=	Python implementation of URI Template
 
 LICENSE=	APACHE20
 
+USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
-USES=		python
 
 NO_ARCH=	yes
 

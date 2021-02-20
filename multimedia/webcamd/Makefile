@@ -2,11 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	webcamd
-PORTVERSION=	5.3.7.1
+DISTVERSION=	5.10.6.0
 PORTREVISION=	1
 CATEGORIES=	multimedia
-MASTER_SITES=	http://www.selasky.org/hans_petter/distfiles/ \
-		http://home.selasky.org/distfiles/
 
 MAINTAINER=	hselasky@FreeBSD.org
 COMMENT=	Port of Linux USB webcam and DVB drivers into userspace
@@ -14,22 +12,30 @@ COMMENT=	Port of Linux USB webcam and DVB drivers into userspace
 LICENSE=	GPLv2
 
 BUILD_DEPENDS=	v4l_compat>=1.0.20100321:multimedia/v4l_compat
-LIB_DEPENDS=	libv4l1.so:multimedia/libv4l
 
 USES=		pkgconfig tar:bzip2 uidfix
 MAKE_ARGS=	LIBDIR="${LOCALBASE}/lib" HAVE_CUSE="YES"
 USE_RC_SUBR=	webcamd
 SUB_FILES=	webcamd.conf
 
-OPTIONS_DEFINE=	COMPAT32 DEBUG HAL VT_CLIENT VT_SERVER DVB INPUT KEYBOARD MOUSE RADIO WEBCAM
+USE_GITHUB=	yes
+GH_ACCOUNT=	hselasky
+GH_PROJECT=	${PORTNAME}
+GH_TAGNAME=	v${DISTVERSION}
+GH_TUPLE=	torvalds:linux:v5.10-rc6:linux
+
+OPTIONS_DEFINE=	DEBUG HAL VT_CLIENT VT_SERVER DVB INPUT KEYBOARD MOUSE RADIO WEBCAM
 OPTIONS_DEFAULT=DVB HAL INPUT RADIO WEBCAM
+
+#
+# 32-bit compatibility support is mostly useful for
+# platforms using 32-bit applications:
+#
+OPTIONS_DEFINE_amd64=		COMPAT32
+OPTIONS_DEFAULT_amd64=		COMPAT32
 
 COMPAT32_DESC=	Enable 32-bit compatibility support
 COMPAT32_MAKE_ARGS=	HAVE_COMPAT32="YES"
-
-.if exists(/usr/lib32/libcuse.so)
-OPTIONS_DEFAULT+=	COMPAT32
-.endif
 
 HAL_DESC=	Build with HAL and DBUS support
 HAL_LIB_DEPENDS+=	libhal.so:sysutils/hal
@@ -70,12 +76,16 @@ GROUPS=		webcamd
 MAKE_ARGS+=	HAVE_MAN="YES"
 MAKE_ARGS+=	PTHREAD_LIBS="-lpthread"
 
+WEBCAMDDIR=	${WRKDIR}/webcamd-${DISTVERSION}
+LINUXDIR=	${WRKDIR}/linux-*
+
 do-configure:
-	${MAKE} -C${WRKSRC}/tools/linux_make
-	${MAKE} ${MAKE_ARGS} configure -C${WRKSRC}
+	${MAKE} -C${WEBCAMDDIR}/tools/linux_make
+	${MAKE} ${MAKE_ARGS} configure -C${WEBCAMDDIR}
 
 post-patch:
-	@(cd ${WRKSRC}/patches && ${SH} ./do_patch.sh)
+	@(${RM} -r ${WEBCAMDDIR}/media_tree && ${LN} -s ${LINUXDIR} ${WEBCAMDDIR}/media_tree)
+	@(cd ${WEBCAMDDIR}/patches && ${SH} ./do_patch.sh)
 
 post-install:
 	@${MKDIR} ${STAGEDIR}${PREFIX}/etc/devd

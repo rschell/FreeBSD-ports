@@ -11,7 +11,7 @@
     SUBDIR += d2coding-ttf
     SUBDIR += engdic
     SUBDIR += fcitx-hangul
-    SUBDIR += gimp-help
+    SUBDIR += fcitx5-hangul
     SUBDIR += h2ps
     SUBDIR += hanyangfonts
     SUBDIR += hcode
@@ -44,6 +44,5 @@
     SUBDIR += unfonts-core
     SUBDIR += unfonts-extra
     SUBDIR += uniksc
-    SUBDIR += xpdf
 
 .include <bsd.port.subdir.mk>

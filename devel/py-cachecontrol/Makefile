@@ -16,17 +16,17 @@ LICENSE=	APACHE20
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}msgpack>=0.5.2:devel/py-msgpack@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}requests>=0:www/py-requests@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes
 
-OPTIONS_DEFINE=	LOCKFILE REDIS
-OPTIONS_DEFAULT=LOCKFILE
-LOCKFILE_DESC=	Lockfile support
+OPTIONS_DEFINE=	FILECACHE REDIS
+OPTIONS_DEFAULT=FILECACHE
+FILECACHE_DESC=	FileCache support
 REDIS_DESC=	Redis support
 
-LOCKFILE_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}lockfile>=0.9:devel/py-lockfile@${PY_FLAVOR}
+FILECACHE_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}lockfile>=0.9:devel/py-lockfile@${PY_FLAVOR}
 REDIS_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}redis>=2.10.5:databases/py-redis@${PY_FLAVOR}
 
 .include <bsd.port.mk>

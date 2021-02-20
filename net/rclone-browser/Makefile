@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	rclone-browser
-DISTVERSION=	1.7.0
+DISTVERSION=	1.8.0
 CATEGORIES=	net
 
 MAINTAINER=	woodsb02@FreeBSD.org
@@ -17,5 +17,8 @@ USE_GITHUB=	yes
 GH_ACCOUNT=	kapitainsky
 GH_PROJECT=	RcloneBrowser
 USE_QT=		buildtools_build core gui qmake_build widgets
+
+# Prepare for Qt5-5.15
+CFLAGS+=	-Wno-deprecated
 
 .include <bsd.port.mk>

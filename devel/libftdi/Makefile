@@ -6,7 +6,7 @@ PORTREVISION=	16
 CATEGORIES=	devel
 MASTER_SITES=	http://www.intra2net.com/en/developer/libftdi/download/
 
-MAINTAINER=	ports@FreeBSD.org
+MAINTAINER=	yuri@FreeBSD.org
 COMMENT=	Library (using libusb) to talk to FTDI chips
 
 LICENSE=	GPLv2 LGPL21
@@ -28,8 +28,7 @@ BOOST_CMAKE_BOOL=	FTDIPP
 BOOST_CXXFLAGS=		-I${LOCALBASE}/include
 
 PYTHON_DESC=		Python bindings
-PYTHON_BINARY_ALIAS=	swig=swig3.0
-PYTHON_BUILD_DEPENDS=	swig3.0:devel/swig30
+PYTHON_BUILD_DEPENDS=	swig:devel/swig
 PYTHON_CMAKE_BOOL=	PYTHON_BINDINGS
 PYTHON_USES=		python
 PYTHON_USE=		PYTHON=py3kplist

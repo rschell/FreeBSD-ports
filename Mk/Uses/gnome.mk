@@ -74,15 +74,15 @@ _USE_GNOME_ALL= intlhack intltool introspection \
 # GNOME 2 components
 _USE_GNOME_ALL+= atk cairo \
 		gdkpixbuf2 gconf2 glib20 \
-		gnomedocutils gnomesharp20 \
+		gnomesharp20 \
 		gnomevfs2 gtk-update-icon-cache gtk20 gtkhtml3 \
 		gtksharp20 gtksourceview2 gvfs libartlgpl2 libbonobo \
 		libbonoboui libglade2 libgnome \
 		libgnomecanvas libgnomekbd \
 		libgnomeui libgsf libgtkhtml libidl librsvg2 libwnck \
 		libxml2 libxslt \
-		orbit2 pango pangox-compat pygnome2 pygobject pygtk2 \
-		pygtksourceview vte
+		orbit2 pango pangox-compat \
+		vte
 
 # GNOME 3 components
 _USE_GNOME_ALL+=dconf evolutiondataserver3 gnomecontrolcenter3 gnomedesktop3 \
@@ -92,9 +92,9 @@ _USE_GNOME_ALL+=dconf evolutiondataserver3 gnomecontrolcenter3 gnomedesktop3 \
 		pygobject3 vte3
 
 # C++ bindings
-_USE_GNOME_ALL+=atkmm cairomm gconfmm26 glibmm gtkmm20 gtkmm24 \
+_USE_GNOME_ALL+=atkmm cairomm gconfmm26 glibmm gtkmm24 \
 		gtkmm30 gtksourceviewmm3 libgdamm5 \
-		libgtksourceviewmm libxml++26 libsigc++12 libsigc++20 \
+		libgtksourceviewmm libxml++26 libsigc++20 \
 		pangomm
 
 # glib-mkenums often fails with C locale
@@ -104,7 +104,7 @@ USE_LOCALE?=	en_US.UTF-8
 GNOME_MAKEFILEIN?=	Makefile.in
 SCROLLKEEPER_DIR=	/var/db/rarian
 
-referencehack_PRE_PATCH=	${FIND} ${WRKSRC} -name "Makefile.in" -type f | ${XARGS} ${REINPLACE_CMD} -e \
+referencehack_PRE_PATCH=	${FIND} ${WRKSRC} -name "Makefile.in" -type f | ${XARGS} ${FRAMEWORK_REINPLACE_CMD} -e \
 				"s|test \"\$$\$$installfiles\" = '\$$(srcdir)/html/\*'|:|"
 
 GNOME_HTML_DIR?=	${PREFIX}/share/doc
@@ -140,9 +140,6 @@ gsound_LIB_DEPENDS=	libgsound.so:audio/gsound
 gsound_RUN_DEPENDS=	gsound-play:audio/gsound
 gsound_USE_GNOME_IMPL=	glib20
 
-gtkmm20_LIB_DEPENDS=	libgtkmm-2.0.so:x11-toolkits/gtkmm20
-gtkmm20_USE_GNOME_IMPL=	libsigc++12 gtk20
-
 gtkmm24_LIB_DEPENDS=	libgtkmm-2.4.so:x11-toolkits/gtkmm24
 gtkmm24_USE_GNOME_IMPL=	glibmm cairomm atkmm pangomm gtk20
 
@@ -157,8 +154,6 @@ libgdamm5_USE_GNOME_IMPL=	libgda5 glibmm
 
 libgtksourceviewmm_LIB_DEPENDS=		libgtksourceviewmm-2.0.so:x11-toolkits/libgtksourceviewmm
 libgtksourceviewmm_USE_GNOME_IMPL=	gtksourceview2 gtkmm24
-
-libsigc++12_LIB_DEPENDS=	libsigc-1.2.so:devel/libsigc++12
 
 libsigc++20_LIB_DEPENDS=	libsigc-2.0.so:devel/libsigc++20
 
@@ -265,13 +260,22 @@ vte_USE_GNOME_IMPL=	gtk20
 vte3_LIB_DEPENDS=	libvte-2.91.so:x11-toolkits/vte3
 vte3_USE_GNOME_IMPL=	gtk30
 
+# Use librsvg2-rust where lang/rust is available
+.if ${LIBRSVG2_DEFAULT:Mrust}
+librsvg2_BUILD_DEPENDS=	librsvg2-rust>=0:graphics/librsvg2-rust
+librsvg2_LIB_DEPENDS=	librsvg-2.so:graphics/librsvg2-rust
+librsvg2_RUN_DEPENDS=	librsvg2-rust>=0:graphics/librsvg2-rust
+.else
+librsvg2_BUILD_DEPENDS=	librsvg2>=0:graphics/librsvg2
 librsvg2_LIB_DEPENDS=	librsvg-2.so:graphics/librsvg2
+librsvg2_RUN_DEPENDS=	librsvg2>=0:graphics/librsvg2
+.endif
 librsvg2_USE_GNOME_IMPL=libgsf gdkpixbuf2 pango
 
 nautilus3_LIB_DEPENDS=	libnautilus-extension.so:x11-fm/nautilus
-nautilus3_USE_GNOME_IMPL=gnomedesktop3 gvfs libxml2
+nautilus3_USE_GNOME_IMPL=gnomedesktop3 libxml2
 
-metacity_LIB_DEPENDS=	libmetacity-private.so:x11-wm/metacity
+metacity_LIB_DEPENDS=	libmetacity.so:x11-wm/metacity
 
 gnomecontrolcenter3_BUILD_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/gnome-keybindings.pc:sysutils/gnome-control-center
 gnomecontrolcenter3_RUN_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/gnome-keybindings.pc:sysutils/gnome-control-center
@@ -295,30 +299,18 @@ gtksourceview4_USE_GNOME_IMPL=gtk30 libxml2
 libgsf_LIB_DEPENDS=	libgsf-1.so:devel/libgsf
 libgsf_USE_GNOME_IMPL=	glib20 libxml2
 
-pygobject_BUILD_DEPENDS=	pygobject-codegen-2.0:devel/py-gobject
-pygobject_RUN_DEPENDS=		pygobject-codegen-2.0:devel/py-gobject
-pygobject_USE_GNOME_IMPL=	glib20
-
 pygobject3_BUILD_DEPENDS=	${PYTHON_PKGNAMEPREFIX}gobject3>=0:devel/py-gobject3@${PY_FLAVOR}
 pygobject3_RUN_DEPENDS=		${PYTHON_PKGNAMEPREFIX}gobject3>=0:devel/py-gobject3@${PY_FLAVOR}
 pygobject3_USE_GNOME_IMPL=	glib20
 
-pygtk2_BUILD_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/pygtk-2.0.pc:x11-toolkits/py-gtk2
-pygtk2_RUN_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/pygtk-2.0.pc:x11-toolkits/py-gtk2
-pygtk2_USE_GNOME_IMPL=	libglade2 pygobject
-
-pygnome2_BUILD_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/gnome-python-2.0.pc:x11-toolkits/py-gnome2
-pygnome2_RUN_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/gnome-python-2.0.pc:x11-toolkits/py-gnome2
-pygnome2_USE_GNOME_IMPL=libgnomeui pygtk2
-
 intltool_BUILD_DEPENDS=	${LOCALBASE}/bin/intltool-extract:textproc/intltool
 
-intlhack_PRE_PATCH=	${FIND} ${WRKSRC} -name "intltool-merge.in" | ${XARGS} ${REINPLACE_CMD} \
+intlhack_PRE_PATCH=	${FIND} ${WRKSRC} -name "intltool-merge.in" | ${XARGS} ${FRAMEWORK_REINPLACE_CMD} \
 			's|mkdir $$lang or|mkdir $$lang, 0777 or| ; \
 			 s|^push @INC, "/.*|push @INC, "${LOCALBASE}/share/intltool";| ; \
 			 s|/usr/bin/iconv|${ICONV_CMD}|g ; \
 			 s|unpack *[(]'"'"'U\*'"'"'|unpack ('"'"'C*'"'"'|' ; \
-			${FIND} ${WRKSRC} -name configure | ${XARGS} ${REINPLACE_CMD} \
+			${FIND} ${WRKSRC} -name configure | ${XARGS} ${FRAMEWORK_REINPLACE_CMD} \
 			's/DATADIRNAME=lib/DATADIRNAME=share/'
 intlhack_USE_GNOME_IMPL=intltool
 
@@ -335,10 +327,6 @@ gnomemenus3_BUILD_DEPENDS=	gnome-menus>=3.2.0:x11/gnome-menus
 gnomemenus3_RUN_DEPENDS=	gnome-menus>=3.2.0:x11/gnome-menus
 gnomemenus3_USE_GNOME_IMPL=	glib20
 
-gnomedocutils_BUILD_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/gnome-doc-utils.pc:textproc/gnome-doc-utils
-gnomedocutils_RUN_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/gnome-doc-utils.pc:textproc/gnome-doc-utils
-gnomedocutils_USE_GNOME_IMPL=	libxslt
-
 gtksharp10_BUILD_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/gtk-sharp.pc:x11-toolkits/gtk-sharp10
 gtksharp10_RUN_DEPENDS=		${LOCALBASE}/libdata/pkgconfig/gtk-sharp.pc:x11-toolkits/gtk-sharp10
 gtksharp10_USE_GNOME_IMPL=	gtk20
@@ -353,10 +341,6 @@ gnomesharp20_USE_GNOME_IMPL=	gnomevfs2 gtkhtml3 gtksharp20 librsvg2 vte
 
 libgnomekbd_LIB_DEPENDS=	libgnomekbd.so:x11/libgnomekbd
 libgnomekbd_USE_GNOME_IMPL=	gtk30 libxml2
-
-pygtksourceview_BUILD_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/pygtksourceview-2.0.pc:x11-toolkits/py-gtksourceview
-pygtksourceview_RUN_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/pygtksourceview-2.0.pc:x11-toolkits/py-gtksourceview
-pygtksourceview_USE_GNOME_IMPL=	gtksourceview2 pygtk2
 
 gvfs_BUILD_DEPENDS=	gvfs>=0:devel/gvfs
 gvfs_RUN_DEPENDS=	gvfs>=0:devel/gvfs

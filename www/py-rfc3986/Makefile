@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	rfc3986
-PORTVERSION=	1.3.2
+PORTVERSION=	1.4.0
 CATEGORIES=	www python
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
@@ -15,7 +15,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 USE_GITHUB=	yes
 GH_ACCOUNT=	sigmavirus24
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
 
 NO_ARCH=	yes

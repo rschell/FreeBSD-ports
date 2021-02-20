@@ -8,6 +8,8 @@ share/doc/HTML/de/kcontrol/plasma-pa/index.cache.bz2
 share/doc/HTML/de/kcontrol/plasma-pa/index.docbook
 share/doc/HTML/en/kcontrol/plasma-pa/index.cache.bz2
 share/doc/HTML/en/kcontrol/plasma-pa/index.docbook
+share/doc/HTML/es/kcontrol/plasma-pa/index.cache.bz2
+share/doc/HTML/es/kcontrol/plasma-pa/index.docbook
 share/doc/HTML/id/kcontrol/plasma-pa/index.cache.bz2
 share/doc/HTML/id/kcontrol/plasma-pa/index.docbook
 share/doc/HTML/it/kcontrol/plasma-pa/index.cache.bz2
@@ -20,14 +22,13 @@ share/doc/HTML/pt_BR/kcontrol/plasma-pa/index.cache.bz2
 share/doc/HTML/pt_BR/kcontrol/plasma-pa/index.docbook
 share/doc/HTML/ru/kcontrol/plasma-pa/index.cache.bz2
 share/doc/HTML/ru/kcontrol/plasma-pa/index.docbook
-share/doc/HTML/sv/kcontrol/plasma-pa/index.cache.bz2
-share/doc/HTML/sv/kcontrol/plasma-pa/index.docbook
 share/doc/HTML/uk/kcontrol/plasma-pa/index.cache.bz2
 share/doc/HTML/uk/kcontrol/plasma-pa/index.docbook
 share/kconf_update/disable_kmix.upd
 share/kconf_update/plasmaVolumeDisableKMixAutostart.pl
 share/kde4/apps/kconf_update/disable_kmix.upd
 share/kde4/apps/kconf_update/plasmaVolumeDisableKMixAutostart.pl
+share/kpackage/kcms/kcm_pulseaudio/contents/code/icon.js
 share/kpackage/kcms/kcm_pulseaudio/contents/ui/Advanced.qml
 share/kpackage/kcms/kcm_pulseaudio/contents/ui/Applications.qml
 share/kpackage/kcms/kcm_pulseaudio/contents/ui/CardListItem.qml
@@ -48,6 +49,8 @@ share/locale/ar/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/ar/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/ast/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/ast/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
+share/locale/az/LC_MESSAGES/kcm_pulseaudio.mo
+share/locale/az/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/ca/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/ca/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/ca@valencia/LC_MESSAGES/kcm_pulseaudio.mo
@@ -77,6 +80,7 @@ share/locale/gl/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/he/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/he/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/hu/LC_MESSAGES/kcm_pulseaudio.mo
+share/locale/hu/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/ia/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/ia/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/id/LC_MESSAGES/kcm_pulseaudio.mo
@@ -90,6 +94,8 @@ share/locale/ko/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/lt/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/lt/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/lv/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
+share/locale/ml/LC_MESSAGES/kcm_pulseaudio.mo
+share/locale/ml/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/nb/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/nl/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/nl/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
@@ -103,6 +109,8 @@ share/locale/pt/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/pt/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/pt_BR/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/pt_BR/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
+share/locale/ro/LC_MESSAGES/kcm_pulseaudio.mo
+share/locale/ro/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/ru/LC_MESSAGES/kcm_pulseaudio.mo
 share/locale/ru/LC_MESSAGES/plasma_applet_org.kde.plasma.volume.mo
 share/locale/sk/LC_MESSAGES/kcm_pulseaudio.mo

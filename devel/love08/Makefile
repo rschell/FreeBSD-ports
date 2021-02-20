@@ -13,6 +13,8 @@ DISTNAME=	${PORTNAME}-${PORTVERSION}-linux-src
 MAINTAINER=	amdmi3@FreeBSD.org
 COMMENT=	Open-source 2D game engine
 
+BROKEN=		fails to build
+
 LIB_DEPENDS=	libIL.so:graphics/devil \
 		libmodplug.so:audio/libmodplug \
 		libmpg123.so:audio/mpg123 \
@@ -30,7 +32,7 @@ GNU_CONFIGURE=	yes
 CPPFLAGS+=	-I${LOCALBASE}/include -I${LOCALBASE}/include/freetype2 \
 		-I${LUA_INCDIR} `${SDL_CONFIG} --cflags`
 LDFLAGS+=	-L${LOCALBASE}/lib -L${LUA_LIBDIR}
-LLD_UNSAFE=	yes
+LDFLAGS_i386=	-Wl,-znotext
 CONFIGURE_ARGS=	--bindir=${PREFIX}/bin --libdir=${PREFIX}/lib \
 		--program-suffix=08
 WRKSRC=		${WRKDIR}/love-${PORTVERSION}

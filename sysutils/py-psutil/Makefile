@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	psutil
-PORTVERSION=	5.6.7
-PORTREVISION=	1
+PORTVERSION=	5.8.0
 CATEGORIES=	sysutils python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -14,21 +13,22 @@ COMMENT=	Process utilities module for Python
 LICENSE=	BSD3CLAUSE
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-RUN_DEPENDS=	${PY_ENUM34}
-TEST_DEPENDS=	${PY_IPADDRESS}
+TEST_DEPENDS=	${PY_ENUM34} \
+		${PY_IPADDRESS}
 
-CONFLICTS_INSTALL=	${PYTHON_PKGNAMEPREFIX}psutil121
-
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
-post-install:
-	${STRIP_CMD} ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/psutil/_psutil_bsd.so ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/psutil/_psutil_posix.so
+CONFLICTS_INSTALL=	${PYTHON_PKGNAMEPREFIX}psutil121
 
 .include <bsd.port.pre.mk>
 
 .if ${PYTHON_REL} < 3000
-TEST_DEPENDS+=	${PYTHON_PKGNAMEPREFIX}mock>=0:devel/py-mock@${PY_FLAVOR}
+TEST_DEPENDS+=	${PYTHON_PKGNAMEPREFIX}mock>=0:devel/py-mock@${PY_FLAVOR} \
+		${PYTHON_PKGNAMEPREFIX}unittest2>=0:devel/py-unittest2@${PY_FLAVOR}
 .endif
+
+post-install:
+	${STRIP_CMD} ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/psutil/_psutil_bsd*.so ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/psutil/_psutil_posix*.so
 
 .include <bsd.port.post.mk>

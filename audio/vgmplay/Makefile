@@ -2,12 +2,12 @@
 
 PORTNAME=	vgmplay
 PORTVERSION=	0.40.9
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	audio
 MASTER_SITES=	https://github.com/vgmrips/${PORTNAME}/releases/download/${PORTVERSION}/
 DISTNAME=	${PORTNAME:S/vgmp/VGMP/}_${PORTVERSION:S/.//:S/./-/}_src
 
-MAINTAINER=	tagattie@yandex.com
+MAINTAINER=	tagattie@FreeBSD.org
 COMMENT=	Command-line player for VGM (video game music) files
 
 LICENSE=	GPLv2
@@ -30,11 +30,12 @@ LIBAO_LIB_DEPENDS=	libao.so:audio/libao
 LIBAO_USES=	localbase:ldflags
 
 MAKE_ENV+=	PREFIX=${LOCALBASE} ${MAKE_ENV_${ARCH}}
-MAKE_ENV_powerpc64=	BYTE_ORDER=2
 MAKE_ENV_powerpc=	BYTE_ORDER=2
+MAKE_ENV_powerpc64=	BYTE_ORDER=2
+MAKE_ENV_powerpc64le=	BYTE_ORDER=1
 MAKE_ENV_powerpcspe=	BYTE_ORDER=2
 
-PLIST_FILES=	bin/vgmplay bin/vgm2pcm bin/vgm2wav man/man1/vgmplay.1.gz ${EXAMPLESDIR}/vgmplay.ini
+PLIST_FILES=	bin/vgmplay bin/vgm2pcm bin/vgm2wav share/man/man1/vgmplay.1.gz ${EXAMPLESDIR}/vgmplay.ini
 
 .include <bsd.port.pre.mk>
 
@@ -49,7 +50,7 @@ do-install:
 	${INSTALL_PROGRAM} ${WRKSRC}/vgmplay ${STAGEDIR}${PREFIX}/bin
 	${INSTALL_PROGRAM} ${WRKSRC}/vgm2pcm ${STAGEDIR}${PREFIX}/bin
 	${INSTALL_PROGRAM} ${WRKSRC}/vgm2wav ${STAGEDIR}${PREFIX}/bin
-	${INSTALL_MAN} ${WRKSRC}/vgmplay.1 ${STAGEDIR}${PREFIX}/man/man1
+	${INSTALL_MAN} ${WRKSRC}/vgmplay.1 ${STAGEDIR}${MANPREFIX}/share/man/man1
 	${MKDIR} ${STAGEDIR}${EXAMPLESDIR}
 	${INSTALL_DATA} ${WRKSRC}/VGMPlay.ini ${STAGEDIR}${EXAMPLESDIR}/vgmplay.ini
 

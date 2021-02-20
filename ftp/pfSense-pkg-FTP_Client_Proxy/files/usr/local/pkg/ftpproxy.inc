@@ -3,7 +3,7 @@
  * ftpproxy.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ function sync_package_ftpproxy() {
 	/* Proxy is not enabled, kill the daemon and issue a filter reload. */
 	if ($cf["proxy_enable"] != "on") {
 		mwexec("/usr/bin/killall -9 ftp-proxy");
+		unlink_if_exists("/usr/local/etc/rc.d/ftp-proxy.sh");
 		filter_configure();
 		return;
 	}

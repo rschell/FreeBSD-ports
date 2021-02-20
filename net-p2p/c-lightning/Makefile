@@ -3,7 +3,7 @@
 
 PORTNAME=	c-lightning
 # To build from an arbitrary git commit comment PORTVERSION and PORTREVISION (if present)
-PORTVERSION=	0.8.0
+PORTVERSION=	0.9.2
 DISTVERSIONPREFIX=	v
 # and uncomment the following two lines (use for example -git-HEAD or -git-f8d8348c)
 #PORTVERSION=	0
@@ -21,7 +21,8 @@ LIB_DEPENDS=	libgmp.so:math/gmp \
 		libsqlite3.so:databases/sqlite3
 RUN_DEPENDS=	bitcoin-cli:net-p2p/bitcoin-utils
 
-USES=		autoreconf:build gettext gmake libtool python:3.5+,build
+USES=		autoreconf:build compiler:c11 gettext gmake libtool \
+		python:3.5+,build
 BINARY_ALIAS=	python=${PYTHON_CMD} python3=${PYTHON_CMD}
 ALL_TARGET=	default
 
@@ -51,9 +52,10 @@ GIT_COMMIT=	${PKGNAMESUFFIX:C/-git-//}
 GIT_COMMIT=	${DISTVERSIONPREFIX}${PORTVERSION}
 .endif
 GH_TUPLE=	ElementsProject:lightning:${GIT_COMMIT} \
-		ElementsProject:libwally-core:release_0.7.4:ext1/external/libwally-core \
+		ElementsProject:libwally-core:b8d7ea91049c3:ext1/external/libwally-core \
 		ianlancetaylor:libbacktrace:5a99ff7fed66b8e:ext2/external/libbacktrace \
-		zserge:jsmn:v1.0.0:ext3/external/jsmn
+		zserge:jsmn:v1.0.0:ext3/external/jsmn \
+		valyala:gheap:67fc83bc953324f4759e52951921d:ext4/external/gheap
 
 USERS=		c-lightning
 GROUPS=		c-lightning
@@ -65,8 +67,7 @@ SUB_LIST=	U="${USERS}" G="${GROUPS}" LIGHTNINGD_BASE_DIR="${DESTDIR}/var/db/c-li
 PLIST_SUB=	U="${USERS}" G="${GROUPS}"
 
 post-patch:
-	${REINPLACE_CMD} -e 's|cd external|unset CFLAGS \&\& cd external|' \
-		${WRKSRC}/external/Makefile
+	${REINPLACE_CMD} 's/sha256sum/sha256 -r/' ${WRKSRC}/Makefile
 
 post-install:
 	${INSTALL_DATA} \

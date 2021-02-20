@@ -2,10 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	denyhosts
-PORTVERSION=	3.1
-DISTVERSIONPREFIX=	v
+PORTVERSION=	3.1.2
 CATEGORIES=	security
 PKGNAMESUFFIX=	${PYTHON_PKGNAMESUFFIX}
+MASTER_SITES=	https://github.com/denyhosts/denyhosts/releases/download/v${PORTVERSION:R}/
+DISTNAME=	DenyHosts-${PORTVERSION}
 
 MAINTAINER=	sunpoet@FreeBSD.org
 COMMENT=	Script to thwart ssh and imap attacks
@@ -16,7 +17,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE.txt
 BUILD_DEPENDS=	${RUN_DEPENDS}
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}ipaddr>=0:devel/py-ipaddr@${PY_FLAVOR}
 
-USES=		cpe python shebangfix
+USES=		cpe python:3.6+ shebangfix
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes
@@ -25,8 +26,6 @@ USE_RC_SUBR=	denyhosts
 PLIST_FILES=	"@sample etc/denyhosts.conf.sample"
 SUB_FILES=	pkg-message
 SUB_LIST=	PYTHON=${PYTHON_CMD}
-
-USE_GITHUB=	yes
 
 SHEBANG_FILES=	daemon-control-dist \
 		plugins/test_deny.py \

@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	Lektor
-PORTVERSION=	3.1.3
-PORTREVISION=	1
+PORTVERSION=	3.2.0
 CATEGORIES=	www devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -24,7 +23,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}Jinja2>=2.4:devel/py-Jinja2@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}inifile>=0.4:devel/py-inifile@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}pip>=0:devel/py-pip@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
 
 NO_ARCH=	yes

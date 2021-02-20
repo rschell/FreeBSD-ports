@@ -1,8 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	mgba
-DISTVERSION=	0.7.0
-PORTREVISION=	2
+DISTVERSION=	0.8.3
+DISTVERSION=	0.8.4
 CATEGORIES=	emulators
 
 MAINTAINER=	greg@unrelenting.technology
@@ -24,6 +24,9 @@ USE_GITHUB=	yes
 GH_ACCOUNT=	mgba-emu
 
 USE_GL=		gl glu
+
+USE_LDCONFIG=	yes
+
 USE_SDL=	sdl2
 
 CMAKE_ARGS=	-DCMAKE_INSTALL_DOCDIR:STRING="${DOCSDIR}" \
@@ -32,6 +35,7 @@ CMAKE_ARGS=	-DCMAKE_INSTALL_DOCDIR:STRING="${DOCSDIR}" \
 		-DUSE_ZLIB:BOOL=ON \
 		-DUSE_LZMA:BOOL=ON \
 		-DUSE_SQLITE3:BOOL=ON \
+		-DUSE_DISCORD_RPC:BOOL=OFF \
 		-DBUILD_GL:BOOL=ON \
 		-DBUILD_GLES2:BOOL=OFF
 LDFLAGS+=	-Wl,--as-needed # glu
@@ -46,26 +50,27 @@ LIBRETRO_DESC=	libretro core
 MAGICK_DESC=	ImageMagick GIF recording support
 QT5_DESC=	Qt 5 frontend
 
-DEBUGGERS_CMAKE_BOOL=	USE_DEBUGGERS USE_EDITLINE USE_GDB_STUB
 DEBUGGERS_USES=		libedit
+DEBUGGERS_CMAKE_BOOL=	USE_DEBUGGERS USE_EDITLINE USE_GDB_STUB
 
-FFMPEG_CMAKE_BOOL=	USE_FFMPEG
 FFMPEG_LIB_DEPENDS=	libavcodec.so:multimedia/ffmpeg \
 			libavformat.so:multimedia/ffmpeg \
 			libavresample.so:multimedia/ffmpeg \
 			libavutil.so:multimedia/ffmpeg \
 			libswscale.so:multimedia/ffmpeg
+FFMPEG_CMAKE_BOOL=	USE_FFMPEG
 
 LIBRETRO_CMAKE_BOOL=	BUILD_LIBRETRO
 LIBRETRO_CMAKE_ON=	-DLIBRETRO_LIBDIR:PATH="${PREFIX}/lib/libretro"
+LIBRETRO_CONFLICTS_INSTALL=	libretro-mgba
 
-MAGICK_CMAKE_BOOL=	USE_MAGICK
 MAGICK_LIB_DEPENDS=	libMagickWand-6.so:graphics/ImageMagick6 \
 			libMagickCore-6.so:graphics/ImageMagick6
+MAGICK_CMAKE_BOOL=	USE_MAGICK
 
-QT5_CMAKE_BOOL=	BUILD_QT
-QT5_USE=	qt=qmake_build,buildtools_build,core,gui,widgets,network,opengl,multimedia
 QT5_USES=	desktop-file-utils qt:5
+QT5_USE=	qt=qmake_build,buildtools_build,core,gui,widgets,network,opengl,multimedia
+QT5_CMAKE_BOOL=	BUILD_QT
 QT5_VARS=	installs_icons=yes
 
 .include <bsd.port.mk>

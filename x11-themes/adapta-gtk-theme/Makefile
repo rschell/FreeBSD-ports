@@ -3,6 +3,7 @@
 
 PORTNAME=	adapta-gtk-theme
 PORTVERSION=	3.95.0.11
+PORTREVISION=	1
 CATEGORIES=	x11-themes
 
 MAINTAINER=	nivit@FreeBSD.org
@@ -12,6 +13,8 @@ LICENSE=	GPLv2 CC-BY-SA-4.0
 LICENSE_COMB=	multi
 LICENSE_FILE_GPLv2=	${WRKSRC}/COPYING
 LICENSE_FILE_CC-BY-SA-4.0=	${WRKSRC}/LICENSE_CC_BY_SA4
+
+BROKEN=		fails to build
 
 BUILD_DEPENDS=	gsed:textproc/gsed \
 		inkscape:graphics/inkscape \

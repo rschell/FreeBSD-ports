@@ -2,6 +2,7 @@
 
 PORTNAME=	pfSense-pkg-arpwatch
 PORTVERSION=	0.2.0
+PORTREVISION=	4
 CATEGORIES=	net-mgmt
 MASTER_SITES=	# empty
 DISTFILES=	# empty

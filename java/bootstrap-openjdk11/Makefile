@@ -3,7 +3,8 @@
 PORTNAME=	openjdk11
 PORTVERSION=	11.0.5.10.1
 CATEGORIES=	java devel
-MASTER_SITES=	LOCAL/glewis/bootstrap-openjdk11
+MASTER_SITES=	LOCAL/glewis/bootstrap-openjdk11 \
+		LOCAL/pkubaj
 PKGNAMEPREFIX=	bootstrap-
 DISTNAME=	${JDK_PORT}-${JDK_ARCH}-${PORTVERSION}
 
@@ -12,7 +13,7 @@ COMMENT=	Java Development Kit 11
 
 LICENSE=	GPLv2
 
-ONLY_FOR_ARCHS=	amd64 i386 powerpc64
+ONLY_FOR_ARCHS=	amd64 i386 powerpc64 powerpc64le
 
 USES=		tar:xz
 
@@ -22,7 +23,8 @@ WRKSRC=		${WRKDIR}/${JDK_ROOT}
 
 JDK_PORT=	${PKGNAMEPREFIX}${PORTNAME}
 JDK_ROOT=	${PKGNAMEPREFIX}${PORTNAME}
-JDK_ARCH=	${ARCH}
+JDK_ARCH=	${ARCH}${JDK_ARCH_SUFFIX_${ARCH}}
+JDK_ARCH_SUFFIX_powerpc64=	-${PPC_ABI:tl}
 
 INSTALLDIR=	${STAGEDIR}${PREFIX}/${JDK_ROOT}
 
@@ -35,6 +37,11 @@ ONLY_FOR_ARCHS+=aarch64
 
 .if ${ARCH} == aarch64
 DISTNAME=	${JDK_PORT}-${JDK_ARCH}-12-${PORTVERSION}
+PLIST_SUB+=	PPC64LE=""
+.elif ${ARCH} == powerpc64le
+PLIST_SUB+=	PPC64LE="@comment "
+.else
+PLIST_SUB+=	PPC64LE=""
 .endif
 
 post-extract:

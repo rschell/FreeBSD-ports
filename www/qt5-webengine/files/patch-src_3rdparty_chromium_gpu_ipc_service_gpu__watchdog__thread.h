@@ -1,13 +1,20 @@
---- src/3rdparty/chromium/gpu/ipc/service/gpu_watchdog_thread.h.orig	2019-05-23 12:39:34 UTC
+--- src/3rdparty/chromium/gpu/ipc/service/gpu_watchdog_thread.h.orig	2020-11-07 01:22:36 UTC
 +++ src/3rdparty/chromium/gpu/ipc/service/gpu_watchdog_thread.h
-@@ -191,8 +191,10 @@ class GPU_IPC_SERVICE_EXPORT GpuWatchdogThread : publi
-   XDisplay* display_;
-   gfx::AcceleratedWidget window_;
-   XAtom atom_;
-+#if !defined(OS_BSD)
-   FILE* tty_file_;
-   int host_tty_;
-+#endif
+@@ -213,7 +213,7 @@ class GPU_IPC_SERVICE_EXPORT GpuWatchdogThreadImplV1
+   base::ThreadTicks GetWatchedThreadTime();
  #endif
  
-   base::RepeatingClosure alternative_terminate_for_testing_;
+-#if defined(USE_X11)
++#if defined(USE_X11) && !defined(OS_BSD)
+   void UpdateActiveTTY();
+ #endif
+ 
+@@ -271,7 +271,7 @@ class GPU_IPC_SERVICE_EXPORT GpuWatchdogThreadImplV1
+   // whether GpuWatchdogThreadEvent::kGpuWatchdogStart has been recorded.
+   bool is_watchdog_start_histogram_recorded = false;
+ 
+-#if defined(USE_X11)
++#if defined(USE_X11) && !defined(OS_BSD)
+   FILE* tty_file_;
+   int host_tty_;
+   int active_tty_ = -1;

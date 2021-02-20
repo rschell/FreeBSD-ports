@@ -9,7 +9,10 @@ COMMENT=	Plasma5 Plasma workspace
 
 LIB_DEPENDS=	libcln.so:math/cln \
 		libdbusmenu-qt5.so:devel/libdbusmenu-qt \
+		libfreetype.so:print/freetype2 \
+		libfontconfig.so:x11-fonts/fontconfig \
 		libqalculate.so:math/libqalculate \
+		libwayland-client.so:graphics/wayland \
 		libxcb-image.so:x11/xcb-util-image \
 		libxcb-util.so:x11/xcb-util
 RUN_DEPENDS=	ck-launch-session:sysutils/consolekit2\
@@ -22,9 +25,9 @@ RUN_DEPENDS=	ck-launch-session:sysutils/consolekit2\
 		${LOCALBASE}/bin/genv:sysutils/coreutils
 
 
-USES=		cmake compiler:c++11-lib cpe gettext kde:5 pkgconfig \
+USES=		cmake compiler:c++11-lib cpe desktop-file-utils gettext kde:5 pkgconfig \
 		qt:5 tar:xz xorg
-USE_KDE=	activities activities-stats activitymanagerd attica auth baloo bookmarks \
+USE_KDE=	activities activities-stats activitymanagerd attica archive auth baloo bookmarks \
 		codecs completion config configwidgets coreaddons crash \
 		dbusaddons doctools emoticons filemetadata globalaccel \
 		guiaddons holidays i18n iconthemes idletime init itemmodels \
@@ -35,14 +38,14 @@ USE_KDE=	activities activities-stats activitymanagerd attica auth baloo bookmark
 		plasma-integration prison runner service solid sonnet \
 		texteditor textwidgets unitconversion wallet wayland \
 		widgetsaddons windowsystem xmlgui xmlrpcclient \
-		breeze_run breeze-icons_run oxygen-icons5_run \
+		breeze_run breeze-icons_run kquickcharts_run oxygen-icons5_run \
 		kded_run milou_run
 USE_QT=		concurrent core declarative dbus graphicaleffects gui network phonon4 \
-		printsupport qdbus quickcontrols_run script sql \
+		printsupport qdbus quickcontrols_run script svg sql \
 		testlib webkit widgets x11extras xml \
 		paths_run \
 		buildtools_build qmake_build
-USE_XORG=	ice sm x11 xau xcb xcomposite xext xfixes xft xkbfile xrender xtst
+USE_XORG=	ice sm x11 xau xcb xcomposite xcursor xext xfixes xft xkbfile xrender xtst
 
 CMAKE_OFF=	BUILD_TESTING
 

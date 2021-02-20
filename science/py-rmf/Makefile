@@ -12,10 +12,10 @@ COMMENT=	Library to support reading and writing of Rich Molecular Format files
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-BUILD_DEPENDS=	swig3.0:devel/swig30
+BUILD_DEPENDS=	swig:devel/swig
 LIB_DEPENDS=	libRMF.so:science/rmf
 
-USES=		cmake compiler:c++11-lang python shebangfix
+USES=		cmake compiler:c++11-lang python:3.6+ shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	salilab
 GH_TAGNAME=	f917cf2

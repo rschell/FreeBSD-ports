@@ -4,10 +4,12 @@
     COMMENT = Java language support
 
     SUBDIR += apache-bcel
+    SUBDIR += apache-commons-beanutils
     SUBDIR += apache-commons-cli
     SUBDIR += apache-commons-codec
     SUBDIR += apache-commons-collections
     SUBDIR += apache-commons-dbcp
+    SUBDIR += apache-commons-discovery
     SUBDIR += apache-commons-httpclient
     SUBDIR += apache-commons-lang
     SUBDIR += apache-commons-lang3
@@ -23,7 +25,6 @@
     SUBDIR += bootstrap-openjdk8
     SUBDIR += bouncycastle
     SUBDIR += bouncycastle15
-    SUBDIR += castor
     SUBDIR += cos
     SUBDIR += cryptix-jce
     SUBDIR += dbvis
@@ -33,9 +34,7 @@
     SUBDIR += eclipse-drjava
     SUBDIR += eclipse-ecj
     SUBDIR += eclipse-findbugs
-    SUBDIR += eclipse-pydev
     SUBDIR += eclipse-shelled
-    SUBDIR += eclipse-windowbuilder
     SUBDIR += hamcrest
     SUBDIR += icedtea-web
     SUBDIR += infobus
@@ -46,10 +45,7 @@
     SUBDIR += intellij-ultimate
     SUBDIR += jad
     SUBDIR += jai
-    SUBDIR += jakarta-commons-beanutils
-    SUBDIR += jakarta-commons-discovery
     SUBDIR += jakarta-oro
-    SUBDIR += jakarta-regexp
     SUBDIR += jasmin
     SUBDIR += jattach
     SUBDIR += java-cup
@@ -65,7 +61,6 @@
     SUBDIR += jcckit
     SUBDIR += jcommon
     SUBDIR += jd-gui
-    SUBDIR += jdbcpool
     SUBDIR += jdk11-doc
     SUBDIR += jdk12-doc
     SUBDIR += jdk8-doc
@@ -79,14 +74,12 @@
     SUBDIR += jlint
     SUBDIR += jmf
     SUBDIR += jode
-    SUBDIR += jomp
     SUBDIR += jrosetta
     SUBDIR += jta
     SUBDIR += jtiger
     SUBDIR += jump
     SUBDIR += junit
     SUBDIR += jxgrabkey
-    SUBDIR += langspec
     SUBDIR += lightweight-java-profiler
     SUBDIR += linux-oracle-jdk18
     SUBDIR += linux-oracle-jre18
@@ -98,14 +91,16 @@
     SUBDIR += netrexx
     SUBDIR += netty
     SUBDIR += openjdk11
+    SUBDIR += openjdk11-jre
     SUBDIR += openjdk12
     SUBDIR += openjdk13
+    SUBDIR += openjdk14
+    SUBDIR += openjdk15
     SUBDIR += openjdk7
     SUBDIR += openjdk7-jre
     SUBDIR += openjdk8
     SUBDIR += openjdk8-jre
-    SUBDIR += openjfx8-devel
-    SUBDIR += openjfx8-scenebuilder
+    SUBDIR += openjfx14
     SUBDIR += phpeclipse
     SUBDIR += proguard
     SUBDIR += sablevm
@@ -128,6 +123,5 @@
     SUBDIR += wildfly17
     SUBDIR += wildfly18
     SUBDIR += wildfly90
-    SUBDIR += xdoclet
 
 .include <bsd.port.subdir.mk>

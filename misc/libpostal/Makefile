@@ -4,7 +4,7 @@ PORTNAME=	libpostal
 DISTVERSIONPREFIX=	v
 DISTVERSION=	1.1
 DISTVERSIONSUFFIX=	-alpha
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	misc geography
 
 PATCH_SITES=	https://github.com/${GH_ACCOUNT}/${PORTNAME}/commit/
@@ -47,7 +47,6 @@ OPTIONS_SUB=	yes
 CBLAS_DESC=	Build with CBLAS/OPENBLAS
 SSE2_DESC=	Enable SSE2 optimization
 
-CBLAS_BUILD_DEPENDS=	${LOCALBASE}/include/cblas.h:math/cblas
 CBLAS_LIB_DEPENDS=	libopenblas.so:math/openblas
 CBLAS_CONFIGURE_WITH=	cblas=${LOCALBASE}/lib/libopenblas.so
 

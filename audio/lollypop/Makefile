@@ -17,12 +17,12 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}sqlite3>=2.7.8:databases/py-sqlite3@${PY_FLA
 		${PYTHON_PKGNAMEPREFIX}dbus>=1.1.1:devel/py-dbus@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}gstreamer1>=1.4.0:multimedia/py-gstreamer1@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}pylast>=1.4.0:audio/py-pylast@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}pillow>=0:graphics/py-pillow@${PY_FLAVOR}
+		${PY_PILLOW}
 LIB_DEPENDS=	libnotify.so:devel/libnotify \
 		libappstream-glib.so:devel/appstream-glib \
 		libtotem-plparser.so:multimedia/totem-pl-parser
 
-USES=		python:3.5+ pkgconfig gnome gettext meson shebangfix sqlite desktop-file-utils
+USES=		python:3.6+ pkgconfig gnome gettext meson shebangfix sqlite desktop-file-utils
 USE_GITLAB=	yes
 GL_SITE=	https://gitlab.gnome.org
 GL_ACCOUNT=	World

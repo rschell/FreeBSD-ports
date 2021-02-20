@@ -20,10 +20,10 @@ LIB_DEPENDS=	libboost_regex.so:devel/boost-libs \
 		libmythes-1.2.so:textproc/mythes
 
 MAJOR_VERSION=	2.3
-MINOR_VERSION=	3
+MINOR_VERSION=	4.2
 
 USES=		autoreconf compiler:c++11-lang desktop-file-utils gmake iconv \
-		pkgconfig perl5 python:2.7 qt:5 shebangfix tar:xz xorg
+		pkgconfig perl5 python qt:5 shebangfix tar:xz xorg
 USE_QT=		core concurrent gui svg widgets x11extras buildtools_build qmake_build
 USE_XORG=	xcb
 GNU_CONFIGURE=	yes

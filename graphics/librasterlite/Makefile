@@ -1,20 +1,19 @@
-# Created by: lbartoletti <coder@tuxfamily.org>
+# Created by: lbartoletti <lbartoletti@FreeBSD.org>
 # $FreeBSD$
 
 PORTNAME=	librasterlite
 PORTVERSION=	1.1g
-PORTREVISION=	11
+PORTREVISION=	13
 CATEGORIES=	graphics geography
 MASTER_SITES=	http://www.gaia-gis.it/gaia-sins/librasterlite-sources/
 
-MAINTAINER=	lbartoletti@tuxfamily.org
+MAINTAINER=	lbartoletti@FreeBSD.org
 COMMENT=	Library that stores and retrieves raster coverages using a SpatiaLite
 
 LICENSE=	MPL11 GPLv2 LGPL21
 LICENSE_COMB=	dual
 
 LIB_DEPENDS=	libspatialite.so:databases/spatialite \
-		libsqlite3.so:databases/sqlite3 \
 		libgeotiff.so:graphics/libgeotiff \
 		libjbig.so:graphics/jbigkit \
 		libpng.so:graphics/png \
@@ -24,7 +23,7 @@ LIB_DEPENDS=	libspatialite.so:databases/spatialite \
 		libfreexl.so:textproc/freexl
 
 GNU_CONFIGURE=	yes
-USES=		gmake iconv jpeg libtool pathfix pkgconfig
+USES=		gmake iconv jpeg libtool pathfix pkgconfig sqlite
 USE_LDCONFIG=	yes
 INSTALL_TARGET=	install-strip
 

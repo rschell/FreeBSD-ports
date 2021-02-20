@@ -2,9 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	godot
-DISTVERSION=	3.1.1
+DISTVERSION=	3.2.3
 DISTVERSIONSUFFIX=	-stable
-PORTREVISION=	2
 CATEGORIES=	devel games
 
 MAINTAINER=	FreeBSD@Shaneware.biz
@@ -22,22 +21,21 @@ RUN_DEPENDS=	xdg-user-dir:devel/xdg-user-dirs \
 		xdg-open:devel/xdg-utils \
 		xmessage:x11/xmessage
 
-USES=		compiler:c++14-lang gl pkgconfig scons ssl xorg
+USES=		compiler:c++14-lang gl pkgconfig scons xorg
 USE_XORG=	x11 xcursor xi xinerama xrandr xrender
 USE_GL=		gl glew glu
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	godotengine
 
-MAKE_ARGS+=		platform=x11 builtin_libpng=False builtin_openssl=False verbose=True
+MAKE_ARGS+=		platform=x11 builtin_libpng=False verbose=True
 MAKE_ARGS+=		${MAKE_ARGS_${CHOSEN_COMPILER_TYPE}}
-MAKE_ARGS_clang=	use_llvm=True
-CXXFLAGS+=		-DRTAUDIO_ENABLED
+MAKE_ARGS_clang=	use_llvm=True use_lld=True
 CXXFLAGS_i386=		${CXXFLAGS_i386_${CHOSEN_COMPILER_TYPE}}
 CXXFLAGS_i386_gcc=	-march=i586
 
 # option MONO doesn't build (needs 5.12+) so for now leave it out as an option
-OPTIONS_DEFINE=		EXAMPLES TOOLS
+OPTIONS_DEFINE=		EXAMPLES TOOLS UDEV
 OPTIONS_DEFAULT=	ALSA
 # Moved to devel/godot-tools
 OPTIONS_EXCLUDE?=	EXAMPLES TOOLS
@@ -47,17 +45,20 @@ OPTIONS_GROUP_AUDIO=	ALSA PULSEAUDIO
 AUDIO_DESC=		Audio support
 ALSA_LIB_DEPENDS=	libasound.so:audio/alsa-lib
 ALSA_MAKE_ARGS=		alsa=True
-EXAMPLES_GH_PROJECT=	godot-demo-projects:DEMOS
-# master at 23/3
-EXAMPLES_GH_TAGNAME=	17e80079e3fc:DEMOS
+ALSA_MAKE_ARGS_OFF=	alsa=False
+# master at 10/7 tagged for 3.2
+EXAMPLES_GH_TUPLE=	godotengine:godot-demo-projects:8d9d58f112d8:DEMOS
 EXAMPLES_PORTEXAMPLES=	*
 # mono support doesn't build at present
-MONO_USES=		mono:nuget
+MONO_BUILD_DEPENDS=	msbuild:devel/msbuild
+MONO_LIB_DEPENDS=	libinotify.so:devel/libinotify
+MONO_GH_TUPLE=		mono:nuget-binary:ebedbf8:NUGT/nuget-binary
+MONO_MAKE_ARGS=		module_mono_enabled=yes mono_glue=True
+MONO_USES=		gettext-runtime mono:nuget
 NUGET_DEPENDS=		DotNet.Glob=2.1.1
-MONO_MAKE_ARGS=		module_mono_enabled=True mono_glue=True NUGET_PATH=${NUGET_EXE}
-MONO_MAKE_ENV=		NUGET_PATH=${NUGET_EXE}
 PULSEAUDIO_LIB_DEPENDS=	libpulse.so:audio/pulseaudio
 PULSEAUDIO_MAKE_ARGS=	pulseaudio=True
+PULSEAUDIO_MAKE_ARGS_OFF=	pulseaudio=False
 TOOLS_DESC=		Include development tools (IDE)
 TOOLS_MAKE_ARGS=	target=release_debug tools=True
 TOOLS_MAKE_ARGS_OFF=	target=release tools=False
@@ -65,6 +66,10 @@ TOOLS_DESKTOP_ENTRIES=	"Godot" "${COMMENT}" "${GODOTFILE}" \
 			"${GODOTFILE}" "Development;IDE;" ""
 TOOLS_PLIST_FILES=	share/pixmaps/${GODOTFILE}.png \
 			share/pixmaps/${GODOTFILE}.svg
+UDEV_DESC=		Libudev support (Joystick)
+UDEV_LIB_DEPENDS=	libudev.so:devel/libudev-devd
+UDEV_MAKE_ARGS=		udev=True
+UDEV_MAKE_ARGS_OFF=	udev=False
 
 GODOTFILE=		${PORTNAME}${PKGNAMESUFFIX}
 PLIST_FILES=		bin/${GODOTFILE}
@@ -77,8 +82,9 @@ PLIST_FILES=		bin/${GODOTFILE}
 .include <bsd.port.pre.mk>
 
 .if ${ARCH} != aarch64 && ${ARCH} != amd64 && ${ARCH} != i386 && ${ARCH} != armv6 && ${ARCH} != armv7
-LIB_DEPENDS+= libvpx.so:multimedia/libvpx
-MAKE_ARGS+= builtin_libvpx=False
+# use system libvpx on archs that break with built-in
+LIB_DEPENDS+=	libvpx.so:multimedia/libvpx
+MAKE_ARGS+=	builtin_libvpx=False
 .endif
 
 post-patch:
@@ -90,7 +96,7 @@ post-patch:
 pre-build-MONO-on: makenuget
 	@(cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_FLAGS} \
 		${_MAKE_JOBS} ${MAKE_ARGS:C,^${DESTDIRNAME}=.*,,g} \
-		target=release_debug tools=True mono_glue=False)
+		target=release_debug tools=True platform=server mono_glue=False)
 	@(cd ${WRKSRC} && ${FIND} ${WRKSRC}/bin -name 'godot*' -exec {} \
 		--generate-mono-glue modules/mono/glue \; && \
 		${FIND} ${WRKSRC}/bin -name 'godot*' -delete)

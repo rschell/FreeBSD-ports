@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	highwayhash
-PORTVERSION=	g20190324
+PORTVERSION=	g20201021
 PORTREVISION=	1
 PORTEPOCH=	1
 CATEGORIES=	security
@@ -13,15 +13,25 @@ COMMENT=	Fast strong hash functions: SipHash/HighwayHash
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-BROKEN_aarch64=		fails to compile: /usr/lib/clang/5.0.0/include/mmintrin.h:47:5: use of undeclared identifier '__builtin_ia32_emms'
-BROKEN_powerpc64=	fails to compile: g++6: error: unrecognized command line option '-mavx2'
-ONLY_FOR_ARCHS=		aarch64 amd64 powerpc powerpc64
+ONLY_FOR_ARCHS=		aarch64 amd64 powerpc powerpc64 powerpc64le
 ONLY_FOR_ARCHS_REASON=	Assembly is implemented only for specific architectures in highwayhash/tsc_timer.h
 
-USES=		compiler:c++11-lib gmake
+USES=		compiler:c++11-lang gmake
 USE_GITHUB=	yes
 GH_ACCOUNT=	google
-GH_TAGNAME=	30bd801
+GH_TAGNAME=	bdd572de8cfa3a1fbef6ba32307c2629db7c4773
 USE_LDCONFIG=	yes
+
+.include <bsd.port.options.mk>
+
+.if ${ARCH:Mpowerpc*}
+CXXFLAGS+=	-mpower8-vector
+MAKE_ENV+=	HH_POWER=1
+.elif ${ARCH} == aarch64 || ${ARCH:Marmv*}
+MAKE_ENV+=	HH_ARM=1
+.endif
+
+post-install:
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/libhighwayhash.so
 
 .include <bsd.port.mk>

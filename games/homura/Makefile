@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	homura
-PORTVERSION=	3.2
+PORTVERSION=	5.2
 CATEGORIES=	games
 
 MAINTAINER=	Alexander88207@protonmail.com
@@ -16,21 +16,21 @@ ONLY_FOR_ARCHS_REASON=	Wine only runs on x86 architecture
 
 RUN_DEPENDS=	zenity:x11/zenity \
 		xdg-open:devel/xdg-utils \
-		curl:ftp/curl \
 		bash:shells/bash \
 		7z:archivers/p7zip \
 		webfonts>=0:x11-fonts/webfonts \
 		winetricks:emulators/winetricks \
-		vulkaninfo:devel/vulkan-tools \
-		glxinfo:graphics/mesa-demos \
-		noto>=0:x11-fonts/noto
+		vulkaninfo:graphics/vulkan-tools \
+		glxinfo:graphics/mesa-demos
 
-USE_GITHUB=	yes
-GH_ACCOUNT=	the-homura-project
+USE_GITLAB=	yes
+GL_ACCOUNT=	Alexander88207
+GL_PROJECT=	Homura
+GL_COMMIT=	e52176c0b1350add43846ba25816ecb90dc0d4b0
 
 NO_BUILD=	yes
 
-PLIST_FILES=	${LOCALBASE}/bin/Homura
+PLIST_FILES=	bin/Homura
 
 .include <bsd.port.pre.mk>
 

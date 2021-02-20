@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	pfSense-pkg-Netgate_Coreboot_Upgrade
-PORTVERSION=	0.27
+PORTVERSION=	0.29
 PORTREVISION=	1
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -13,7 +13,7 @@ LICENSE=	APACHE20
 
 BUILD_DEPENDS=	e2fsprogs-libuuid>=0:misc/e2fsprogs-libuuid \
 		gmake:devel/gmake
-RUN_DEPENDS=	flashrom:sysutils/flashrom \
+RUN_DEPENDS=	flashrom>=1.1:sysutils/flashrom \
 		e2fsprogs-libuuid>=0:misc/e2fsprogs-libuuid
 
 NO_MTREE=	yes
@@ -56,6 +56,7 @@ post-extract:
 	${REINPLACE_CMD} -e "s,%%COREBOOT_PLCCB_ROM%%,${COREBOOT_PLCCB_ROM},g" \
 		${WRKSRC}/adi_smbios_util/config.h
 	${LN} -sf ${WRKSRC_coreboot} ${WRKSRC}/coreboot
+	${PATCH} -p0 -d ${WRKSRC_coreboot} < ${FILESDIR}/fix-build-clang10
 
 do-build:
 	${CC} ${CFLAGS} -o ${WRKSRC}/adi_flash_util \

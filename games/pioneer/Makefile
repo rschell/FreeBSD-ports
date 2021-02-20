@@ -3,9 +3,10 @@
 
 PORTNAME=	pioneer
 DISTVERSION=	0.0.${GH_TAGNAME}
+PORTREVISION=	1
 CATEGORIES=	games
 
-MAINTAINER=	lightside@gmx.com
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Space adventure game set in the Milky Way galaxy
 
 LICENSE=		APACHE20 BSD2CLAUSE CC-BY-SA-3.0 DejaVu GLEW GPLv3 IUP \

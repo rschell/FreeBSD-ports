@@ -2,11 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	mailutils
-PORTVERSION=	3.8
+PORTVERSION=	3.11
 CATEGORIES=	mail
 MASTER_SITES=	GNU GNU_ALPHA
-
-EXTRA_PATCHES=	${FILESDIR}/git-de640c83e9:-p1
 
 MAINTAINER=	zeus@gnu.org.ua
 COMMENT=	Utilities, daemons, and filters for processing e-mail
@@ -25,12 +23,12 @@ USE_RC_SUBR=	comsatd imap4d pop3d
 INSTALL_TARGET=	install-strip
 TEST_TARGET=	check
 
-PLIST_SUB+=	LIBVERSION=6.0.0 LIBSUFX=6 VERSION=${PORTVERSION}
+PLIST_SUB+=	LIBVERSION=8.0.0 LIBSUFX=8 VERSION=${PORTVERSION}
 
 INFO=		${PORTNAME}
 PORTDOCS=	AUTHORS ChangeLog NEWS README* THANKS TODO
 
-OPTIONS_DEFINE=		DOCS GNUTLS GSSAPI GUILE MH NNTP NLS PAM PYTHON
+OPTIONS_DEFINE=		DOCS FRIBIDI GNUTLS GSSAPI GUILE MH NLS PAM PYTHON
 OPTIONS_DEFAULT=	GDBM GNUTLS PAM
 OPTIONS_MULTI=		DB
 OPTIONS_MULTI_DB=	BDB GDBM KYOTOCABINET LDAP MYSQL PGSQL TOKYOCABINET
@@ -40,6 +38,9 @@ DB_DESC=		Database configuration
 KYOTOCABINET_DESC=	Kyoto Cabinet database support
 MH_DESC=		MH (Message Handling) system support
 TOKYOCABINET_DESC=	Tokyo Cabinet database support
+
+FRIBIDI_LIB_DEPENDS=	libfribidi.so:converters/fribidi
+FRIBIDI_CONFIGURE_WITH=	fribidi
 
 GNUTLS_LIB_DEPENDS=	libgnutls.so:security/gnutls
 GNUTLS_CONFIGURE_WITH=	gnutls
@@ -57,15 +58,13 @@ MH_CONFIGURE_ENABLE=	mh
 MH_USES=		emacs:noflavors
 MH_VARS=		EMACS_NO_DEPENDS=yes
 
-NNTP_CONFIGURE_ENABLE=	nntp
-
 NLS_USES=		gettext
 NLS_CONFIGURE_ENABLE=	nls
 
 PAM_CONFIGURE_ENABLE=	pam
 
 PYTHON_BINARY_ALIAS=	python-config=python${PYTHON_VER}-config
-PYTHON_USES=		python:2.7
+PYTHON_USES=		python:3.0+
 PYTHON_CONFIGURE_ENABLE=python
 
 BDB_USES=		bdb
@@ -100,7 +99,8 @@ post-patch:
 		${WRKSRC}/configure
 	@${REINPLACE_CMD} -e '/need_charset_alias=/s|true|false|' \
 		${WRKSRC}/lib/gnu/Makefile.in
-	@${REINPLACE_CMD} -e '/chown/,+1s|ch|#&|' ${WRKSRC}/dotlock/Makefile.in
+	@${REINPLACE_CMD} -e '/chown/,+1s|ch|#&|' \
+		${WRKSRC}/dotlock/Makefile.in ${WRKSRC}/mda/mda/Makefile.in
 	@${REINPLACE_CMD} -e 's,-E,& -P,' ${WRKSRC}/libmu_scm/Makefile.in
 
 post-install-DOCS-on:

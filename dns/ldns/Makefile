@@ -3,7 +3,7 @@
 
 PORTNAME=	ldns
 PORTVERSION=	1.7.1
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	dns
 MASTER_SITES=	https://www.nlnetlabs.nl/downloads/ldns/ \
 		LOCAL/ehaupt
@@ -22,6 +22,7 @@ CPE_VENDOR=	nlnetlabs
 GNU_CONFIGURE=	yes
 CONFIGURE_ARGS+=	--disable-dane-ta-usage \
 			--with-ssl=${OPENSSLBASE}
+MAKE_JOBS_UNSAFE=	yes
 
 .if ! (defined(BUILD_PYLDNS) || defined(BUILD_P5PERL))
 OPTIONS_DEFINE=		DOXYGEN DRILL EXAMPLES
@@ -37,7 +38,7 @@ HTMLDOCS=		doc/html/*
 OPTIONS_DEFINE+=	DANETAUSAGE GOST RRTYPEAMTRELAY RRTYPEAVC RRTYPENINFO \
 			RRTYPERKEY RRTYPETA
 
-DANETAUSAGE_DESC=	Enable ta uasage, requires openssl >= 1.1.0
+DANETAUSAGE_DESC=	Enable ta usage, requires openssl >= 1.1.0
 GOST_DESC=		GOST signatures enabled, requires openssl >= 1.0.0
 RRTYPENINFO_DESC=	Enable draft RR type ninfo.
 RRTYPERKEY_DESC=	Enable draft RR type rkey.
@@ -61,7 +62,7 @@ DRILL_INSTALL_TARGET=			install-drill
 EXAMPLES_INSTALL_TARGET=		install-examples
 
 .if defined(BUILD_PYLDNS)
-USES+=		python
+USES+=		python:3.6+
 USE_PYTHON=	flavors
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 ALL_TARGET=	pyldns
@@ -69,9 +70,8 @@ INSTALL_TARGET=	install-pyldns
 
 CONFIGURE_ARGS+=	--with-pyldns
 LIB_DEPENDS+=		libldns.so:dns/ldns
-BUILD_DEPENDS+=		swig3.0:devel/swig30
+BUILD_DEPENDS+=		swig:devel/swig
 CFLAGS+=		-I${OPENSSLINC}
-BINARY_ALIAS=		swig=swig3.0
 
 post-patch:
 	@${REINPLACE_CMD} \

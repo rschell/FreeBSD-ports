@@ -2,8 +2,7 @@
 # $FreeBSD$
 #
 # PROVIDE: webcamd
-# REQUIRE: FILESYSTEMS netif dbus
-# BEFORE: devd
+# REQUIRE: FILESYSTEMS netif dbus kld
 # KEYWORD: shutdown
 #
 # ================================================================

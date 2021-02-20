@@ -12,11 +12,13 @@ USES=		compiler:c++11-lang gl python:build qmake:norecursive \
 		qt-dist:5
 USE_GL=		gl
 USE_QT=		core gui network sql testlib \
-		widgets xmlpatterns buildtools_build
-USE_LDCONFIG=	${PREFIX}/${QT_LIBDIR_REL}
+		widgets buildtools_build
 
 CONFLICTS=	qt5-declarative-render2d-* qt5-qml qt5-quick
 
+BINARY_ALIAS=	python=${PYTHON_CMD}
+
+QT_BINARIES=	yes
 QT_DEFINES=	ACCESSIBILITY
 QT_CONFIG=	accessibility accessibility-atspi-bridge
 

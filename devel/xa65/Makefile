@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	xa65
-PORTVERSION=	2.3.9
+PORTVERSION=	2.3.11
 CATEGORIES=	devel
 MASTER_SITES=	http://www.floodgap.com/retrotech/xa/dists/
 DISTNAME=	xa-${PORTVERSION}
@@ -12,7 +12,6 @@ COMMENT=	Two-pass cross-assembler for MOS 6502 and compatible CPUs
 
 LICENSE=	GPLv2+
 
-USES=		gmake
 MAKE_ARGS=	CC="${CC}" CFLAGS="${CFLAGS}" LD="${CC}" LDFLAGS="${LDFLAGS}"
 
 OPTIONS_DEFINE=	DOCS EXAMPLES

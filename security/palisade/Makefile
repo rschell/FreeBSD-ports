@@ -2,11 +2,11 @@
 
 PORTNAME=	palisade
 DISTVERSIONPREFIX=	v
-DISTVERSION=	1.7.c.20191227
+DISTVERSION=	1.10.6
 CATEGORIES=	security math
 
 MAINTAINER=	yuri@FreeBSD.org
-COMMENT=	PALISADE lattice cryptography library
+COMMENT=	PALISADE lattice cryptography library for Fully Homomorphic Encryption
 
 LICENSE=	BSD2CLAUSE
 LICENSE_FILE=	${WRKSRC}/License.md
@@ -16,22 +16,39 @@ BROKEN_powerpc64=	fails to build: math/native_int/binint.h:510:11: error: Archit
 
 BUILD_DEPENDS=	autoconf:devel/autoconf # possibly a mistake in the project
 
-USES=		cmake:noninja compiler:c++11-lang localbase
+USES=		cmake:noninja localbase # compiler:c++11-lang
 USE_GITLAB=	yes
 USE_GITHUB=	nodefault
-GL_PROJECT=	palisade-development
-GL_COMMIT=	5d4f7a3ff66006966bf16c67f3da2e4e6936e39f
+GL_PROJECT=	palisade-release # there's also palisade-development
+GL_COMMIT=	7eec669e1faa4aca0434021b7bdd5fd43695c075
 GH_TUPLE=	\
-		JerryRyan:cereal:181fbcd3:cereal/third-party/cereal \
-		google:benchmark:c50ac68c:benchmark/third-party/google-benchmark \
-		google:googletest:78fdd6c0:google_test/third-party/google-test \
-		gperftools:gperftools:c1d546d7:gperftools/third-party/gperftools
-USE_GCC=	any # clang fails: fatal error: 'quadmath.h' file not found
+		JerryRyan:cereal:a384b101:cereal/third-party/cereal \
+		google:benchmark:d3ad0b9d:benchmark/third-party/google-benchmark \
+		google:googletest:8b4817e3:google_test/third-party/google-test
 USE_LDCONFIG=	yes
 
-CMAKE_OFF=	BUILD_UNITTESTS
+CMAKE_OFF=	BUILD_UNITTESTS BUILD_EXAMPLES BUILD_BENCHMARKS
+CMAKE_OFF+=	WITH_NTL # https://gitlab.com/palisade/palisade-development/-/issues/180
+CMAKE_ARGS=	-DWITH_NTL=Y # libntl.so will be discontinued in 1.11, see https://gitlab.com/palisade/palisade-development/-/issues/180
 
 CXXFLAGS+=	-I${WRKSRC}/third-party/google-test/googletest
+
+BINARY_ALIAS=	git=false
+
+# clang-8 fails: error: use of undeclared identifier '__builtin_FILE'
+LLVM_VERSION=	10 # ${LLVM_DEFAULT}
+BUILD_DEPENDS+=	clang${LLVM_VERSION}:devel/llvm${LLVM_VERSION}
+RUN_DEPENDS+=	clang${LLVM_VERSION}:devel/llvm${LLVM_VERSION}
+CPP=		clang-cpp${LLVM_VERSION}
+CC=		clang${LLVM_VERSION}
+CXX=		clang++${LLVM_VERSION}
+
+LDFLAGS+=	-pthread # only for tests: see https://gitlab.com/palisade/palisade-release/-/issues/23
+
+OPTIONS_DEFINE=		OPENMP
+OPTIONS_DEFAULT=	OPENMP
+
+OPENMP_CMAKE_BOOL=	USE_OpenMP
 
 do-test:
 	@cd ${BUILD_WRKSRC} && \

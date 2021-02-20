@@ -5,10 +5,6 @@ lib/libkeybinder.so.0
 lib/libkeybinder.so.0.1.0
 %%LUA%%%%LUA_MODLIBDIR%%/keybinder.so
 libdata/pkgconfig/keybinder.pc
-%%PYTHON%%%%PYTHON_SITELIBDIR%%/keybinder/__init__.py
-%%PYTHON%%%%PYTHON_SITELIBDIR%%/keybinder/__init__.pyc
-%%PYTHON%%%%PYTHON_SITELIBDIR%%/keybinder/__init__.pyo
-%%PYTHON%%%%PYTHON_SITELIBDIR%%/keybinder/_keybinder.so
 %%PORTEXAMPLES%%%%EXAMPLESDIR%%/Makefile
 %%PORTEXAMPLES%%%%EXAMPLESDIR%%/README
 %%PORTEXAMPLES%%%%EXAMPLESDIR%%/example.lua
@@ -29,7 +25,6 @@ share/gir-1.0/Keybinder-0.0.gir
 %%PORTDOCS%%share/gtk-doc/html/keybinder/keybinder.devhelp2
 %%PORTDOCS%%share/gtk-doc/html/keybinder/left-insensitive.png
 %%PORTDOCS%%share/gtk-doc/html/keybinder/left.png
-%%PORTDOCS%%share/gtk-doc/html/keybinder/object-tree.html
 %%PORTDOCS%%share/gtk-doc/html/keybinder/right-insensitive.png
 %%PORTDOCS%%share/gtk-doc/html/keybinder/right.png
 %%PORTDOCS%%share/gtk-doc/html/keybinder/style.css

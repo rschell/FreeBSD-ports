@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	ntopng
-PORTVERSION=	3.8.d20191111
+PORTVERSION=	4.2.d20210122
 PORTEPOCH=	1
 CATEGORIES=	net
 
@@ -18,8 +18,12 @@ LIB_DEPENDS=	librrd.so:databases/rrdtool \
 		libndpi.so:net/ndpi \
 		libjson-c.so:devel/json-c \
 		libsodium.so:security/libsodium \
-		libmaxminddb.so:net/libmaxminddb
-BUILD_DEPENDS=  bash:shells/bash
+		libmaxminddb.so:net/libmaxminddb \
+		libexpat.so:textproc/expat2 \
+		libzstd.so:archivers/zstd \
+		libgcrypt.so:security/libgcrypt \
+		libgpg-error.so:security/libgpg-error
+BUILD_DEPENDS=	bash:shells/bash
 
 USES=		autoreconf compiler:c++11-lang cpe gmake libtool localbase \
 		mysql pathfix pkgconfig shebangfix sqlite ssl
@@ -36,7 +40,7 @@ PLIST_SUB=	NTOPNGUSER="${USERS}" NTOPNGROUP="${GROUPS}"
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	ntop
-GH_TAGNAME=	2c6a3fe
+GH_TAGNAME=	e91b1b5
 
 CPE_VENDOR=	ntop
 
@@ -49,13 +53,13 @@ NLS_USES=	gettext
 USE_RC_SUBR=	ntopng
 
 post-patch:
-	@${REINPLACE_CMD} -e 's|%%LOCALBASE%%|${LOCALBASE}|' \
-		${WRKSRC}/configure.seed
 	cd ${WRKSRC} && ${SH} autogen.sh
 
 post-install:
 	${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/ntopng
 	${MKDIR} ${STAGEDIR}/var/db/ntopng
 	${INSTALL_SCRIPT} ${WRKDIR}/ntopng-geoip2update.sh ${STAGEDIR}${PREFIX}/bin
+	${RM} ${STAGEDIR}${DATADIR}/httpdocs/misc/ntopng-utils-manage-updates \
+		${STAGEDIR}${DATADIR}/httpdocs/misc/ntopng-utils-manage-updates.in
 
 .include <bsd.port.mk>

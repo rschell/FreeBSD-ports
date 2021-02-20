@@ -2,9 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	milkytracker
-PORTVERSION=	1.02.00
+PORTVERSION=	1.03.00
 DISTVERSIONPREFIX=	v
-PORTREVISION=	1
 CATEGORIES=	audio
 
 MAINTAINER=	ehaupt@FreeBSD.org
@@ -14,14 +13,11 @@ LICENSE=	GPLv3+ BSD3CLAUSE
 LICENSE_COMB=	multi
 LICENSE_FILE_GPLv3+ =	${WRKSRC}/COPYING
 
-BROKEN_powerpc=		Does not build on powerpc
-BROKEN_powerpc64=	Does not build on powerpc64
-
 LIB_DEPENDS=	liblhasa.so:archivers/lhasa \
 		libzzip.so:devel/zziplib \
 		libjack.so:audio/jack
 
-USES=		cmake sdl
+USES=		cmake compiler:c11 sdl
 USE_GITHUB=	yes
 USE_SDL=	sdl2
 

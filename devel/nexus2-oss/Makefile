@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	nexus2
-PORTVERSION=	2.14.15
+PORTVERSION=	2.14.18
 DISTVERSIONSUFFIX=	01
 CATEGORIES=	devel www java
 MASTER_SITES=	https://download.sonatype.com/nexus/oss/
@@ -12,8 +12,6 @@ MAINTAINER=	michael.osipov@siemens.com
 COMMENT=	Maven (and others) artifacts repostory manager
 
 LICENSE=	EPL
-
-ONLY_FOR_ARCHS=	amd64 i386
 
 PATCH_DEPENDS=	zip:archivers/zip
 RUN_DEPENDS=	javaservicewrapper:sysutils/javaservicewrapper

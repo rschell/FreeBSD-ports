@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	Coro
-PORTVERSION=	6.550
+PORTVERSION=	6.570
 PORTEPOCH=	1
 CATEGORIES=	devel perl5
 MASTER_SITES=	CPAN
@@ -14,8 +14,7 @@ COMMENT=	Coroutine process abstraction for perl
 LICENSE=	ART10 GPLv1+
 LICENSE_COMB=	dual
 
-BUILD_DEPENDS=	p5-Canary-Stability>=0:devel/p5-Canary-Stability \
-		${RUN_DEPENDS}
+BUILD_DEPENDS=	${RUN_DEPENDS}
 RUN_DEPENDS=	p5-AnyEvent>=7:devel/p5-AnyEvent \
 		p5-AnyEvent-AIO>=1.0:devel/p5-AnyEvent-AIO \
 		p5-EV>=4:devel/p5-EV \
@@ -27,10 +26,10 @@ RUN_DEPENDS=	p5-AnyEvent>=7:devel/p5-AnyEvent \
 USES=		perl5 shebangfix
 USE_PERL5=	configure
 
-OPTIONS_DEFINE=	DOCS EXAMPLES
-
 SHEBANG_FILES=	Coro/*.pl eg/*
 perl_OLD_CMD=	/.*/bin/perl
+
+OPTIONS_DEFINE=	DOCS EXAMPLES
 
 post-install:
 	${STRIP_CMD} ${STAGEDIR}${PREFIX}/${SITE_ARCH_REL}/auto/Coro/EV/EV.so

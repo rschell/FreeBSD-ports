@@ -3,9 +3,9 @@
  * snort_rulesets.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2006-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2006-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2009 Robert Zelaya
- * Copyright (c) 2019 Bill Meeks
+ * Copyright (c) 2020 Bill Meeks
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +55,8 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['ips_policy_enable'] = $a_nat[$id]['ips_policy_enable'] == 'on' ? 'on' : 'off';;
 	$pconfig['ips_policy'] = $a_nat[$id]['ips_policy'];
 	$pconfig['ips_policy_mode'] = $a_nat[$id]['ips_policy_mode'];
+} else {
+	$pconfig['autoflowbitrules'] = 'on';
 }
 
 $if_real = get_real_interface($pconfig['interface']);
@@ -90,8 +92,7 @@ if (empty($test))
 if (!file_exists("{$snortdir}/rules/" . GPL_FILE_PREFIX . "community.rules"))
 	$no_community_files = true;
 
-if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
-	$policy_select_disable = "disabled";
+$inline_ips_mode = $a_nat[$id]['ips_mode'] == 'ips_mode_inline' ? true:false;
 
 // If a Snort Subscriber Rules policy is enabled and selected, remove all Snort
 // Subscriber rules from the configured rule sets to allow automatic selection.
@@ -159,7 +160,7 @@ if (isset($_POST["save"])) {
 
 	$pconfig = $_POST;
 	$enabled_rulesets_array = explode("||", $enabled_items);
-	if (snort_is_running($if_real))
+	if (snort_is_running($a_nat[$id]['uuid']))
 		$savemsg = gettext("Snort is 'live-reloading' the new rule set.");
 
 	// Sync to configured CARP slaves if any are enabled
@@ -296,7 +297,6 @@ $tab_array = array();
 	$tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
-	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Logs"), false, "/snort/snort_interface_logs.php?id={$id}");
 display_top_tabs($tab_array, true, 'nav nav-tabs');
@@ -361,35 +361,33 @@ print($section);
 
 if ($snortdownload == "on") {
 	$section = new Form_Section('Snort Subscriber IPS Policy Selection');
-	$section->addInput(new Form_Checkbox(
+	$group = new Form_Group('Use IPS Policy');
+	$group->add(new Form_Checkbox(
 		'ips_policy_enable',
 		'Use IPS Policy',
 		'If checked, Snort will use rules from one of three pre-defined IPS policies in the Snort Subscriber rules. Default is Not Checked.',
 		$pconfig['ips_policy_enable'] == 'on' ? true:false,
 		'on'
-	));
-	$section->addInput(new Form_StaticText(
-	null,
-	'<span class="help-block">Selecting this option disables manual selection of Snort Subscriber categories in the list below, ' . 
+	))->setHelp('Selecting this option disables manual selection of Snort Subscriber categories in the list below, ' . 
 		'although Emerging Threats categories may still be selected if enabled on the Global Settings tab.  These ' . 
-		'will be added to the pre-defined Snort IPS policy rules from the Snort VRT.</span>'
-	));
-	$section->addInput(new Form_Select(
+		'will be added to the pre-defined Snort IPS policy rules from the Snort VRT.');
+	$section->add($group);
+
+	$group = new Form_Group('IPS Policy Selection');
+	$group->add(new Form_Select(
 		'ips_policy',
 		'IPS Policy Selection',
 		$pconfig['ips_policy'],
 		array('connectivity' => 'Connectivity', 'balanced' => 'Balanced', 'security' => 'Security', 'max-detect' => 'Max-Detect')
-	))->setHelp('Snort IPS policies are:  Connectivity, Balanced, Security or Max-Detect.');
-
-	$section->addInput(new Form_StaticText(
-		'',
-		'<span class="help-block">Connectivity blocks most major threats with few or no false positives. ' . 
+	))->setHelp('Snort IPS policies are:  Connectivity, Balanced, Security or Max-Detect.' . '</br>' . 
+		'Connectivity blocks most major threats with few or no false positives. ' . 
 		'Balanced is a good starter policy. It is speedy, has good base coverage level, and covers ' . 
 		'most threats of the day.  It includes all rules in Connectivity. Security is a stringent ' . 
 		'policy.  It contains everything in the first two plus policy-type rules such as a Flash object ' . 
 		'in an Excel file.  Max-Detect is a policy created for testing network traffic through your ' . 
-		'device.  This policy should be used with caution on production systems!</span>'
-	));
+		'device.  This policy should be used with caution on production systems!');
+	$section->add($group);
+
 	$section->addInput(new Form_Select(
 		'ips_policy_mode',
 		'IPS Policy Mode',
@@ -768,24 +766,28 @@ if ($snortdownload == "on") {
 
 		function enable_change()
 		{
-		var endis = !($('#ips_policy_enable').prop('checked'));
+			var endis = !($('#ips_policy_enable').prop('checked'));
 
-		hideInput('ips_policy', endis);
-		hideInput('ips_policy_mode', endis);
+			hideInput('ips_policy', endis);
+	<?php if ($inline_ips_mode): ?>
+			hideInput('ips_policy_mode', endis);
+	<?php else: ?>
+			hideInput('ips_policy_mode', true);
+	<?php endif;?>
 
-		$('input[type="checkbox"]').each(function() {
-			var str = $(this).val();
+			$('input[type="checkbox"]').each(function() {
+				var str = $(this).val();
 
-			if (str.substr(0,6) == "snort_") {
-				$(this).attr('disabled', !endis);
-				if (!endis) {
-					$(this).prop('title', 'Disabled because an IPS Policy is selected');
+				if (str.substr(0,6) == "snort_") {
+					$(this).attr('disabled', !endis);
+					if (!endis) {
+						$(this).prop('title', 'Disabled because an IPS Policy is selected');
+					}
+					else {
+						$(this).prop('title', '');
+					}
 				}
-				else {
-					$(this).prop('title', '');
-				}
-			}
-		});
+			});
 		}
 
 	events.push(function(){

@@ -2,14 +2,17 @@
 # $FreeBSD$
 
 PORTNAME=	ilias
-PORTVERSION=	5.4.8
+PORTVERSION=	5.4.18
 DISTVERSIONPREFIX=	v
-CATEGORIES=	www
+CATEGORIES=	www education
 
 MAINTAINER=	wen@FreeBSD.org
 COMMENT=	Powerful, dynamic, PHP and MySQL based e-learning platform
 
 LICENSE=	GPLv2
+
+CONFLICTS=	ilias6-[0-9]*
+PORTSCOUT=	limit:^5\.
 
 RUN_DEPENDS=	convert:graphics/ImageMagick6 \
 		zip:archivers/zip \
@@ -43,7 +46,29 @@ EXTRA_FILES=	%%WWWDIR%%/libs/composer/vendor/bin/generate_vcards \
 		%%WWWDIR%%/libs/composer/vendor/bin/naturalselection \
 		%%WWWDIR%%/libs/composer/vendor/bin/sabredav \
 		%%WWWDIR%%/libs/composer/vendor/bin/vobject \
-		%%WWWDIR%%/libs/composer/vendor/simplesamlphp/simplesamlphp/locales/no
+		%%WWWDIR%%/libs/composer/vendor/simplesamlphp/simplesamlphp/locales/no \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/_mocha \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/esparse \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/esvalidate \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/flat \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/he \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/js-yaml \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/mime \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/mkdirp \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/mocha \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/semver \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/uuid \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/.bin/which \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/js-yaml/node_modules/.bin/esparse \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/js-yaml/node_modules/.bin/esvalidate \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/mocha/node_modules/.bin/he \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/mocha/node_modules/.bin/js-yaml \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/mocha/node_modules/.bin/mkdirp \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/mocha/node_modules/.bin/which \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/node-environment-flags/node_modules/.bin/semver \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/send/node_modules/.bin/mime \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/superagent/node_modules/.bin/mime \
+		%%WWWDIR%%/Modules/Chatroom/chat/node_modules/yargs-unparser/node_modules/.bin/flat
 
 pre-install:
 	@${ECHO_CMD} "@owner ${WWWOWN}" >> ${PLIST}
@@ -53,6 +78,7 @@ pre-install:
 .for i in ${EXTRA_FILES}
 	@${ECHO_CMD} ${i} >> ${PLIST}
 .endfor
+	@${ECHO} @dir ${ILIASDIR} >> ${PLIST}
 	@${ECHO} @dir ${ILIASDATADIR} >> ${PLIST}
 	@${ECHO_CMD} "@mode" >> ${PLIST}
 	@${ECHO_CMD} "@group" >> ${PLIST}

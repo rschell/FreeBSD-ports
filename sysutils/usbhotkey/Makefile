@@ -15,16 +15,12 @@ LICENSE=	GPLv2
 LIB_DEPENDS=	libhid.so:devel/libhid \
 		libXtst.so:x11/libXtst
 
-BROKEN_powerpc64=	fails to compile: ruby.h: wrong number of arguments specified for 'deprecated' attribute
-
-USES=		gmake
+USES=		compiler:c11 gmake localbase:ldflags
 USE_RUBY=	yes
 GNU_CONFIGURE=	yes
 
-CPPFLAGS+=	-I${LOCALBASE}/include \
-		-I${LOCALBASE}/include/ruby-${RUBY_VER} \
+CPPFLAGS+=	-I${LOCALBASE}/include/ruby-${RUBY_VER} \
 		-I${LOCALBASE}/include/ruby-${RUBY_VER}/${RUBY_ARCH}
-LDFLAGS+=	-L${LOCALBASE}/lib
 LIBS+=		-lX11
 
 CONFIGURE_ARGS=	--without-Imlib

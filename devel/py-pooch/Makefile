@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	pooch
-PORTVERSION=	0.7.0
+PORTVERSION=	1.3.0
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -17,8 +17,8 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}appdirs>=0:devel/py-appdirs@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}packaging>=0:devel/py-packaging@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}requests>=0:www/py-requests@${PY_FLAVOR}
 
-USES=		python:3.5+
-USE_PYTHON=	autoplist distutils
+USES=		python:3.6+
+USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes
 USE_LOCALE=	en_US.UTF-8

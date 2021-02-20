@@ -3,7 +3,7 @@
 
 PORTNAME=	sdpa
 PORTVERSION=	7.3.8
-PORTREVISION=	8
+PORTREVISION=	9
 CATEGORIES=	math
 MASTER_SITES=	SF/${PORTNAME}/${PORTNAME} \
 		DEBIAN/pool/main/m/mumps:mumps
@@ -40,6 +40,13 @@ REFERENCE_USES=		blaslapack
 
 MANUALFILE=		sdpa.7.1.1.manual.20080618.pdf
 
+.include <bsd.port.pre.mk>
+
+.if ${GCC_DEFAULT} >= 10
+# workaround for Type mismatch in argument 's' at (1); passed INTEGER(4) to LOGICAL(4)
+CONFIGURE_ARGS+=	FCFLAGS=-fallow-argument-mismatch
+.endif
+
 post-extract:
 	@(cd ${DISTDIR}/${DIST_SUBDIR} && ${PAX} -rw \
 		mumps_4.10.0.dfsg.orig.tar.gz ${WRKSRC}/mumps)
@@ -62,4 +69,4 @@ post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}
 	${INSTALL_DATA} ${DISTDIR}/${DIST_SUBDIR}/${MANUALFILE} ${STAGEDIR}${DOCSDIR}
 
-.include <bsd.port.mk>
+.include <bsd.port.post.mk>

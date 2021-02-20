@@ -5,7 +5,7 @@ DISTVERSION=	g20190424
 PORTREVISION=	1
 CATEGORIES=	sysutils
 
-MAINTAINER=	araujo@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	UEFI-EDK2 firmware for bhyve
 
 LICENSE=	BSD2CLAUSE
@@ -18,7 +18,7 @@ BUILD_DEPENDS=	${BASH_CMD}:shells/bash \
 
 USES=		gmake \
 		python:2.7,build
-USE_GCC=	8+
+USE_GCC=	yes
 USE_GITHUB=	yes
 GH_ACCOUNT=	freebsd
 GH_PROJECT=	uefi-edk2

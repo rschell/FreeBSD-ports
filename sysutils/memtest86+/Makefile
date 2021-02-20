@@ -1,13 +1,12 @@
-# Created by: Andriy Gapon <avg@icyb.net.ua>
 # $FreeBSD$
 
 PORTNAME=	memtest86+
 PORTVERSION=	5.01
-PORTREVISION=	3
+PORTREVISION=	4
 CATEGORIES=	sysutils
 MASTER_SITES=	http://www.memtest.org/download/${PORTVERSION}/
 
-MAINTAINER=	avg@icyb.net.ua
+MAINTAINER=	avg@FreeBSD.org
 COMMENT=	Stand-alone memory test for x86 architecture computers
 
 LICENSE=	GPLv2
@@ -18,7 +17,7 @@ USES=	gmake
 ALL_TARGET=	all
 PORTDOCS=	*
 
-USE_GCC=	4.8
+USE_GCC=	yes
 
 # Please provide absolute path below (cannot be root)
 BOOT_DIR?=	/boot/opt

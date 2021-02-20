@@ -2,7 +2,7 @@
 
 PORTNAME=	openvsp
 DISTVERSIONPREFIX=	${GH_PROJECT}_
-DISTVERSION=	3.19.1
+DISTVERSION=	3.20.0
 CATEGORIES=	cad
 
 MAINTAINER=	fernape@FreeBSD.org
@@ -55,7 +55,7 @@ USE_GNOME=	libxml2
 
 # See https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=230888
 .if ${OPSYS} == FreeBSD
-.if (${OSVERSION} < 1200000 || ${OSVERSION} >=1300000)
+.if (${OSVERSION} < 1104507) || (${OSVERSION} >= 1200000 && ${OSVERSION} < 1202000) || (${OSVERSION} >= 1300000 && ${OSVERSION} < 1300115)
 BROKEN=	undefined reference to __atomic_load
 .endif
 .endif

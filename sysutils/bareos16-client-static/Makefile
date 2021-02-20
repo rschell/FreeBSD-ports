@@ -1,9 +1,12 @@
 # $FreeBSD$
 
-PORTNAME=	bareos16
-PKGNAMESUFFIX=	-client-static
+PORTNAME=	bareos
+PKGNAMESUFFIX=	16-client-static
 
 COMMENT=	Backup archiving recovery open sourced (static client)
+
+BROKEN_aarch64=	Fails to link: missing sbrk
+BROKEN_riscv64=	Fails to link: missing sbrk
 
 CONFLICTS=	bareos-client-static-*
 
@@ -23,7 +26,5 @@ CONFIGURE_ARGS+=	--enable-client-only \
 			--disable-build-dird \
 			--disable-build-stored \
 			--with-jansson=${LOCALBASE}
-
-BROKEN_aarch64=	Fails to link: missing sbrk
 
 .include "${MASTERDIR}/Makefile"

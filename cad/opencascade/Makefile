@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	opencascade
-PORTVERSION=	7.4.0
-PORTREVISION=	1
+PORTVERSION=	7.5.0
 CATEGORIES=	cad science
 MASTER_SITES=	LOCAL/thierry
 
@@ -15,8 +14,11 @@ LICENSE_NAME=	LGPL21 with exception
 LICENSE_FILE=	${WRKSRC}/OCCT_LGPL_EXCEPTION.txt
 LICENSE_PERMS=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
+BUILD_DEPENDS=	rapidjson>0:devel/rapidjson			\
+		${LOCALBASE}/lib/qt5/bin/qmake:devel/qt5-qmake	\
+		${LOCALBASE}/lib/qt5/bin/moc:devel/qt5-buildtools
 LIB_DEPENDS=	libfontconfig.so:x11-fonts/fontconfig	\
-		libvtksys-${VTKVER}.so:math/vtk6	\
+		libvtksys-${VTKVER}.so:math/vtk8	\
 		libfreetype.so:print/freetype2		\
 		libtbb.so:devel/tbb
 RUN_DEPENDS=	bash:shells/bash
@@ -24,7 +26,7 @@ RUN_DEPENDS=	bash:shells/bash
 # Check ${WRKSRC}/dox/overview/overview.md
 # and ${WRKSRC}/dox/dev_guides/building
 USES=		alias:10 cmake compiler:c++14-lang dos2unix \
-		gl python shebangfix tk tar:tgz xorg
+		gl python qt:5 shebangfix tk tar:tgz xorg
 USE_XORG=	ice sm x11 xext xi xmu xt
 USE_GL=		gl glu
 
@@ -37,10 +39,10 @@ SHEBANG_FILES=	adm/templates/*.sh	\
 		gendoc
 ENVSH=		adm/templates/env.sh
 
-VTKVER=		6.2
+VTKVER=		8.2
 
 OPTIONS_DEFINE=	DOCS DOXYGEN FFMPEG VIS
-VIS_DESC=	Build Visualizazion module (requires OpenGL, freetype, ftgl and gl2ps)
+VIS_DESC=	Build Visualizazion module (requires OpenGL, freetype, ftgl)
 OPTIONS_DEFAULT=FFMPEG VIS
 OPTIONS_SUB=	yes
 
@@ -56,7 +58,12 @@ CMAKE_ARGS+=	-DINSTALL_DIR=${OCCROOT}				\
 		-DINSTALL_DIR_TESTS=${OCCROOT}/tests			\
 		-DINSTALL_TEST_CASES:BOOL=ON				\
 		-DUSE_TBB:BOOL=ON					\
-		-DUSE_VTK:BOOL=ON
+		-DUSE_RAPIDJSON:BOOL=ON					\
+		-DUSE_VTK:BOOL=ON					\
+		-DVTK_DIR:PATH=${LOCALBASE}/lib/vtk-${VTKVER}/cmake/vtk-${VTKVER}
+
+#CMAKE_ARGS+=	-DUSE_EIGEN:BOOL=ON
+#USES+=		eigen:3
 
 USE_LDCONFIG=	yes
 
@@ -69,13 +76,16 @@ FFMPEG_CMAKE_ON=	-DUSE_FFMPEG:BOOL=ON
 FFMPEG_CMAKE_OFF=	-DUSE_FFMPEG:BOOL=OFF
 FFMPEG_LIB_DEPENDS=	libavcodec.so:multimedia/ffmpeg
 
-VIS_CMAKE_ON=		-DUSE_FREEIMAGE:BOOL=ON -DUSE_GL2PS:BOOL=ON	\
-			-DUSE_FREETYPE:BOOL=ON -D3RDPARTY_FREETYPE_DIR=${LOCALBASE}
-VIS_CMAKE_OFF=		-DUSE_FREEIMAGE:BOOL=OFF -DUSE_GL2PS:BOOL=OFF	\
-			-DUSE_FREETYPE:BOOL=OFF
-VIS_LIB_DEPENDS=	libftgl.so:graphics/ftgl		\
-			libgl2ps.so:print/gl2ps		\
+VIS_CMAKE_ON=		-DUSE_FREEIMAGE:BOOL=ON	\
+			-DUSE_FREETYPE:BOOL=ON	\
+			-DUSE_GLES2:BOOL=ON	\
+			-D3RDPARTY_FREETYPE_DIR=${LOCALBASE}
+VIS_CMAKE_OFF=		-DUSE_FREEIMAGE:BOOL=OFF	\
+			-DUSE_FREETYPE:BOOL=OFF		\
+			-DUSE_GLES2:BOOL=OFF
+VIS_LIB_DEPENDS=	libftgl.so:graphics/ftgl	\
 			libfreeimageplus.so:graphics/freeimage
+VIS_USE=		GL=glesv2
 
 DOXYGEN_IMPLIES=	DOCS
 DOXYGEN_USE=	TEX=latex:build
@@ -99,6 +109,13 @@ pre-everything::
 	@${ECHO_MSG} "Warning: to build OpenCascade, you should have at least"
 	@${ECHO_MSG} "2.6 Gb of free disk space in build area!"
 	@${ECHO_MSG}
+	@${ECHO_MSG} "Warning: OpenCascade must be deinstalled before rebuilding it!"
+	@${ECHO_MSG}
+
+pre-patch:
+	${REINPLACE_CMD} 's|<malloc.h>|<stdlib.h>|' \
+		${WRKSRC}/src/BRepMesh/delabella.cpp\
+		${WRKSRC}/src/OSD/OSD_MemInfo.cxx
 
 pre-configure:
 	${REINPLACE_CMD} -e 's|tclsh|${TCLSH}|' ${WRKSRC}/gendoc
@@ -109,12 +126,6 @@ pre-configure:
 	${REINPLACE_CMD} -e 's|lin|bsd|' ${WRKSRC}/${es}
 .endfor
 
-pre-patch:
-	@${REINPLACE_CMD} 's|<malloc.h>|<stdlib.h>|' \
-		${WRKSRC}/src/OSD/OSD_MemInfo.cxx \
-		${WRKSRC}/src/StepFile/step.tab.c \
-		${WRKSRC}/src/StepFile/step.yacc
-
 post-build-DOXYGEN-on:
 	(cd ${WRKSRC} && ./gendoc -overview)
 
@@ -122,10 +133,12 @@ post-install:
 	${MV} ${STAGEDIR}${OCCROOT}/bin/DRAWEXE-${PORTVERSION} ${STAGEDIR}${PREFIX}/bin/DRAWEXE
 	(cd ${STAGEDIR}${PREFIX}/bin &&							\
 	${LN} -sf DRAWEXE ${STAGEDIR}${OCCROOT}/bin/DRAWEXE)
+
 post-install-DOXYGEN-on:
 	${MKDIR} ${STAGEDIR}${DOCSDIR}
 	(cd ${WRKSRC}/doc/overview && ${COPYTREE_SHARE} . ${STAGEDIR}${DOCSDIR})
 	${RM} -r ${STAGEDIR}${DOCSDIR}/latex
+	${RM} ${STAGEDIR}${DOCSDIR}/html/build_upgrade_building_3rdparty.html.bak
 
 .if defined(MAINTAINER_MODE)
 regression-test:	install

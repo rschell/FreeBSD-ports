@@ -1,6 +1,15 @@
---- common.pri.orig	2018-08-11 23:09:01 UTC
+--- common.pri.orig	2020-10-24 09:23:35 UTC
 +++ common.pri
-@@ -164,11 +164,11 @@ defineTest(forceCopyToDestdir) {
+@@ -21,7 +21,7 @@ unix{
+     }
+ 
+     # Default prefix. Use for creation install path.
+-    DEFAULT_PREFIX = /usr
++    DEFAULT_PREFIX = /usr/local
+ 
+     # Prefix for binary file.
+     isEmpty(PREFIX){
+@@ -222,11 +222,11 @@ defineTest(forceCopyToDestdir) {
  # We use precompiled headers for more fast compilation source code.
  defineReplace(set_PCH){
      no_ccache{

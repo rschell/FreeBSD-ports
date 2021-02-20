@@ -3,11 +3,11 @@
 
 PORTNAME=	lttng-ust
 PORTVERSION=	2.9.0
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	sysutils
 MASTER_SITES=	http://lttng.org/files/${PORTNAME}/
 
-MAINTAINER=	mmokhi@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Libraries to instrument and trace user applications
 
 LICENSE=		LGPL21 MIT GPLv2

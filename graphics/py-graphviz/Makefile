@@ -1,4 +1,4 @@
-# Created by: lbartoletti <lbartoletti@tuxfamily.org>
+# Created by: lbartoletti <lbartoletti@FreeBSD.org>
 # $FreeBSD$
 
 PORTNAME=	graphviz
@@ -7,7 +7,7 @@ CATEGORIES=	graphics python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=	lbartoletti@tuxfamily.org
+MAINTAINER=	lbartoletti@FreeBSD.org
 COMMENT=	Simple Python interface for Graphviz
 
 LICENSE=	MIT
@@ -17,7 +17,7 @@ RUN_DEPENDS=	dot:graphics/graphviz
 TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}pytest-cov>=0:devel/py-pytest-cov@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}pytest-mock>=0:devel/py-pytest-mock@${PY_FLAVOR}
 
-USES=		python zip
+USES=		python:3.6+ zip
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes

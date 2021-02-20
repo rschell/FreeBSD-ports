@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	bpython
-PORTVERSION=	0.18
-PORTREVISION=	1
+PORTVERSION=	0.20.1
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP \
 		https://bpython-interpreter.org/releases/
@@ -15,20 +14,21 @@ COMMENT=	Fancy interface to the Python interpreter
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-BUILD_DEPENDS=	${PYTHON_PKGNAMEPREFIX}sphinx>=1.1.3:textproc/py-sphinx@${PY_FLAVOR}
-RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}curtsies>=0.1.18:devel/py-curtsies@${PY_FLAVOR} \
+BUILD_DEPENDS=	${PY_SPHINX}
+RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}curtsies>=0.3.0:devel/py-curtsies@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}greenlet>=0:devel/py-greenlet@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}pygments>=0:textproc/py-pygments@${PY_FLAVOR} \
+		${PY_PYGMENTS} \
 		${PYTHON_PKGNAMEPREFIX}requests>=0:www/py-requests@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}six>=1.5:devel/py-six@${PY_FLAVOR}
+		${PYTHON_PKGNAMEPREFIX}six>=1.5:devel/py-six@${PY_FLAVOR} \
+		${PYTHON_PKGNAMEPREFIX}wcwidth>=0:devel/py-wcwidth@${PY_FLAVOR}
 
-OPTIONS_DEFINE=	EXAMPLES NLS
-OPTIONS_SUB=	yes
-
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes
+
+OPTIONS_DEFINE=	EXAMPLES NLS
+OPTIONS_SUB=	yes
 
 NLS_USES=	gettext
 

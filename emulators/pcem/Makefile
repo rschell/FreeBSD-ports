@@ -2,6 +2,7 @@
 
 PORTNAME=	pcem
 DISTVERSION=	14
+PORTREVISION=	1
 CATEGORIES=	emulators
 MASTER_SITES=	https://bitbucket.org/pcem_emulator/pcem/get/
 DISTNAME=	faf5d6423060
@@ -10,6 +11,9 @@ MAINTAINER=	darkfm@vera.com.uy
 COMMENT=	PC/PC-Compatible low-level emulator striving for accuracy
 
 LICENSE=	GPLv2
+
+BROKEN_FreeBSD_13=	ld: error: duplicate symbol: CGACONST
+BROKEN_FreeBSD_14=	ld: error: duplicate symbol: CGACONST
 
 USES=		autoreconf compiler gl gmake openal pkgconfig sdl zip
 USE_GL=		gl
@@ -22,11 +26,5 @@ PLIST_FILES=	bin/pcem
 CONFIGURE_ARGS=	--enable-release-build --with-wx-config=wxgtk3u-3.0-config
 GNU_CONFIGURE=	yes
 ONLY_FOR_ARCHS=	amd64
-
-.include <bsd.port.options.mk>
-
-.if ${OPSYS} == FreeBSD && ${OSVERSION} < 1300000
-LDFLAGS+=	-fuse-ld=bfd
-.endif
 
 .include <bsd.port.mk>

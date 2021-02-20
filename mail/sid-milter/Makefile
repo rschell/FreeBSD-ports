@@ -2,14 +2,12 @@
 
 PORTNAME=	sid-milter
 PORTVERSION=	1.0.0
-PORTREVISION=	7
+PORTREVISION=	8
 CATEGORIES=	mail
 MASTER_SITES=	SF/${PORTNAME}/SenderID%20Milter/${PORTVERSION}
 
 MAINTAINER=	dinoex@FreeBSD.org
 COMMENT=	Milter module for sid and spf
-
-RESTRICTED=	May incorporate intellectual property, possible patent issues
 
 USES=		groff
 # on FreeBSD 11 optimized code fails with 'MalformedDomain'
@@ -19,7 +17,7 @@ DOCSFILES=	FEATURES INSTALL KNOWNBUGS LICENSE README README-SenderID \
 		RELEASE_NOTES rfc4406.txt rfc4407.txt rfc4408.txt
 INSTALL_WRKSRC=	${WRKSRC}/sid-filter
 PLIST_FILES=	libexec/sid-filter man/man8/sid-filter.8.gz
-USE_RC_SUBR=	milter-sid
+USE_RC_SUBR=	miltersid
 PORTDOCS=	${DOCSFILES}
 
 SITE+=		${FILESDIR}/site.config.m4

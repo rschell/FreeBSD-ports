@@ -1,8 +1,16 @@
---- ruby/Gemfile.orig	2019-11-22 14:21:07 UTC
+--- ruby/Gemfile.orig	2020-12-10 15:14:51 UTC
 +++ ruby/Gemfile
-@@ -24,17 +24,3 @@ gem 'licensee', '~> 8.9.0'
+@@ -1,6 +1,6 @@
+ source 'https://rubygems.org'
  
- gem 'google-protobuf', '~> 3.8.0'
+-gem 'rugged', '~> 0.28'
++gem 'rugged', '~> 1.0'
+ gem 'github-linguist', '~> 7.12', require: 'linguist'
+ gem 'gitlab-markup', '~> 1.7.1'
+ gem 'activesupport', '~> 6.0.3.3'
+@@ -21,13 +21,3 @@ gem 'licensee', '~> 8.9.0'
+ 
+ gem 'google-protobuf', '~> 3.12'
  
 -group :development, :test do
 -  gem 'rubocop', '~> 0.69', require: false
@@ -12,9 +20,5 @@
 -  gem 'factory_bot', require: false
 -  gem 'pry', '~> 0.12.2', require: false
 -
--  # gitlab-shell spec gems
--  gem 'listen', '~> 0.5.0'
--  gem 'simplecov', '~> 0.9.0', require: false
--  gem 'vcr', '~> 4.0.0'
--  gem 'webmock', '~> 3.4.0'
+-  gem 'grpc-tools', '= 1.30.2'
 -end

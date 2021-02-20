@@ -37,7 +37,7 @@ post-patch:
 post-install:
 	cd ${WRKSRC} &&\
 		${MKDIR} ${STAGEDIR}${DOCSDIR}/html ${STAGEDIR}${DOCSDIR}/Scintilla &&\
-		${INSTALL_DATA} NEWS README ${STAGEDIR}${DOCSDIR} &&\
+		${INSTALL_DATA} NEWS ${STAGEDIR}${DOCSDIR} &&\
 		${INSTALL_DATA} doc/html-Qt4Qt5/* ${STAGEDIR}${DOCSDIR}/html &&\
 		${INSTALL_DATA} doc/Scintilla/* ${STAGEDIR}${DOCSDIR}/Scintilla
 	cd ${WRKSRC}/example-Qt4Qt5 &&\

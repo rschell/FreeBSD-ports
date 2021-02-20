@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	qbittorrent
-DISTVERSION=	4.2.1
+DISTVERSION=	4.3.1
 CATEGORIES=	net-p2p
 MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}/${PORTNAME}-${PORTVERSION}
 
@@ -11,6 +11,8 @@ COMMENT=	Bittorrent client using Qt5 and libtorrent-rasterbar
 
 LICENSE=	GPLv2+
 LICENSE_FILE=	${WRKSRC}/COPYING
+
+BROKEN_FreeBSD_12_powerpc64=	fails to build: ./base/tristatebool.h:44:5: 'constexpr' constructor does not have empty body
 
 LIB_DEPENDS=	libtorrent-rasterbar.so:net-p2p/libtorrent-rasterbar \
 		libboost_system.so:devel/boost-libs
@@ -41,6 +43,7 @@ GROUPS=			qbittorrent
 USE_RC_SUBR=		qbittorrent
 SUB_LIST=		USER=${USERS} GROUP=${GROUPS}
 PLIST_SUB=		USER=${USERS} GROUP=${GROUPS}
+OPTIONS_EXCLUDE=	DBUS
 .endif
 
 OPTIONS_DEFINE=		DBUS DEBUG

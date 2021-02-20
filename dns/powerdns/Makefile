@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	powerdns
-DISTVERSION=	4.2.0
-PORTREVISION=	1
+DISTVERSION=	4.4.1
 CATEGORIES=	dns
 MASTER_SITES=	https://downloads.powerdns.com/releases/
 DISTNAME=	pdns-${DISTVERSION}
@@ -12,14 +11,15 @@ COMMENT=	Advanced DNS server with multiple backends including SQL
 
 LICENSE=	GPLv2
 
-BROKEN_sparc64=		Does not compile: error: to_string is not a member of std
+BROKEN_sparc64=	Does not compile: error: to_string is not a member of std
 
 LIB_DEPENDS=	libboost_serialization.so:devel/boost-libs \
-		libcurl.so:ftp/curl
+		libcurl.so:ftp/curl \
+		libprotobuf.so:devel/protobuf
 
-USES=		compiler:c++11-lib cpe gmake libtool localbase:ldflags pathfix \
-		pkgconfig ssl tar:bzip2
-USE_LDCONFIG=	YES
+USES=		autoreconf compiler:c++11-lib cpe gmake libtool \
+		localbase:ldflags pathfix pkgconfig ssl tar:bzip2
+
 USE_RC_SUBR=	pdns
 USE_SUBMAKE=	YES
 
@@ -29,33 +29,42 @@ CONFIGURE_ARGS=	--disable-static \
 		--sysconfdir="${PREFIX}/etc/pdns" \
 		--with-boost="${LOCALBASE}" \
 		--with-dynmodules="pipe bind ${MODULES}" \
-		--with-modules=""
+		--with-modules="" \
+		--with-protobuf
 
-INSTALL_TARGET=	install-strip
-SCRIPTS_ENV=	CURDIR2="${.CURDIR}" DISTNAME="${DISTNAME}" MKDIR="${MKDIR}" \
+SCRIPTS_ENV=	CURDIR2="${.CURDIR}" \
+		DISTNAME="${DISTNAME}" \
+		MKDIR="${MKDIR}" \
 		POWERDNS_OPTIONS="${POWERDNS_OPTIONS}" \
 		WRKDIRPREFIX="${WRKDIRPREFIX}"
+INSTALL_TARGET=	install-strip
 SUB_FILES=	pkg-message
 
-OPTIONS_DEFINE=			DOCS EXAMPLES GEOIP LUABACKEND LUAJIT MYDNS \
-				MYSQL OPENDBX OPENLDAP PGSQL PROTOBUF REMOTE \
-				SQLITE3 TINYDNS TOOLS UNIXODBC
-OPTIONS_DEFAULT=		MYSQL PGSQL SQLITE3
+USERS=		pdns
+GROUPS=		pdns
+
+OPTIONS_DEFINE=			DOCS EXAMPLES GEOIP IXFRDIST LMDB LUABACKEND \
+				MYSQL OPENLDAP PGSQL REMOTE SQLITE3 TINYDNS \
+				TOOLS UNIXODBC
+OPTIONS_DEFAULT=		LMDB LUA MYSQL PGSQL SQLITE3
 OPTIONS_GROUP=			GEOIPOPT REMOTEOPT
 OPTIONS_GROUP_REMOTEOPT=	ZEROMQ
+OPTIONS_SINGLE=			EXTLUA
+OPTIONS_SINGLE_EXTLUA=		LUA LUAJIT LUAJITOR
 
 OPTIONS_SUB=	yes
 
 GEOIPOPT_DESC=		GeoIP DB options
 GEOIP_DESC=		GeoIP backend (GeoIP2 DB)
+IXFRDIST_DESC=		Build ixfrdist
+LMDB_DESC=		LMDB backend
 LUABACKEND_DESC=	Lua2 backend
-LUAJIT_DESC=		Use LuaJIT instead of Lua
-MYDNS_DESC=		MyDNS backend
+LUAJITOR_DESC=		Use lang/luajit-openresty
+LUAJIT_DESC=		Use lang/luajit
+LUA_DESC=		Use lang/lua
 MYSQL_DESC=		MySQL backend
-OPENDBX_DESC=		OpenDBX backend
 OPENLDAP_DESC=		OpenLDAP backend
 PGSQL_DESC=		PostgreSQL backend
-PROTOBUF_DESC=		Protobuf support
 REMOTEOPT_DESC=		Remote backend connectors
 REMOTE_DESC=		Remote backend
 SQLITE3_DESC=		SQLite 3 backend
@@ -67,23 +76,28 @@ GEOIP_LIB_DEPENDS=	libmaxminddb.so:net/libmaxminddb \
 			libyaml-cpp.so:devel/yaml-cpp
 GEOIP_VARS=		MODULES+=geoip
 
+IXFRDIST_LIB_DEPENDS=		libyaml-cpp.so:devel/yaml-cpp
+IXFRDIST_CONFIGURE_ENABLE=	ixfrdist
+
+LMDB_LIB_DEPENDS=	liblmdb.so:databases/lmdb
+LMDB_CONFIGURE_ON=	--with-lmdb=${LOCALBASE}
+LMDB_CONFIGURE_OFF=	--without-lmdb
+LMDB_VARS=		MODULES+=lmdb
+
 LUABACKEND_VARS=	MODULES+=lua2
 
+LUAJITOR_LIB_DEPENDS=	libluajit-5.1.so.2:lang/luajit-openresty
+LUAJITOR_CONFIGURE_ON=	--with-lua=luajit
+
 LUAJIT_LIB_DEPENDS=	libluajit-5.1.so.2:lang/luajit
-LUAJIT_USES_OFF=	lua
 LUAJIT_CONFIGURE_ON=	--with-lua=luajit
 
-MYDNS_USES=		mysql
-MYDNS_CONFIGURE_ON=	--with-mysql=${LOCALBASE}
-MYDNS_VARS=		MODULES+=mydns
+LUA_USES=	lua
 
 MYSQL_USES=		mysql
-MYSQL_CONFIGURE_OFF=	--without-mysql
 MYSQL_CONFIGURE_ON=	--with-mysql=${LOCALBASE}
+MYSQL_CONFIGURE_OFF=	--without-mysql
 MYSQL_VARS=		MODULES+=gmysql
-
-OPENDBX_LIB_DEPENDS=	libopendbx.so:databases/opendbx
-OPENDBX_VARS=		MODULES+=opendbx
 
 OPENLDAP_USE=		OPENLDAP=YES
 OPENLDAP_CXXFLAGS=	-DLDAP_DEPRECATED=1
@@ -92,9 +106,6 @@ OPENLDAP_VARS=		MODULES+=ldap
 PGSQL_USES=		pgsql
 PGSQL_CONFIGURE_ON=	--with-pg-config=${LOCALBASE}/bin/pg_config
 PGSQL_VARS=		MODULES+=gpgsql
-
-PROTOBUF_LIB_DEPENDS=		libprotobuf.so:devel/protobuf
-PROTOBUF_CONFIGURE_WITH=	protobuf
 
 REMOTE_VARS=	MODULES+=remote
 
@@ -117,16 +128,18 @@ ZEROMQ_CONFIGURE_ON=	--enable-remotebackend-zeromq
 
 .include <bsd.port.pre.mk>
 
-.if ${OPSYS} == FreeBSD && ${OSVERSION} < 1200085 && ${SSL_DEFAULT} != openssl111
+.if ${OPSYS} == FreeBSD && ${OSVERSION} < 1200085 && ${SSL_DEFAULT} != openssl
 CONFIGURE_ARGS+=	--with-libdecaf \
 			--with-libsodium
 LIB_DEPENDS+=		libdecaf.so:security/libdecaf \
 			libsodium.so:security/libsodium
+.else
+CONFIGURE_ARGS+=	--with-libsodium=no
 .endif
 
 post-install::
-	@${MKDIR} ${STAGEDIR}${EXAMPLESDIR}
-	@${STAGEDIR}${LOCALBASE}/sbin/pdns_server --module-dir=${STAGEDIR}${LOCALBASE}/lib/pdns --launch="pipe bind ${MODULES}" --config > ${STAGEDIR}${EXAMPLESDIR}/pdns.conf
+	@${MKDIR} ${STAGEDIR}${EXAMPLESDIR} ${STAGEDIR}/var/run/pdns
+	@${STAGEDIR}${PREFIX}/sbin/pdns_server --module-dir=${STAGEDIR}${PREFIX}/lib/pdns --launch="pipe bind ${MODULES}" --config > ${STAGEDIR}${EXAMPLESDIR}/pdns.conf
 	@${REINPLACE_CMD} -e 's;${STAGEDIR};;' -i '' ${STAGEDIR}${EXAMPLESDIR}/pdns.conf
 
 .include <bsd.port.post.mk>

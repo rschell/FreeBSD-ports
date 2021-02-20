@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	buildbot-worker
-PORTVERSION=	2.3.1
+PORTVERSION=	2.7.0
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -17,7 +17,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}twisted>=17.9.0:devel/py-twisted@${PY_FLAVOR
 		${PYTHON_PKGNAMEPREFIX}future>=0:devel/py-future@${PY_FLAVOR}
 TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}mock>0:devel/py-mock@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 USE_RC_SUBR=	buildbot-worker
 

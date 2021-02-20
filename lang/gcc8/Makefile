@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	gcc
-PORTVERSION=	8.3.0
-PORTREVISION=	3
+PORTVERSION=	8.4.0
 CATEGORIES=	lang
 MASTER_SITES=	GCC
 PKGNAMESUFFIX=	${SUFFIX}
@@ -14,7 +13,7 @@ COMMENT=	GNU Compiler Collection 8
 LICENSE=	GPLv3 GPLv3RLE
 LICENSE_COMB=	multi
 
-ONLY_FOR_ARCHS=	aarch64 amd64 arm armv6 armv7 i386 powerpc powerpc64 powerpcspe sparc64
+ONLY_FOR_ARCHS=	aarch64 amd64 arm armv6 armv7 i386 powerpc powerpc64 powerpcspe
 
 LIB_DEPENDS=	libgmp.so:math/gmp \
 		libmpfr.so:math/mpfr \
@@ -35,14 +34,12 @@ CPE_VENDOR=	gnu
 
 GCC_VERSION=	${PORTVERSION}
 SUFFIX=		${PORTVERSION:C/([0-9]+).*/\1/}
-SSP_UNSAFE=	yes
 CFLAGS:=	${CFLAGS:N-mretpoline}
 CXXFLAGS:=	${CXXFLAGS:N-mretpoline}
 
-OPTIONS_DEFINE=		BOOTSTRAP GRAPHITE
+OPTIONS_DEFINE=		BOOTSTRAP
 OPTIONS_DEFAULT=	BOOTSTRAP
 BOOTSTRAP_DESC=		Build using a full bootstrap
-GRAPHITE_DESC=		Support for Graphite loop optimizations
 
 .if exists(/usr/lib32/libc.so)
 OPTIONS_DEFINE_amd64+=		MULTILIB
@@ -117,11 +114,6 @@ INFO+=		gcc${SUFFIX}/libquadmath \
 		gcc${SUFFIX}/libitm
 SUB_FILES=	pkg-message
 SUB_LIST+=	TARGLIB=${TARGLIB}
-
-.if ${PORT_OPTIONS:MGRAPHITE}
-LIB_DEPENDS+=	libisl.so:devel/isl
-CONFIGURE_ARGS+=--with-isl=${LOCALBASE}
-.endif
 
 CONFIGURE_ARGS+=--enable-languages=${LANGUAGES}
 

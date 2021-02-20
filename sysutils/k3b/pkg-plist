@@ -123,7 +123,7 @@ lib/libk3bdevice.so.7.0.0
 lib/libk3blib.so
 lib/libk3blib.so.7
 lib/libk3blib.so.7.0.0
-lib/libexec/k3bhelper
+lib/libexec/kauth/k3bhelper
 %%QT_PLUGINDIR%%/k3baudiometainforenamerplugin.so
 %%QT_PLUGINDIR%%/k3baudioprojectcddbplugin.so
 %%QT_PLUGINDIR%%/k3bexternalencoder.so
@@ -413,6 +413,10 @@ share/locale/hu/LC_MESSAGES/k3b.mo
 share/locale/hu/LC_MESSAGES/kio_videodvd.mo
 share/locale/hu/LC_MESSAGES/libk3b.mo
 share/locale/hu/LC_MESSAGES/libk3bdevice.mo
+share/locale/ia/LC_MESSAGES/k3b.mo
+share/locale/ia/LC_MESSAGES/kio_videodvd.mo
+share/locale/ia/LC_MESSAGES/libk3b.mo
+share/locale/ia/LC_MESSAGES/libk3bdevice.mo
 share/locale/id/LC_MESSAGES/kio_videodvd.mo
 share/locale/is/LC_MESSAGES/k3b.mo
 share/locale/is/LC_MESSAGES/kio_videodvd.mo

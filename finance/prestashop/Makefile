@@ -2,9 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	prestashop
-PORTVERSION=	1.7.6.2
+PORTVERSION=	1.7.7.0
 CATEGORIES=	finance www
-MASTER_SITES=	http://www.prestashop.com/download/old/
+MASTER_SITES=	https://download.prestashop.com/download/releases/
 DISTNAME=	${PORTNAME}_${PORTVERSION}
 
 MAINTAINER=	wen@FreeBSD.org

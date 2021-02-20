@@ -15,17 +15,9 @@ LICENSE_FILE=	${WRKSRC}/LICENSE.rst
 
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}backports>0:devel/py-backports@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes
-
-POST_PLIST=	trim-backports-namespace
-
-post-install:
-	@${RM} ${STAGEDIR}${PYTHON_SITELIBDIR}/backports/__init__.py*
-
-trim-backports-namespace:
-	@${REINPLACE_CMD} '/backports\/__init__.py*/d' ${TMPPLIST}
 
 .include <bsd.port.mk>

@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	pyjsparser
-PORTVERSION=	2.5.2
+DISTVERSION=	2.7.1
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -11,7 +11,7 @@ COMMENT=	Fast javascript parser
 
 LICENSE=	MIT
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils autoplist
 
 NO_ARCH=	yes

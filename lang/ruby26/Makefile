@@ -23,7 +23,7 @@ BUILD_DEPENDS=	libffi>=0:devel/libffi
 LIB_DEPENDS=	libyaml.so:textproc/libyaml
 RUN_DEPENDS=	libffi>=0:devel/libffi
 
-USES=		autoreconf cpe ssl tar:xz
+USES=		autoreconf compiler cpe ssl tar:xz
 
 CONFIGURE_ARGS=	${RUBY_CONFIGURE_ARGS} \
 		--disable-rpath \
@@ -94,11 +94,11 @@ CONFIGURE_ARGS+=--disable-dtrace
 .endif
 
 # keep in sync with all platforms where libunwind is available
-.if (${ARCH} == amd64 || ${ARCH} == i386)
+.if (${ARCH} == aarch64 || ${ARCH} == amd64 || ${ARCH} == i386 || ${ARCH:Mpowerpc64*})
 LIB_DEPENDS+=	libunwind.so:devel/libunwind
 .endif
 
-.if (${ARCH} == powerpc || ${ARCH} == powerpc64)
+.if (defined(PPC_ABI) && ${PPC_ABI} == ELFv1) || (${ARCH} == powerpc && ${CHOSEN_COMPILER_TYPE} == clang)
 USE_GCC=	yes
 .endif
 
@@ -116,6 +116,12 @@ PLIST_SUB+=	IF_DEFAULT=""
 .else
 PKGNAMESUFFIX=	${RUBY_VER:C/\.//}
 PLIST_SUB+=	IF_DEFAULT="@comment "
+.endif
+
+.if ${OPSYS} == FreeBSD && ${OSVERSION} >= 1300109
+PLIST_SUB+=	EXTRADOC=""
+.else
+PLIST_SUB+=	EXTRADOC="@comment "
 .endif
 
 INSTALLED_SCRIPTS=	erb irb rdoc ri ruby

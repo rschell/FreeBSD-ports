@@ -8,11 +8,11 @@ r226103 | des | 2011-10-07 08:10:16 -0500 (Fri, 07 Oct 2011) | 5 lines
 Add a -x option that causes ssh-agent(1) to exit when all clients have
 disconnected.
 
---- ssh-agent.c.orig	2017-10-02 12:34:26.000000000 -0700
-+++ ssh-agent.c	2017-10-12 11:31:40.908737000 -0700
-@@ -162,15 +162,34 @@ static long lifetime = 0;
- 
- static int fingerprint_hash = SSH_FP_HASH_DEFAULT;
+--- ssh-agent.c.orig	2020-09-27 00:25:01.000000000 -0700
++++ ssh-agent.c	2020-11-09 09:07:10.924940000 -0800
+@@ -171,15 +171,34 @@ static int fingerprint_hash = SSH_FP_HASH_DEFAULT;
+ /* Refuse signing of non-SSH messages for web-origin FIDO keys */
+ static int restrict_websafe = 1;
  
 +/*
 + * Client connection count; incremented in new_socket() and decremented in
@@ -45,7 +45,7 @@ disconnected.
  }
  
  static void
-@@ -745,6 +764,10 @@ new_socket(sock_type type, int fd)
+@@ -961,6 +980,10 @@ new_socket(sock_type type, int fd)
  {
  	u_int i, old_alloc, new_alloc;
  
@@ -56,16 +56,16 @@ disconnected.
  	set_nonblock(fd);
  
  	if (fd > max_fd)
-@@ -1007,7 +1030,7 @@ static void
+@@ -1261,7 +1284,7 @@ static void
  usage(void)
  {
  	fprintf(stderr,
 -	    "usage: ssh-agent [-c | -s] [-Dd] [-a bind_address] [-E fingerprint_hash]\n"
 +	    "usage: ssh-agent [-c | -s] [-Ddx] [-a bind_address] [-E fingerprint_hash]\n"
- 	    "                 [-P pkcs11_whitelist] [-t life] [command [arg ...]]\n"
- 	    "       ssh-agent [-c | -s] -k\n");
- 	exit(1);
-@@ -1039,6 +1062,7 @@ main(int ac, char **av)
+ 	    "                 [-P allowed_providers] [-t life]\n"
+ 	    "       ssh-agent [-a bind_address] [-E fingerprint_hash] [-P allowed_providers]\n"
+ 	    "                 [-t life] command [arg ...]\n"
+@@ -1295,6 +1318,7 @@ main(int ac, char **av)
  	/* drop */
  	setegid(getgid());
  	setgid(getgid());
@@ -73,16 +73,16 @@ disconnected.
  
  	platform_disable_tracing(0);	/* strict=no */
  
-@@ -1049,7 +1073,7 @@ main(int ac, char **av)
+@@ -1306,7 +1330,7 @@ main(int ac, char **av)
  	__progname = ssh_get_progname(av[0]);
  	seed_rng();
  
--	while ((ch = getopt(ac, av, "cDdksE:a:P:t:")) != -1) {
-+	while ((ch = getopt(ac, av, "cDdksE:a:P:t:x")) != -1) {
+-	while ((ch = getopt(ac, av, "cDdksE:a:O:P:t:")) != -1) {
++	while ((ch = getopt(ac, av, "cDdksE:a:O:P:t:x")) != -1) {
  		switch (ch) {
  		case 'E':
  			fingerprint_hash = ssh_digest_alg_by_name(optarg);
-@@ -1092,6 +1116,9 @@ main(int ac, char **av)
+@@ -1355,6 +1379,9 @@ main(int ac, char **av)
  				fprintf(stderr, "Invalid lifetime\n");
  				usage();
  			}

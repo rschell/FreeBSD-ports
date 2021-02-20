@@ -9,14 +9,15 @@ CATEGORIES=	devel
 MASTER_SITES=	GCC
 PKGNAMEPREFIX=	mingw32-
 
-MAINTAINER=	cyberbotx@cyberbotx.com
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	FSF gcc-4 for Windows cross-development
 
 LICENSE=	GPLv3 GPLv3RLE
 LICENSE_COMB=	multi
 
 BUILD_DEPENDS=	${PKGNAMEPREFIX}as:devel/binutils@${PKGNAMEPREFIX:C/-$//} \
-		mingwm10.dll:devel/${PKGNAMEPREFIX}bin-msvcrt
+		mingwm10.dll:devel/${PKGNAMEPREFIX}bin-msvcrt \
+		objdump:devel/binutils
 RUN_DEPENDS=	${PKGNAMEPREFIX}as:devel/binutils@${PKGNAMEPREFIX:C/-$//}
 LIB_DEPENDS=	libgmp.so:math/gmp \
 		libmpfr.so:math/mpfr \

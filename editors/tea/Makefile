@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	tea
-PORTVERSION=	50.0.3
+PORTVERSION=	50.1.0
 CATEGORIES=	editors
 
 MAINTAINER=	danilo@FreeBSD.org

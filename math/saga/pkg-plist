@@ -23,10 +23,12 @@ include/saga/saga_core/saga_api/tool_library.h
 include/saga/saga_core/saga_gdi/3d_view.h
 include/saga/saga_core/saga_gdi/3d_view_tools.h
 include/saga/saga_core/saga_gdi/saga_gdi.h
+include/saga/saga_core/saga_gdi/sgdi_controls.h
 include/saga/saga_core/saga_gdi/sgdi_core.h
 include/saga/saga_core/saga_gdi/sgdi_diagram.h
 include/saga/saga_core/saga_gdi/sgdi_dialog.h
 include/saga/saga_core/saga_gdi/sgdi_helper.h
+include/saga/saga_core/saga_gdi/sgdi_layout_items.h
 lib/libsaga_api-%%PORTVERSION%%.so
 lib/libsaga_api.so
 lib/libsaga_gdi-%%PORTVERSION%%.so
@@ -75,6 +77,7 @@ lib/saga/libio_shapes_dxf.so
 lib/saga/libio_shapes_las.so
 lib/saga/libio_table.so
 lib/saga/libio_virtual.so
+lib/saga/libio_webservices.so
 lib/saga/libpj_georeference.so
 lib/saga/libpj_proj4.so
 lib/saga/libpointcloud_tools.so
@@ -85,6 +88,7 @@ lib/saga/libshapes_points.so
 lib/saga/libshapes_polygons.so
 lib/saga/libshapes_tools.so
 lib/saga/libshapes_transect.so
+lib/saga/libsim_air_flow.so
 lib/saga/libsim_cellular_automata.so
 lib/saga/libsim_ecosystems_hugget.so
 lib/saga/libsim_erosion.so
@@ -100,6 +104,7 @@ lib/saga/libstatistics_kriging.so
 lib/saga/libstatistics_points.so
 lib/saga/libstatistics_regression.so
 lib/saga/libta_channels.so
+lib/saga/libta_cliffmetrics.so
 lib/saga/libta_compound.so
 lib/saga/libta_hydrology.so
 lib/saga/libta_lighting.so
@@ -132,9 +137,16 @@ share/pixmaps/saga.png
 @mode 0777
 @dir %%DATADIR%%
 @mode 0666
+%%DATADIR%%/docs/saga_on_mac.odt
+%%DATADIR%%/docs/saga_toolchains_cheat_sheet.xml
+%%DATADIR%%/docs/saga_toolchains_manual.odt
+%%DATADIR%%/helper/doxygen_saga_api_chm
+%%DATADIR%%/helper/doxygen_saga_api_html
 %%DATADIR%%/helper/make_arcsaga_toolboxes.bat
 %%DATADIR%%/helper/make_python_api.bat
-%%DATADIR%%/helper/make_python_api_x64.bat
+%%DATADIR%%/helper/make_python_api_all.bat
+%%DATADIR%%/helper/make_saga4qgis_toolboxes.bat
+%%DATADIR%%/helper/make_saga_api_doc.bat
 %%DATADIR%%/helper/make_saga_release.bat
 %%DATADIR%%/helper/make_saga_snapshot.bat
 %%DATADIR%%/helper/make_tools_interface.bat
@@ -149,6 +161,7 @@ share/pixmaps/saga.png
 %%DATADIR%%/python/examples/06_xyz2shp.py
 %%DATADIR%%/python/examples/07_grid_tpi.py
 %%DATADIR%%/python/examples/saga_helper.py
+%%DATADIR%%/python/examples/test_all.bat
 %%DATADIR%%/python/helpers/print_version.py
 %%DATADIR%%/python/helpers/saga_cmd_param_interface/environment.py
 %%DATADIR%%/python/helpers/saga_cmd_param_interface/param_interface.py
@@ -168,25 +181,22 @@ share/pixmaps/saga.png
 %%DATADIR%%/saga.ger.txt
 %%DATADIR%%/saga.lng.txt
 %%DATADIR%%/saga.png
+%%DATADIR%%/saga.rus.txt
 %%DATADIR%%/saga_prj.dic
 %%DATADIR%%/saga_prj.srs
 %%DATADIR%%/saga_tip.txt
 %%DATADIR%%/templates/template4saga-tools/my_tool_library/Makefile
 %%DATADIR%%/templates/template4saga-tools/my_tool_library/Makefile.am
 %%DATADIR%%/templates/template4saga-tools/my_tool_library/TLB_Interface.cpp
-%%DATADIR%%/templates/template4saga-tools/my_tool_library/TLB_Interface.h
 %%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool.cpp
 %%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool.h
 %%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library.cbp
 %%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library.layout
-%%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library_link2bin.vcxproj
-%%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library_link2bin.vcxproj.filters
-%%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library_link2src.vcxproj
-%%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library_link2src.vcxproj.filters
-%%DATADIR%%/templates/template4saga-tools/my_tools_link2bin.vc14.sln
-%%DATADIR%%/templates/template4saga-tools/my_tools_link2src.vc14.sln
+%%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library.vcxproj
+%%DATADIR%%/templates/template4saga-tools/my_tool_library/my_tool_library.vcxproj.filters
+%%DATADIR%%/templates/template4saga-tools/my_tools.vc14.sln
 %%DATADIR%%/templates/template4saga-tools/readme.txt
-%%DATADIR%%/toolchains/climate.xml
+%%DATADIR%%/toolchains/climate_tools.xml
 %%DATADIR%%/toolchains/cluster_terrain.xml
 %%DATADIR%%/toolchains/gc_filter_gaussian.xml
 %%DATADIR%%/toolchains/gc_filter_laplacian.xml
@@ -194,10 +204,12 @@ share/pixmaps/saga.png
 %%DATADIR%%/toolchains/gc_filter_simple.xml
 %%DATADIR%%/toolchains/gc_longitudinal_range.xml
 %%DATADIR%%/toolchains/gc_tools.xml
+%%DATADIR%%/toolchains/grid_and_polygon_to_table.xml
 %%DATADIR%%/toolchains/grid_filter.xml
 %%DATADIR%%/toolchains/grid_list_simple_filter.xml
 %%DATADIR%%/toolchains/grid_notch_filter.xml
 %%DATADIR%%/toolchains/grid_statistics_for_directions.xml
+%%DATADIR%%/toolchains/grid_tools_bulk_no-data_change.xml
 %%DATADIR%%/toolchains/gridding.xml
 %%DATADIR%%/toolchains/group_files.xml
 %%DATADIR%%/toolchains/imagery.xml
@@ -211,6 +223,7 @@ share/pixmaps/saga.png
 %%DATADIR%%/toolchains/shapes_select_delete.xml
 %%DATADIR%%/toolchains/sieve_and_clump.xml
 %%DATADIR%%/toolchains/ta_flow_accumulation.xml
+%%DATADIR%%/toolchains/ta_ls_factor.xml
 %%DATADIR%%/toolchains/ta_summits.xml
 %%DATADIR%%/toolchains/temperature_downscaling.xml
 %%DATADIR%%/toolchains/temperature_downscaling_bulk.xml

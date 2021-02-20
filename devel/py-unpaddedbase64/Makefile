@@ -7,7 +7,7 @@ DISTVERSIONPREFIX=	v
 CATEGORIES=	devel python
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=	ports@FreeBSD.org
+MAINTAINER=	sunpoet@FreeBSD.org
 COMMENT=	Unpadded Base64
 
 LICENSE=	APACHE20
@@ -15,10 +15,10 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}pytest>0:devel/py-pytest@${PY_FLAVOR}
 
-USES=		python
-USE_GITHUB=	yes
+USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
 
+USE_GITHUB=	yes
 GH_ACCOUNT=	matrix-org
 GH_PROJECT=	python-unpaddedbase64
 

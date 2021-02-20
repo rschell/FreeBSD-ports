@@ -3,12 +3,12 @@
 
 PORTNAME=	pdftk
 DISTVERSIONPREFIX=	v
-DISTVERSION=	3.0.8
+DISTVERSION=	3.2.2
 CATEGORIES=	print java
-MASTER_SITES=	http://repo.maven.apache.org/maven2/:bcprov
+MASTER_SITES=	https://repo.maven.apache.org/maven2/:bcprov
 DISTFILES=	${_BCPROV_JAR}:bcprov
 
-MAINTAINER=	tobik@FreeBSD.org
+MAINTAINER=	andreas@bilke.org
 COMMENT=	Simple tool for doing everyday things with PDF documents
 
 LICENSE=	GPLv2
@@ -20,7 +20,7 @@ RUN_DEPENDS=	${JAVAJARDIR}/commons-lang3.jar:java/apache-commons-lang3
 USE_ANT=	yes
 USE_GITLAB=	yes
 GL_ACCOUNT=	pdftk-java
-GL_COMMIT=	c98f90e623376942b5a0e9c77345e11710e50509
+GL_COMMIT=	eefd0b5178e1cafd25a0ae762b8535c7f13a5a4e
 USE_JAVA=	yes
 ALL_TARGET=	jar
 NO_ARCH=	yes
@@ -30,9 +30,9 @@ SUB_LIST=	CLASSPATH="${_CLASSPATH:ts:}" \
 PLIST_FILES=	${JAVAJARDIR}/${_BCPROV_JAR:T} \
 		${JAVAJARDIR}/pdftk.jar \
 		bin/pdftk \
-		man/man1/pdftk.1.gz
+		share/man/man1/pdftk.1.gz
 
-_BCPROV_JAR=	org/bouncycastle/bcprov-jdk15on/1.51/bcprov-jdk15on-1.51.jar
+_BCPROV_JAR=	org/bouncycastle/bcprov-jdk15on/1.64/bcprov-jdk15on-1.64.jar
 _CLASSPATH=	${JAVAJARDIR}/${_BCPROV_JAR:T} ${JAVAJARDIR}/commons-lang3.jar \
 		${JAVAJARDIR}/pdftk.jar
 
@@ -48,6 +48,6 @@ do-install:
 		${DISTDIR}/${_BCPROV_JAR} \
 		${STAGEDIR}${JAVAJARDIR}
 	${INSTALL_MAN} ${WRKSRC}/pdftk.1 \
-		${STAGEDIR}${PREFIX}/man/man1
+		${STAGEDIR}${PREFIX}/share/man/man1
 
 .include <bsd.port.mk>

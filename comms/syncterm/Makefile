@@ -11,6 +11,8 @@ COMMENT=	ANSI-BBS terminal which supports telnet, rlogin, and SSH
 
 LICENSE=	GPLv2
 
+BUILD_DEPENDS=	as:devel/binutils
+
 WRKSRC=		${WRKDIR}/syncterm-${PORTVERSION}/src/syncterm
 USES=		gmake perl5 tar:tgz
 USE_PERL5=	build
@@ -40,7 +42,7 @@ SDL_USE=	SDL=sdl
 SDL_MAKE_ARGS=	USE_SDL=1
 SDL_MAKE_ARGS_OFF=	WITHOUT_SDL=1
 
-ONLY_FOR_ARCHS=		i386 amd64
+ONLY_FOR_ARCHS=		i386 amd64 powerpc64
 ONLY_FOR_ARCHS_REASON=	does not configure except on i386 amd64
 
 .include <bsd.port.mk>

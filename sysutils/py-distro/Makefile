@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	distro
-PORTVERSION=	1.4.0
-PORTREVISION=	1
+PORTVERSION=	1.5.0
 CATEGORIES=	sysutils python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -14,7 +13,7 @@ COMMENT=	Linux OS platform information API
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-USES=		python shebangfix
+USES=		python:3.6+ shebangfix
 USE_PYTHON=	autoplist concurrent distutils
 
 SHEBANG_FILES=	query_local_distro.py

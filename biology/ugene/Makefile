@@ -2,19 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	ugene
-DISTVERSION=	1.31.0
-PORTREVISION=	1
+PORTVERSION=	37.0
 CATEGORIES=	biology science
-MASTER_SITES=	http://ugene.unipro.ru/downloads/
-DISTFILES=	${DISTNAME}${EXTRACT_SUFX} QueryDesigner_UserManual.pdf \
-		UniproUGENE_UserManual.pdf WorkflowDesigner_UserManual.pdf
-DIST_SUBDIR=	${PORTNAME}
-EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
 
 MAINTAINER=	h2+fbsdports@fsfe.org
 COMMENT=	Free, open-source, cross-platform bioinformatics toolkit
-
-BROKEN=		unfetchable
 
 LICENSE=	GPLv2+
 LICENSE_FILE=	${WRKSRC}/LICENSE.txt
@@ -23,23 +15,24 @@ RUN_DEPENDS=	bash:shells/bash
 
 BROKEN_aarch64=	Fails to build: invokes x86 asm
 
+USE_GITHUB=	yes
+GH_ACCOUNT=	ugeneunipro
+
 USES=		desktop-file-utils gl qmake qt:5 shared-mime-info xorg
 USE_GL=		gl glu
 USE_QT=		buildtools_build linguisttools_build \
-		core gui network opengl printsupport script scripttools \
-		sql svg testlib webkit widgets xml \
+		core gui network opengl printsupport scripttools script \
+		sql svg testlib widgets xml \
 		imageformats_run
 USE_XORG=	x11 xtst
 
 QMAKE_ARGS=	INSTALL_PREFIX="${PREFIX}" UGENE_INSTALL_DATA="${DATADIR}" \
-		INSTALL_MANDIR="${MAN1PREFIX}/man" LRELEASE="${LRELEASE}" \
-		LUPDATE="${LUPDATE}"
+		INSTALL_MANDIR="${MAN1PREFIX}/man" \
+		UGENE_LRELEASE="${LRELEASE}" UGENE_LUPDATE="${LUPDATE}"
 ALL_TARGET=	release
+CXXFLAGS_i386=	-msse2
 
-DOCSDIR=	${DATADIR}/manuals
-
-OPTIONS_DEFINE=	DOCS OPENCL
-DOCS_DESC=	Install official UGENE documentation (PDF)
+OPTIONS_DEFINE=	OPENCL
 
 OPENCL_QMAKE_ON=	UGENE_OPENCL_DETECTED=1
 
@@ -50,14 +43,6 @@ OPENCL_QMAKE_ON=	UGENE_OPENCL_DETECTED=1
 QMAKE_ARGS+=	CONFIG+=x64
 .endif
 
-.if ${MACHINE_CPU:Msse2}
-QMAKE_ARGS+=	UGENE_SSE2_DETECTED=1
-.endif
-
-post-extract:
-	@${MKDIR} ${WRKSRC}/data/manuals
-	${CP} -p ${_DISTDIR}/*.pdf ${WRKSRC}/data/manuals
-
 post-patch:
 # yes, bash is required, stuff will not execute with sh
 	@${REINPLACE_CMD} -e 's|/bin/bash|/usr/bin/env bash|' \
@@ -65,10 +50,15 @@ post-patch:
 		${WRKSRC}/installer/_common_data/ugene
 	@${REINPLACE_CMD} -e 's|-bit version|& for ${OPSYS}/${ARCH}|' \
 		${WRKSRC}/src/ugeneui/src/main_window/AboutDialogController.cpp
-	@${REINPLACE_CMD} 's, -lbreakpad,,' \
+	@${REINPLACE_CMD} 's, -lbreakpad$$$$D,,' \
 		${WRKSRC}/src/corelibs/U2Private/U2Private.pri \
 		${WRKSRC}/src/plugins_checker/plugins_checker.pri \
 		${WRKSRC}/src/ugenecl/ugenecl.pri \
 		${WRKSRC}/src/ugeneui/ugeneui.pri
+	@${REINPLACE_CMD} -e '218,220s|NULL)|false)|' \
+		${WRKSRC}/src/plugins/GUITestBase/src/GTUtilsMdi.cpp
+
+post-stage:
+	@cd ${STAGEDIR}${PREFIX} && ${RM} bin/ecp.* lib/ugene/ecp.*
 
 .include <bsd.port.post.mk>

@@ -2,11 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	tinymce
-PORTVERSION=	5.1.5
+PORTVERSION=	5.6.2
 CATEGORIES=	www
 MASTER_SITES=	http://download.tiny.cloud/tinymce/community/ \
 		LOCAL/sunpoet
-DISTNAME=	${PORTNAME}_${PORTVERSION}
+DISTNAME=	tinymce_${PORTVERSION}
 
 MAINTAINER=	sunpoet@FreeBSD.org
 COMMENT=	Open source JavaScript HTML WYSIWYG editor for web sites
@@ -18,7 +18,7 @@ USES=		cpe zip
 
 NO_ARCH=	yes
 NO_BUILD=	yes
-WRKSRC=		${WRKDIR}/${PORTNAME}
+WRKSRC=		${WRKDIR}/tinymce
 
 do-install:
 	cd ${WRKSRC}/ && ${COPYTREE_SHARE} . ${STAGEDIR}${WWWDIR}/

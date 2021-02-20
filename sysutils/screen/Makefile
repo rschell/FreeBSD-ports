@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	screen
-PORTVERSION=	4.7.0
-PORTREVISION=	8
+PORTVERSION=	4.8.0
 CATEGORIES=	sysutils
 MASTER_SITES=	GNU \
 		ftp://ftp.gnu.org/gnu/screen/ \
@@ -49,7 +48,7 @@ CPE_VENDOR=	gnu
 .include <bsd.port.options.mk>
 
 .if ${ARCH} == armv6 || ${ARCH} == armv7 || ${ARCH} == i386 || \
-    ${ARCH} == powerpc64
+    ${ARCH:Mpowerpc*}
 SSP_CFLAGS?=	-fno-stack-protector
 .endif
 

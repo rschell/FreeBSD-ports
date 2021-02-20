@@ -1,33 +1,35 @@
 # $FreeBSD$
 
 PORTNAME=	sdcc
-PORTVERSION=	3.9.0
+PORTVERSION=	4.0.0
 DISTVERSIONPREFIX=src-
 PORTREVISION=	1
 CATEGORIES=	lang
 MASTER_SITES=	SF
 
-MAINTAINER=	ports@FreeBSD.org
+MAINTAINER=	darius@dons.net.au
 COMMENT=	Small Device C Compiler
 
-DEPRECATED=	Unmaintained, uses EOLed python27
-EXPIRATION_DATE=	2020-01-27
-
-LICENSE=	GPLv3
-
-BROKEN_aarch64=		Fails to configure: BFD does not support target aarch64-portbld-freebsd11.0
+LICENSE=	GPLv2 GPLv3
+LICENSE_COMB=	multi
+LICENSE_FILE_GPLv2=	${WRKSRC}/COPYING
+LICENSE_FILE_GPLv3=	${WRKSRC}/sdas/COPYING3
 
 BUILD_DEPENDS=	${LOCALBASE}/include/boost/graph/adjacency_list.hpp:devel/boost-libs
 
 CONFLICTS_INSTALL=	sdcc-[0-9]* sdcc-devel-[0-9]*
 GNU_CONFIGURE=	yes
-USES=		bison compiler:c++11-lang gmake readline:port python:2.7,run shebangfix tar:bzip2
+USES=		autoreconf:build bison compiler:c++11-lang gmake \
+		readline:port python shebangfix tar:bzip2
 SHEBANG_FILES=	support/scripts/as2gbmap.py
+TEST_WRKSRC=	${WRKSRC}/support/regression
+TEST_ARGS=	--no-print-directory # tons of them, way too annoying
+TEST_TARGET=	all
 
 OPTIONS_DEFINE=		SDCCLIB DEVLIB DOCS UCSIM
 OPTIONS_MULTI=		TARGETS
 OPTIONS_MULTI_TARGETS=	HC08 MCS51 PADAUK PIC STM8 Z80
-OPTIONS_DEFAULT=	SDCCLIB DEVLIB SDCCLIB UCSIM HC08 MCS51 PADAUK PIC STM8 Z80
+OPTIONS_DEFAULT=	SDCCLIB DEVLIB UCSIM HC08 MCS51 PADAUK PIC STM8 Z80
 
 # XXX libsdcc does not build correctly without this.
 SDCCLIB_IMPLIES=MCS51
@@ -42,7 +44,7 @@ STM8_DESC=	STMicroelectronics STM8
 UCSIM_DESC=	The ucSim simulator
 Z80_DESC=	Zilog Z80/Z180/GBZ80, Rabbit 2000/3000, Toshiba TLCS-90
 
-CONFIGURE_ARGS=	--disable-non-free \
+CONFIGURE_ARGS=	--enable-non-free \
 		docdir=${DOCSDIR}
 PORTDOCS=	*
 WRKSRC=		${WRKDIR}/sdcc-${PORTVERSION}
@@ -79,12 +81,14 @@ post-patch:
 		${WRKSRC}/device/lib/pic14/Makefile.common \
 		${WRKSRC}/device/lib/pic14/Makefile.in \
 		${WRKSRC}/device/lib/pic14/configure \
+		${WRKSRC}/device/lib/pic14/libc/Makefile.in \
 		${WRKSRC}/device/lib/pic14/libm/Makefile.in \
 		${WRKSRC}/device/lib/pic14/libsdcc/enhanced/Makefile.in \
 		${WRKSRC}/device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in \
 		${WRKSRC}/device/lib/pic14/libsdcc/regular/Makefile.in \
 		${WRKSRC}/device/lib/pic16/Makefile.in \
 		${WRKSRC}/device/lib/pic16/configure \
+		${WRKSRC}/device/lib/pic16/configure.ac \
 		${WRKSRC}/device/lib/pic16/debug/Makefile.in \
 		${WRKSRC}/device/lib/pic16/libc/Makefile.in \
 		${WRKSRC}/device/lib/pic16/libio/Makefile.in \
@@ -95,12 +99,11 @@ post-patch:
 		${WRKSRC}/device/non-free/lib/pic14/Makefile.rules \
 		${WRKSRC}/device/non-free/lib/pic16/Makefile.in \
 		${WRKSRC}/device/non-free/lib/pic16/configure \
-		${WRKSRC}/device/non-free/lib/pic16/libdev/Makefile.in
-# Upstream forgot to run some autotools in this release so make tries to run
-# them.  Change a timestamp so aclocal.m4 and Makefile.in no longer appear
-# out-of-date.
-	@${TOUCH} -r ${WRKSRC}/device/non-free/lib/pic16/configure.ac \
-		${WRKSRC}/device/non-free/lib/pic16/supported-devices.ac
+		${WRKSRC}/device/non-free/lib/pic16/configure.ac \
+		${WRKSRC}/device/non-free/lib/pic16/libdev/Makefile.in \
+		${WRKSRC}/device/non-free/lib/pic16/libdev/mkmk.sh
+	@${REINPLACE_CMD} 's/[[:<:]]arch[[:>:]]/picarch/g' \
+		${WRKSRC}/device/non-free/lib/pic16/libdev/mkmk.sh
 
 post-patch-DOCS-off:
 	@${REINPLACE_CMD} 's, [a-z-]*doc,,' \

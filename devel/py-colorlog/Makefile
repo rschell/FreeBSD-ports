@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	colorlog
-PORTVERSION=	4.0.2
+PORTVERSION=	4.6.2
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -13,14 +13,14 @@ COMMENT=	Python module for log formatting with colors
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-OPTIONS_DEFINE=	DOCS
-
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes
 
 PORTDOCS=	README.md
+
+OPTIONS_DEFINE=	DOCS
 
 post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}

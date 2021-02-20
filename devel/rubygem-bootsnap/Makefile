@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	bootsnap
-PORTVERSION=	1.4.5
+PORTVERSION=	1.5.1
 CATEGORIES=	devel rubygems
 MASTER_SITES=	RG
 
@@ -13,9 +13,9 @@ LICENSE_FILE=	${WRKSRC}/LICENSE.txt
 
 RUN_DEPENDS=	rubygem-msgpack>=1.0<2:devel/rubygem-msgpack
 
-USES=		gem shebangfix
+USES=		gem
 USE_RUBY=	yes
 
-SHEBANG_FILES=	bin/*
+PLIST_FILES=	bin/bootsnap
 
 .include <bsd.port.mk>

@@ -3,7 +3,7 @@
 
 PORTNAME=	xine
 PORTVERSION=	1.2.9
-PORTREVISION=	11
+PORTREVISION=	13
 CATEGORIES=	multimedia
 MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}-lib/${PORTVERSION}
 PKGNAMEPREFIX=	lib
@@ -129,6 +129,10 @@ XVMC_LIB_DEPENDS=		libXvMC.so:x11/libXvMC
 XVMC_CONFIGURE_ENABLE=		xvmc
 
 .include <bsd.port.pre.mk>
+
+.if ${ARCH} == aarch64
+BUILD_DEPENDS+=	as:devel/binutils
+.endif
 
 post-patch:
 .if ${COMPILER_TYPE} == "clang"

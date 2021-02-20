@@ -3,7 +3,7 @@
 
 PORTNAME=	gobject
 PORTVERSION=	3.28.3
-PORTREVISION=	0
+PORTREVISION=	3
 CATEGORIES=	devel python
 MASTER_SITES=	GNOME/sources/pygobject/${PORTVERSION:C/^([0-9]+\.[0-9]+).*/\1/}
 PKGNAMEPREFIX?=	py
@@ -11,8 +11,8 @@ PKGNAMESUFFIX?=	3-common
 DISTNAME=	pygobject-${PORTVERSION}
 DIST_SUBDIR=	gnome
 
-MAINTAINER=	gnome@FreeBSD.org
-COMMENT=	Common files for the Python bindings for GObject
+MAINTAINER=	desktop@FreeBSD.org
+COMMENT?=	Common files for the Python bindings for GObject
 
 LICENSE=	LGPL21
 LICENSE_FILE=	${WRKSRC}/COPYING
@@ -56,7 +56,7 @@ LIB_DEPENDS+=	libffi.so:devel/libffi
 RUN_DEPENDS+=	pygobject3-common>=0:devel/pygobject3-common
 
 .if ${SLAVE_PORT} == python
-USES+=		python
+USES+=		python:3.6+
 USE_PYTHON=	flavors py3kplist
 BUILD_DEPENDS+=	${PYTHON_PKGNAMEPREFIX}cairo>=0:graphics/py-cairo@${PY_FLAVOR}
 RUN_DEPENDS+=	${PYTHON_PKGNAMEPREFIX}cairo>=0:graphics/py-cairo@${PY_FLAVOR}

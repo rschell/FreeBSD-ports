@@ -37,7 +37,7 @@ __FBSDID("$FreeBSD$");
 #include "symtab.h"
 #include "trad-frame.h"
 #include "amd64-tdep.h"
-#include "common/x86-xstate.h"
+#include "gdbsupport/x86-xstate.h"
 
 #ifdef __amd64__
 #include <machine/pcb.h>
@@ -241,6 +241,7 @@ amd64fbsd_kernel_init_abi(struct gdbarch_info info, struct gdbarch *gdbarch)
 	fbsd_vmcore_set_cpu_pcb_addr(gdbarch, kgdb_trgt_stop_pcb);
 }
 
+void _initialize_amd64_kgdb_tdep(void);
 void
 _initialize_amd64_kgdb_tdep(void)
 {

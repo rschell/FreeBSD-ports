@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	pycoin
-PORTVERSION=	0.80
-PORTREVISION=	1
+PORTVERSION=	0.90.20201031
 CATEGORIES=	finance
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -14,7 +13,7 @@ COMMENT=	Utilities for Bitcoin and altcoin addresses/transaction manipulation
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes

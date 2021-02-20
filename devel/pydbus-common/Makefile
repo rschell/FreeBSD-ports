@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	dbus
-DISTVERSION=	1.2.14
+DISTVERSION=	1.2.16
 PORTREVISION?=	0
 CATEGORIES=	devel gnome python
 MASTER_SITES=	http://dbus.freedesktop.org/releases/dbus-python/
@@ -35,7 +35,8 @@ OPTIONS_DEFINE=	HTMLDOCS DOCS EXAMPLES
 HTMLDOCS_DESC=	build html documentation
 HTMLDOCS_IMPLIES=	DOCS
 HTMLDOCS_CONFIGURE_ENABLE=	documentation
-HTMLDOCS_BUILD_DEPENDS=		sphinx-build:textproc/py-sphinx
+HTMLDOCS_BUILD_DEPENDS=		sphinx-build:textproc/py-sphinx \
+				${PYTHON_PKGNAMEPREFIX}sphinx_rtd_theme>0:textproc/py-sphinx_rtd_theme@${PY_FLAVOR}
 
 post-patch-DOCS-on:
 	@${REINPLACE_CMD} -e 's|HEADERS install-dist_docDATA|HEADERS|g ; \
@@ -64,7 +65,7 @@ do-install-HTMLDOCS-on:
 LIB_DEPENDS+=	libdbus-glib-1.so:devel/dbus-glib
 RUN_DEPENDS+=	pydbus-common>=0:devel/pydbus-common
 USE_LDCONFIG=	yes
-USES+=		python
+USES+=		python:3.6+
 USE_PYTHON=	flavors py3kplist
 
 post-install:

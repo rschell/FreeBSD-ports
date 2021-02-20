@@ -3,7 +3,7 @@
  * telegraf.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2017-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2017-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +63,7 @@ function telegraf_resync_config() {
 	if (count($a_ca)) {
 		$ca_pem = '';
 		foreach ($a_ca as $ca) {
-			$ca_pem .= base64_decode($ca['crt']);
+			$ca_pem .= base64_decode($ca['crt']) . "\n";
 		}
 		file_put_contents($ca_pem_file, $ca_pem);
 	}

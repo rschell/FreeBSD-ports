@@ -2,6 +2,7 @@
 
 PORTNAME=	spidermonkey
 DISTVERSION=	60.9.0
+PORTREVISION=	5
 CATEGORIES=	lang
 MASTER_SITES=	MOZILLA/firefox/releases/${DISTVERSION}esr/source
 PKGNAMESUFFIX=	${SP_VER}
@@ -12,6 +13,9 @@ COMMENT=	Standalone JavaScript based from Mozilla 60-esr
 
 LICENSE=	MPL20
 LICENSE_FILE=	${WRKSRC}/LICENSE
+
+DEPRECATED=	Requires python2 to build
+EXPIRATION_DATE=	2020-12-31
 
 BUILD_DEPENDS=	autoconf-2.13:devel/autoconf213
 LIB_DEPENDS=	libnspr4.so:devel/nspr \
@@ -50,6 +54,11 @@ CONFIGURE_ENV=	HOST_CC=${CC} HOST_CXX=${CXX}
 
 .if ${ARCH} == amd64
 CONFIGURE_TARGET=x86_64-portbld-freebsd${OSREL}
+.endif
+
+.if ${ARCH} == i386
+# ld: error: undefined symbol: __atomic_load
+USE_GCC=	9+
 .endif
 
 post-install:

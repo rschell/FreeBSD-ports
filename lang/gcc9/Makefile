@@ -2,7 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	gcc
-PORTVERSION=	9.2.0
+PORTVERSION=	9.3.0
+PORTREVISION=	1
 CATEGORIES=	lang
 MASTER_SITES=	GCC
 PKGNAMESUFFIX=	${SUFFIX}
@@ -34,11 +35,10 @@ CPE_VENDOR=	gnu
 
 GCC_VERSION=	${PORTVERSION}
 SUFFIX=		${PORTVERSION:C/([0-9]+).*/\1/}
-SSP_UNSAFE=	yes
 CFLAGS:=	${CFLAGS:N-mretpoline}
 CXXFLAGS:=	${CXXFLAGS:N-mretpoline}
 
-OPTIONS_DEFINE=		BOOTSTRAP GRAPHITE PLUGINS
+OPTIONS_DEFINE=		BOOTSTRAP GRAPHITE
 OPTIONS_DEFAULT=	BOOTSTRAP
 BOOTSTRAP_DESC=		Build using a full bootstrap
 GRAPHITE_DESC=		Support for Graphite loop optimizations
@@ -54,8 +54,6 @@ MULTILIB_CONFIGURE_ENABLE=	multilib
 CONFIGURE_ARGS+=	--disable-multilib
 .endif
 
-PLUGINS_CONFIGURE_ENABLE=	plugin
-
 .include <bsd.port.pre.mk>
 
 .if ${ARCH} == amd64
@@ -66,7 +64,8 @@ CONFIGURE_ENV+=	UNAME_m="powerpc64"
 . if defined(PPC_ABI) && ${PPC_ABI} == ELFv2
 CONFIGURE_ARGS+=	--with-abi=elfv2
 . else
-USE_GCC=	8
+MAKE_ARGS+=		CFLAGS_FOR_TARGET="-O0" CXXFLAGS_FOR_TARGET="-O0" BOOT_CFLAGS="-O0" 
+EXTRA_PATCHES+=		${FILESDIR}/extra-patch-libgcc_config_rs6000_t-crtstuff
 . endif
 .endif
 
@@ -88,6 +87,7 @@ BINMODE=	755
 .endif
 CONFIGURE_ARGS+=--disable-nls \
 		--enable-gnu-indirect-function \
+		--enable-plugin \
 		--libdir=${TARGLIB} \
 		--libexecdir=${LIBEXEC} \
 		--program-suffix=${SUFFIX} \

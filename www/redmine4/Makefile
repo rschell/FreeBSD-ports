@@ -2,30 +2,30 @@
 # $FreeBSD$
 
 PORTNAME=	redmine
-PORTVERSION=	4.0.5
-PORTREVISION=	4
+PORTVERSION=	4.1.1
+PORTREVISION=	3
 CATEGORIES=	www
 MASTER_SITES=	https://www.redmine.org/releases/
 PKGNAMESUFFIX=	4
 
-MAINTAINER=	mikael.urankar@gmail.com
+MAINTAINER=	mikael@FreeBSD.org
 COMMENT=	Flexible project management web application
 
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/doc/COPYING
 
 RUN_DEPENDS=	rubygem-bundler>=1.5.0:sysutils/rubygem-bundler \
-		rubygem-rails52>=5.2.4.1:www/rubygem-rails52 \
+		rubygem-rails52>=5.2.4.4:www/rubygem-rails52 \
 		rubygem-rouge312>=3.12.0:textproc/rubygem-rouge312 \
-		rubygem-request_store>=1.0.5:devel/rubygem-request_store \
+		rubygem-request_store14>=1.0.5:devel/rubygem-request_store14 \
 		rubygem-mini_mime>=1.0.1:mail/rubygem-mini_mime \
-		rubygem-actionpack-xml_parser52>=0:textproc/rubygem-actionpack-xml_parser52 \
-		rubygem-roadie-rails52>=1.3.0:mail/rubygem-roadie-rails52 \
+		rubygem-actionpack-xml_parser-rails52>=0:textproc/rubygem-actionpack-xml_parser-rails52 \
+		rubygem-roadie-rails-rails52>=2.1.0:mail/rubygem-roadie-rails-rails52 \
 		rubygem-mimemagic>=0:misc/rubygem-mimemagic \
 		rubygem-mail>=2.7.1:mail/rubygem-mail \
+		rubygem-csv>=3.1.1:devel/rubygem-csv \
 		rubygem-nokogiri>=1.10.0:textproc/rubygem-nokogiri \
 		rubygem-i18n>=0.7:devel/rubygem-i18n \
-		rubygem-sprockets3>=3.7.2:devel/rubygem-sprockets3 \
 		rubygem-rbpdf>=1.19.6:print/rubygem-rbpdf \
 		rubygem-net-ldap>=0.16:net/rubygem-net-ldap \
 		rubygem-ruby-openid>=2.9.2:net/rubygem-ruby-openid \
@@ -34,8 +34,6 @@ RUN_DEPENDS=	rubygem-bundler>=1.5.0:sysutils/rubygem-bundler \
 
 USES=		cpe
 USE_RUBY=	yes
-
-CONFLICTS_INSTALL=	redmine
 
 NO_ARCH=	yes
 NO_BUILD=	yes
@@ -58,10 +56,12 @@ NO_OPTIONS_SORT=	yes
 MYSQL_RUN_DEPENDS=	rubygem-mysql2>=0.5.0:databases/rubygem-mysql2
 POSTGRESQL_RUN_DEPENDS=	rubygem-pg>=1.1.4:databases/rubygem-pg
 MARKDOWN_RUN_DEPENDS=	rubygem-redcarpet>=3.4.0:textproc/rubygem-redcarpet
-RMAGIC_RUN_DEPENDS=	rubygem-rmagick>=2.16.0:graphics/rubygem-rmagick
+RMAGIC_RUN_DEPENDS=	rubygem-mini_magick>=4.9.5:graphics/rubygem-mini_magick
 THIN_RUN_DEPENDS=	rubygem-thin>=1.6.2:www/rubygem-thin
 THIN_SUB_LIST=		WWWOWN=${WWWOWN} WWWGRP=${WWWGRP}
 THIN_VARS=		USE_RC_SUBR=redmine
+
+.include <bsd.port.options.mk>
 
 post-extract:
 	@${RM} -r ${WRKSRC}/.hgignore ${WRKSRC}/.gitignore ${WRKSRC}/.github \
@@ -91,7 +91,7 @@ do-install-MARKDOWN-on:
 	${CP} ${FILESDIR}/markdown.rb ${STAGEDIR}${WWWDIR}/bundler.d
 
 do-install-RMAGIC-on:
-	${CP} ${FILESDIR}/rmagic.rb ${STAGEDIR}${WWWDIR}/bundler.d
+	${CP} ${FILESDIR}/mini_magick.rb ${STAGEDIR}${WWWDIR}/bundler.d
 
 do-install-THIN-on:
 	${CP} ${FILESDIR}/thin.rb ${STAGEDIR}${WWWDIR}/bundler.d

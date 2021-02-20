@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	sprockets
-PORTVERSION=	4.0.0
+PORTVERSION=	4.0.2
 CATEGORIES=	devel rubygems
 MASTER_SITES=	RG
 
@@ -22,4 +22,3 @@ NO_ARCH=	yes
 PLIST_FILES=	bin/sprockets
 
 .include <bsd.port.mk>
-

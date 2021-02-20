@@ -3,7 +3,7 @@
  * snort_ip_list_mgmt.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2004-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2004-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2009-2010 Robert Zelaya.
  * Copyright (c) 2018 Bill Meeks
  * All rights reserved.
@@ -163,15 +163,6 @@ display_top_tabs($tab_array, true);
 
 		<div class="table-responsive">
 
-	<?php if ($g['platform'] == "nanobsd") : ?>
-			<table id="maintable" class="table table-striped table-hover table-condensed">
-				<tbody>
-				<tr>
-					<td><?php echo gettext("IP Reputation is not supported on NanoBSD installs"); ?></td>
-				</tr>
-				</tbody>
-			</table>
-	<?php else: ?>
 			<table id="maintable" class="table table-striped table-hover table-condensed">
 				<thead>
 					<tr>
@@ -236,7 +227,6 @@ display_top_tabs($tab_array, true);
 				</p>
 			</div>
 		</div>
-	<?php endif; ?>
 		</form>
 	</div>
 </div>

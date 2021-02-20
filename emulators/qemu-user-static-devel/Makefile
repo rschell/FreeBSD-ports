@@ -2,7 +2,7 @@
 
 PORTNAME=	qemu
 PORTVERSION=	3.1.0
-PORTREVISION=	1
+PORTREVISION=	5
 CATEGORIES=	emulators
 PKGNAMESUFFIX=	-user-static-devel
 DIST_SUBDIR=	qemu/${PORTVERSION}
@@ -18,7 +18,7 @@ CONFLICTS_INSTALL=	qemu-user-static-[0-9]*
 
 USES=		bison compiler:c11 gmake perl5 pkgconfig python:build
 USE_GITHUB=	yes
-GH_TUPLE=	seanbruno:qemu-bsd-user:e21442a	\
+GH_TUPLE=	seanbruno:qemu-bsd-user:74de8c0708	\
 		qemu:keycodemapdb:10739aa:keycodemapdb/ui/keycodemapdb
 HAS_CONFIGURE=	yes
 USE_PERL5=	build
@@ -39,7 +39,7 @@ CONFIGURE_ARGS+=	--extra-cflags=-I${LOCALBASE}/include
 CONFIGURE_ARGS+=	--disable-libssh2
 
 QEMU_TARGETS=		i386-bsd-user sparc-bsd-user arm-bsd-user mips-bsd-user mipsel-bsd-user ppc-bsd-user
-.if ${ARCH} == "amd64"
+.if ${ARCH} == "amd64" || ${ARCH} == "powerpc64"
 QEMU_TARGETS+=		x86_64-bsd-user riscv64-bsd-user sparc64-bsd-user mips64-bsd-user mips64el-bsd-user ppc64-bsd-user aarch64-bsd-user
 PLIST_SUB+=	64BIT=""
 .else
@@ -47,7 +47,6 @@ PLIST_SUB+=	64BIT="@comment "
 .endif
 CONFIGURE_ARGS+=	--target-list=${QEMU_TARGETS:ts,}
 
-SSP_CFLAGS?=	-fstack-protector # XXX -strong crashes qemu-user-static
 WITHOUT_CPU_CFLAGS=yes	#to avoid problems with register allocation
 CFLAGS:=	${CFLAGS:C/-fno-tree-vrp//}
 CFLAGS+=	-Wno-address-of-packed-member
@@ -63,20 +62,11 @@ CONFIGURE_ARGS+=	--prefix=${PREFIX} --cc=${CC} --enable-docs \
 	--disable-sdl --disable-gtk --disable-vte --disable-gnutls --disable-vnc \
 	--disable-curl --disable-opengl --disable-usb-redir --disable-pcap \
 	--disable-docs --disable-tools --disable-system --disable-guest-agent \
+	--disable-capstone \
 	--extra-cflags=-I${WRKSRC}\ -I${LOCALBASE}/include\ -DPREFIX=\\\"\"${PREFIX}\\\"\"
 
 QEMU_ARCH=	${ARCH:C/amd64/x86_64/:C/powerpc/ppc/}
 MAKE_ARGS+=	ARCH=${QEMU_ARCH}
-
-post-patch:
-	@${REINPLACE_CMD} -E \
-		-e "s|^(CFLAGS=).*|\1${CFLAGS} -fno-strict-aliasing|" \
-		-e "s|^(LDFLAGS=).*|\1${LDFLAGS}|" \
-		${WRKSRC}/Makefile.target
-	@${REINPLACE_CMD} -E \
-		-e "s|^(CFLAGS=).*|\1${CFLAGS} -fno-strict-aliasing -I.|" \
-		-e "s|^(LDFLAGS=).*|\1${LDFLAGS}|" \
-		${WRKSRC}/Makefile
 
 post-install:
 	@${MV} ${STAGEDIR}${PREFIX}/etc/rc.d ${WRKDIR}

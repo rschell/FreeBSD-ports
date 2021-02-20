@@ -7,12 +7,12 @@ MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
 MAINTAINER=	fax@nohik.ee
-COMMENT=	Statsd is a client for Etsy's node-js statsd server
+COMMENT=	Client for Etsy's node-js statsd server
 
 LICENSE=	BSD3CLAUSE
 
 NO_ARCH=	yes
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist distutils
 
 post-extract:

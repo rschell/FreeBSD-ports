@@ -1,8 +1,9 @@
 # $FreeBSD$
 
 PORTNAME=	cloudscraper
-DISTVERSION=	1.2.18
+DISTVERSION=	1.2.50
 CATEGORIES=	net python
+MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
 MAINTAINER=	tcberner@FreeBSD.org
@@ -17,11 +18,8 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}openssl>17.0:security/py-openssl@${PY_FLAVOR
 		${PYTHON_PKGNAMEPREFIX}requests-toolbelt>0:www/py-requests-toolbelt@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}brotli>0:archivers/py-brotli@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils autoplist
-
-USE_GITHUB=	yes
-GH_ACCOUNT=	VeNoMouS
 
 CONFLICTS_INSTALL=	${PYTHON_PKGNAMEPREFIX}cloudflare-scrape-1.*
 

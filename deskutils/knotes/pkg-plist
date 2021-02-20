@@ -8,7 +8,7 @@ lib/libnotesharedprivate.so.5
 lib/libnotesharedprivate.so.%%KDE_APPLICATIONS_SHLIB_VER%%
 %%QT_PLUGINDIR%%/kcm_knote.so
 %%QT_PLUGINDIR%%/kcm_knotessummary.so
-%%QT_PLUGINDIR%%/kontact_knotesplugin.so
+%%QT_PLUGINDIR%%/kontact5/kontact_knotesplugin.so
 share/akonadi/agents/notesagent.desktop
 share/applications/org.kde.knotes.desktop
 share/config.kcfg/knotesglobalconfig.kcfg
@@ -73,6 +73,7 @@ share/locale/de/LC_MESSAGES/knotes.mo
 share/locale/de/LC_MESSAGES/libnoteshared.mo
 share/locale/el/LC_MESSAGES/akonadi_notes_agent.mo
 share/locale/el/LC_MESSAGES/knotes.mo
+share/locale/el/LC_MESSAGES/libnoteshared.mo
 share/locale/en_GB/LC_MESSAGES/akonadi_notes_agent.mo
 share/locale/en_GB/LC_MESSAGES/knotes.mo
 share/locale/en_GB/LC_MESSAGES/libnoteshared.mo

@@ -3,7 +3,7 @@
  * status_monitoring.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2008-2016 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2008-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -28,6 +28,16 @@
 require("guiconfig.inc");
 require_once("filter.inc");
 require("shaper.inc");
+
+/*
+ * Check user privileges to test if the user is allowed to disable graphing / reset data.
+ */
+phpsession_begin();
+$guiuser = getUserEntry($_SESSION['Username']);
+$read_only = (is_array($guiuser) && userHasPrivilege($guiuser, "user-config-readonly"));
+phpsession_end();
+
+$saveclass = 'success';
 
 function createOptions($dropdown) {
 	echo 'var newOptions = {' . "\n";
@@ -69,25 +79,36 @@ if(!empty($_POST['view-title'])) {
 
 $changedesc = gettext("Status: Monitoring:") . " ";
 if($_POST['enable']) {
-	if(($_POST['enable'] === 'false')) {
-		unset($config['rrd']['enable']);
-		$savemsg = "RRD graphing has been disabled.";
-		$changedesc .= gettext("RRD graphing has been disabled.");
+	if ($read_only) {
+		$savemsg = "Insufficient privileges to make the requested change (read only).";
+		$saveclass = 'danger';
 	} else {
-		$config['rrd']['enable'] = true;
-		$savemsg = "RRD graphing has been enabled.";
-		$changedesc .= gettext("RRD graphing has been enabled.");
-	}
-	write_config($changedesc);
+		if(($_POST['enable'] === 'false')) {
+			unset($config['rrd']['enable']);
+			$savemsg = "RRD graphing has been disabled.";
+			$changedesc .= gettext("RRD graphing has been disabled.");
+		} else {
+			$config['rrd']['enable'] = true;
+			$savemsg = "RRD graphing has been enabled.";
+			$changedesc .= gettext("RRD graphing has been enabled.");
+		}
+		write_config($changedesc);
 
-	enable_rrd_graphing();
+		enable_rrd_graphing();
+	}
 }
 
 if ($_POST['ResetRRD']) {
-	mwexec('/bin/rm /var/db/rrd/*');
-	enable_rrd_graphing();
-	setup_gateways_monitor();
-	$savemsg = "RRD data has been cleared. New RRD files have been generated.";
+	if ($read_only) {
+		$savemsg = "Insufficient privileges to make the requested change (read only).";
+		$saveclass = 'danger';
+	} else {
+		mwexec('/bin/rm /var/db/rrd/*');
+		enable_rrd_graphing();
+		setup_gateways_monitor();
+		$savemsg = "RRD data has been cleared. New RRD files have been generated.";
+
+	}
 }
 
 //old config that needs to be updated
@@ -364,7 +385,7 @@ $pgtitle = array(gettext("Status"), gettext("Monitoring"));
 include("head.inc");
 
 if ($savemsg) {
-	print_info_box($savemsg, 'success');
+	print_info_box($savemsg, $saveclass);
 }
 
 $tab_array = array();

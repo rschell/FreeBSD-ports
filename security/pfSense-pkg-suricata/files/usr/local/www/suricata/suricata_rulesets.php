@@ -3,11 +3,11 @@
  * suricata_rulesets.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2006-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2006-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2003-2004 Manuel Kasper
  * Copyright (c) 2005 Bill Marquette
  * Copyright (c) 2009 Robert Zelaya Sr. Developer
- * Copyright (c) 2019 Bill Meeks
+ * Copyright (c) 2021 Bill Meeks
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,6 +65,7 @@ $snortcommunitydownload = $config['installedpackages']['suricata']['config'][0][
 
 $no_emerging_files = false;
 $no_snort_files = false;
+$inline_ips_mode = $a_nat[$id]['ips_mode'] == 'ips_mode_inline' ? true:false;
 
 $enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
 
@@ -265,10 +266,9 @@ $tab_array = array();
 $tab_array[] = array($menu_iface . gettext("Settings"), false, "/suricata/suricata_interfaces_edit.php?id={$id}");
 $tab_array[] = array($menu_iface . gettext("Categories"), true, "/suricata/suricata_rulesets.php?id={$id}");
 $tab_array[] = array($menu_iface . gettext("Rules"), false, "/suricata/suricata_rules.php?id={$id}");
-    $tab_array[] = array($menu_iface . gettext("Flow/Stream"), false, "/suricata/suricata_flow_stream.php?id={$id}");
+$tab_array[] = array($menu_iface . gettext("Flow/Stream"), false, "/suricata/suricata_flow_stream.php?id={$id}");
 $tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 $tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
-$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
 $tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
 display_top_tabs($tab_array, true);
 
@@ -662,7 +662,11 @@ events.push(function() {
 		var endis = !($('#ips_policy_enable').prop('checked'));
 
 		hideInput('ips_policy', endis);
-		hideInput('ips_policy_mode', endis);
+	<?php if ($inline_ips_mode): ?>
+			hideInput('ips_policy_mode', endis);
+	<?php else: ?>
+			hideInput('ips_policy_mode', true);
+	<?php endif;?>
 
 		$('input[type="checkbox"]').each(function() {
 			var str = $(this).val();

@@ -2,8 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	xfce4-timer-plugin
-PORTVERSION=	1.7.0
-PORTREVISION=	2
+PORTVERSION=	1.7.1
+PORTREVISION=	1
 CATEGORIES=	x11-clocks xfce
 MASTER_SITES=	XFCE/panel-plugins
 DIST_SUBDIR=	xfce4

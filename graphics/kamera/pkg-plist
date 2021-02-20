@@ -12,6 +12,7 @@ share/locale/ca@valencia/LC_MESSAGES/kio5_kamera.mo
 share/locale/cs/LC_MESSAGES/kcmkamera.mo
 share/locale/cs/LC_MESSAGES/kio5_kamera.mo
 share/locale/da/LC_MESSAGES/kcmkamera.mo
+share/locale/da/LC_MESSAGES/kio5_kamera.mo
 share/locale/de/LC_MESSAGES/kcmkamera.mo
 share/locale/de/LC_MESSAGES/kio5_kamera.mo
 share/locale/el/LC_MESSAGES/kcmkamera.mo
@@ -38,6 +39,7 @@ share/locale/hi/LC_MESSAGES/kcmkamera.mo
 share/locale/hr/LC_MESSAGES/kcmkamera.mo
 share/locale/hu/LC_MESSAGES/kcmkamera.mo
 share/locale/ia/LC_MESSAGES/kcmkamera.mo
+share/locale/ia/LC_MESSAGES/kio5_kamera.mo
 share/locale/is/LC_MESSAGES/kcmkamera.mo
 share/locale/it/LC_MESSAGES/kcmkamera.mo
 share/locale/it/LC_MESSAGES/kio5_kamera.mo
@@ -67,11 +69,13 @@ share/locale/pt/LC_MESSAGES/kio5_kamera.mo
 share/locale/pt_BR/LC_MESSAGES/kcmkamera.mo
 share/locale/pt_BR/LC_MESSAGES/kio5_kamera.mo
 share/locale/ro/LC_MESSAGES/kcmkamera.mo
+share/locale/ro/LC_MESSAGES/kio5_kamera.mo
 share/locale/ru/LC_MESSAGES/kcmkamera.mo
 share/locale/ru/LC_MESSAGES/kio5_kamera.mo
 share/locale/sk/LC_MESSAGES/kcmkamera.mo
 share/locale/sk/LC_MESSAGES/kio5_kamera.mo
 share/locale/sl/LC_MESSAGES/kcmkamera.mo
+share/locale/sl/LC_MESSAGES/kio5_kamera.mo
 share/locale/sv/LC_MESSAGES/kcmkamera.mo
 share/locale/sv/LC_MESSAGES/kio5_kamera.mo
 share/locale/tr/LC_MESSAGES/kcmkamera.mo

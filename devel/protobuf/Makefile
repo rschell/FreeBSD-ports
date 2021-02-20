@@ -2,8 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	protobuf
-PORTVERSION=	3.9.2
-DISTVERSIONPREFIX=	all-
+PORTVERSION=   3.13.0
+DISTVERSIONPREFIX=	cpp-
 PORTEPOCH=	1
 CATEGORIES=	devel
 MASTER_SITES=	https://github.com/protocolbuffers/protobuf/releases/download/v${PORTVERSION}/

@@ -211,11 +211,11 @@ i386fbsd_fetch_tss(void)
 	 * change it to be relative to cpu0prvpage instead.
 	 */ 
 	if (trunc_page(tss) == 0xffc00000) {
-		TRY {
+		try {
 			cpu0prvpage = parse_and_eval_address("cpu0prvpage");
-		} CATCH(e, RETURN_MASK_ERROR) {
+		} catch (const gdb_exception_error &e) {
 			return (0);
-		} END_CATCH
+		}
 		tss = cpu0prvpage + (tss & PAGE_MASK);
 	}
 	return (tss);
@@ -467,6 +467,7 @@ i386fbsd_kernel_init_abi(struct gdbarch_info info, struct gdbarch *gdbarch)
 	fbsd_vmcore_set_cpu_pcb_addr(gdbarch, kgdb_trgt_stop_pcb);
 }
 
+void _initialize_i386_kgdb_tdep(void);
 void
 _initialize_i386_kgdb_tdep(void)
 {

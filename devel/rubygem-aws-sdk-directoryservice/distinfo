@@ -1,3 +1,3 @@
-TIMESTAMP = 1575794055
-SHA256 (rubygem/aws-sdk-directoryservice-1.23.0.gem) = 630f26e01fbde029007f153f635c748ae1b09a684ea33fb73b6f2ce706e33f9a
-SIZE (rubygem/aws-sdk-directoryservice-1.23.0.gem) = 51712
+TIMESTAMP = 1607685427
+SHA256 (rubygem/aws-sdk-directoryservice-1.37.0.gem) = 8317b65747b0352158ce424b5f7572f1673632e14680efc9b50bf8d117853960
+SIZE (rubygem/aws-sdk-directoryservice-1.37.0.gem) = 57344

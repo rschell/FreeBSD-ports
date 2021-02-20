@@ -10,12 +10,12 @@
     SUBDIR += dialog4ports
     SUBDIR += dialog4ports-static
     SUBDIR += distilator
+    SUBDIR += fastest_pkg
     SUBDIR += freebsd-bugzilla-cli
     SUBDIR += genpatch
     SUBDIR += genplist
     SUBDIR += jailaudit
     SUBDIR += lsknobs
-    SUBDIR += managepkg
     SUBDIR += mkreadmes
     SUBDIR += modules2tuple
     SUBDIR += octopkg
@@ -43,7 +43,6 @@
     SUBDIR += portal
     SUBDIR += portconf
     SUBDIR += portdowngrade
-    SUBDIR += portell
     SUBDIR += portest
     SUBDIR += portfind
     SUBDIR += portfmt

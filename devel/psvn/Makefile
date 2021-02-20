@@ -3,13 +3,14 @@
 
 PORTNAME=	psvn
 PORTVERSION=	20150720.214200
+PORTREVISION=	2
 CATEGORIES=	devel elisp
 MASTER_SITES=	http://www.xsteve.at/prg/emacs/
 PKGNAMESUFFIX=	${EMACS_PKGNAMESUFFIX}
 DISTNAME=	psvn.el
 EXTRACT_SUFX=	# empty
 
-MAINTAINER=	yasu@utahime.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Subversion interface for Emacs
 
 LICENSE=	GPLv2+

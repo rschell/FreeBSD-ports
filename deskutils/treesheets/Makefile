@@ -3,10 +3,11 @@
 
 PORTNAME=	treesheets
 PORTVERSION=	1.0.2
+PORTREVISION=	1
 DISTVERSIONPREFIX=	v
 CATEGORIES=	deskutils
 
-MAINTAINER=	lightside@gmx.com
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Free form data organizer
 
 LICENSE=	ZLIB

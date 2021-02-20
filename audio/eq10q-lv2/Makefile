@@ -33,5 +33,9 @@ SSE_CMAKE_ON=	-DPORT_SIMD_FLAGS:STRING="-msse -mfpmath=sse"
 post-patch:
 	@${REINPLACE_CMD} -e 's/pow10(/pow(10,/g' \
 		${WRKSRC}/gui/widgets/*.cpp
+	# fix for audio/lv2 1.18.0 based on: https://sourceforge.net/p/eq10q/bugs/23/
+.for f in gui/eq10q_ui.cpp gui/dyn_ui.cpp gui/bassup_ui.cpp gui/midside_ui.cpp
+	cd ${WRKSRC} && ${REINPLACE_CMD} -e 's/const _LV2UI_Descriptor/const LV2UI_Descriptor/' ${f}
+.endfor
 
 .include <bsd.port.mk>

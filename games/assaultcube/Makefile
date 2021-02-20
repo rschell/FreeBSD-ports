@@ -8,7 +8,7 @@ CATEGORIES=	games
 MASTER_SITES=	SF/actiongame/AssaultCube%20Version%20${PORTVERSION}
 DISTNAME=	AssaultCube_v${PORTVERSION}
 
-MAINTAINER=	lightside@gmx.com
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Total conversion of the FPS game called Cube
 
 LICENSE=	ACUBE CUBE MIT OTHER
@@ -24,7 +24,7 @@ LICENSE_PERMS_CUBE=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 LICENSE_PERMS_OTHER=	dist-mirror pkg-mirror auto-accept
 
 USES=		gmake tar:bzip2
-LLD_UNSAFE=	yes
+LDFLAGS_i386=	-Wl,-znotext
 WRKSRC=		${WRKDIR}/AssaultCube_v${PORTVERSION}
 BUILD_WRKSRC=	${WRKSRC}/source/src
 SUB_FILES=	${PLIST_FILES:Mbin/*:T}

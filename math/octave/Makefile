@@ -28,7 +28,7 @@ LIB_DEPENDS=	libGraphicsMagick.so:graphics/GraphicsMagick \
 		libftgl.so:graphics/ftgl \
 		libhdf5.so:science/hdf5 \
 		libpcre.so:devel/pcre \
-		libqhull.so.5:math/qhull5 \
+		libqhull.so.7:math/qhull \
 		libqrupdate.so:math/qrupdate \
 		libumfpack.so:math/suitesparse \
 		libglpk.so:math/glpk \
@@ -36,10 +36,9 @@ LIB_DEPENDS=	libGraphicsMagick.so:graphics/GraphicsMagick \
 		libfontconfig.so:x11-fonts/fontconfig \
 		libfreetype.so:print/freetype2 \
 		libdrm.so:graphics/libdrm \
-		libOSMesa.so:graphics/libosmesa \
+		libsndfile.so:audio/libsndfile \
 		libsundials_arkode.so:math/sundials \
 		libportaudio.so:audio/portaudio
-#		libsndfile.so:audio/libsndfile # Commented out until this port no longer has vulnerabilities.
 
 USES=		charsetfix fortran gmake libtool perl5 pkgconfig readline \
 		tar:xz compiler:c++14-lang \
@@ -73,10 +72,10 @@ CONFIGURE_ENV=	GPERF="${LOCALBASE}/bin/gperf" \
 CONFIGURE_ARGS=	--host=${GNU_HOST} \
 		--with-blas="-L${LOCALBASE}/lib ${BLASLIB}" \
 		--with-lapack="${LAPACKLIB}" \
+		--with-sndfile \
 		--enable-shared \
 		--disable-jit \
-		--disable-openmp \
-		--with-osmesa
+		--disable-openmp
 
 INFO=		octave liboctave
 

@@ -3,23 +3,22 @@
 
 PORTNAME=	nlopt
 DISTVERSIONPREFIX=	v
-DISTVERSION=	2.6.1
-PORTREVISION=	2
+DISTVERSION=	2.7.0
 CATEGORIES=	math
 
-MAINTAINER=	rhurlin@gwdg.de
+MAINTAINER=	rhurlin@FreeBSD.org
 COMMENT=	Nonlinear optimization library
 
 LICENSE=	LGPL21 MIT
 LICENSE_COMB=	multi
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-BROKEN_armv6=		fails to package: Unable to access file site-packages/_nlopt.a:No such file or directory
-BROKEN_armv7=		fails to package: Unable to access file site-packages/_nlopt.a:No such file or directory
+BROKEN_armv6=	fails to package: Unable to access file site-packages/_nlopt.a:No such file or directory
+BROKEN_armv7=	fails to package: Unable to access file site-packages/_nlopt.a:No such file or directory
 
-BUILD_DEPENDS=	swig3.0:devel/swig30 \
-		${PYTHON_PKGNAMEPREFIX}numpy>=1.16.1:math/py-numpy@${PY_FLAVOR}
-RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}numpy>=1.16.1:math/py-numpy@${PY_FLAVOR}
+BUILD_DEPENDS=	swig:devel/swig \
+		${PYNUMPY}
+RUN_DEPENDS=	${PYNUMPY}
 LIB_DEPENDS=	libgmp.so:math/gmp \
 		libguile-2.2.so:lang/guile2
 

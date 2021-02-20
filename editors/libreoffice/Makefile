@@ -1,12 +1,13 @@
 # $FreeBSD$
+PORTREVISION=	1
 
 .include "${.CURDIR}/Makefile.common"
 
-MASTER_SITES=	https://download.documentfoundation.org/libreoffice/src/${PORTVERSION}/ \
+MASTER_SITES=	https://download.documentfoundation.org/libreoffice/src/${LOVERSION}/ \
 		https://dev-www.libreoffice.org/src/:src \
 		https://dev-www.libreoffice.org/extern/:ext
-DISTFILES=	${PORTNAME}-${LOVERSION}${EXTRACT_SUFX} \
-		${PORTNAME}-help-${LOVERSION}${EXTRACT_SUFX}
+DISTFILES=	${PORTNAME}-${DISTVERSION}${EXTRACT_SUFX} \
+		${PORTNAME}-help-${DISTVERSION}${EXTRACT_SUFX}
 DIST_SUBDIR=	libreoffice
 EXTRACT_ONLY:=	${DISTFILES}
 
@@ -17,8 +18,8 @@ BUILD_DEPENDS=	p5-Archive-Zip>=0:archivers/p5-Archive-Zip \
 		${LOCALBASE}/include/sqlext.h:databases/unixODBC \
 		cppunit-config:devel/cppunit \
 		dmake:devel/dmake \
-		gperf31>=3.1:devel/gperf31 \
-		mdds>=1.4:devel/mdds \
+		gperf>=3.1:devel/gperf \
+		mdds>=1.5:devel/mdds \
 		ucpp:devel/ucpp \
 		${LOCALBASE}/include/sane/sane.h:graphics/sane-backends \
 		vigra-config:graphics/vigra \
@@ -29,13 +30,13 @@ BUILD_DEPENDS=	p5-Archive-Zip>=0:archivers/p5-Archive-Zip \
 		flex>=0.26:textproc/flex
 LIB_DEPENDS=	libapr-1.so:devel/apr1 \
 		libboost_date_time.so:devel/boost-libs \
+		libBox2D.so:misc/box2d \
 		libicutu.so:devel/icu \
 		liblangtag.so:devel/liblangtag \
 		libltdl.so:devel/libltdl \
-		liborcus-0.14.so:devel/liborcus \
+		liborcus-0.16.so:devel/liborcus \
 		libplds4.so:devel/nspr \
 		libcurl.so:ftp/curl \
-		libcairo.so:graphics/cairo \
 		libgraphite2.so:graphics/graphite2 \
 		liblcms2.so:graphics/lcms2 \
 		libcdr-0.1.so:graphics/libcdr01 \
@@ -45,10 +46,9 @@ LIB_DEPENDS=	libapr-1.so:devel/apr1 \
 		libgltf-0.0.so:graphics/libgltf \
 		libwpg-0.3.so:graphics/libwpg03 \
 		libzmf-0.0.so:graphics/libzmf \
-		libGeneratedSaxParser.so:graphics/opencollada \
 		libpng.so:graphics/png \
 		libpoppler.so:graphics/poppler \
-		libCoinMP.so:math/coinmp \
+		libqrcodegencpp.so:graphics/qr-code-generator \
 		liblpsolve55.so:math/lp_solve \
 		libcmis-0.5.so:net/libcmis \
 		libfreetype.so:print/freetype2 \
@@ -75,12 +75,11 @@ LIB_DEPENDS=	libapr-1.so:devel/apr1 \
 		libvisio-0.1.so:textproc/libvisio01 \
 		libwpd-0.10.so:textproc/libwpd010 \
 		libwps-0.4.so:textproc/libwps \
-		libxml2.so:textproc/libxml2 \
-		libxslt.so:textproc/libxslt \
 		libmythes-1.2.so:textproc/mythes \
 		libraptor2.so:textproc/raptor2 \
 		librdf.so:textproc/redland \
 		libfontconfig.so:x11-fonts/fontconfig \
+		libxcb-icccm.so:x11/xcb-util-wm \
 		libserf-1.so:www/serf
 RUN_DEPENDS=	xdg-open:devel/xdg-utils \
 		${LOCALBASE}/share/fonts/Caladea/Caladea-Bold.ttf:x11-fonts/crosextrafonts-caladea-ttf \
@@ -91,46 +90,55 @@ RUN_DEPENDS=	xdg-open:devel/xdg-utils \
 		${LOCALBASE}/share/fonts/Liberation/LiberationMono-Bold.ttf:x11-fonts/liberation-fonts-ttf \
 		${LOCALBASE}/share/fonts/LinLibertineG/LinLibertine_DR_G.ttf:x11-fonts/linuxlibertine-g
 
-DISTFILES+=	4b87018f7fff1d054939d19920b751a0-collada2gltf-master-cb1d97788a.tar.bz2:src \
-		884ed41809687c3e168fc7c19b16585149ff058eca79acbf3ee784f6630704cc-opens___.ttf:ext
+DISTFILES+=	f543e6e2d7275557a839a164941c0a86e5f2c3f2a0042bfc434c88c6dde9e140-opens___.ttf:ext
+DISTFILES+=	dtoa-20180411.tgz:src
+DISTFILES+=	skia-m88-59bafeeaa7de9eb753e3778c414e01dcf013dcd8.tar.xz:src
 
-NOT_FOR_ARCHS=		aarch64 armv6 armv7
+NOT_FOR_ARCHS=		armv6 armv7
 NOT_FOR_ARCHS_REASON=	Unsupported host_cpu
 
 .if defined(PRERELEASE)
 MASTER_SITES+=	https://dev-builds.libreoffice.org/pre-releases/src/
 .endif
 
+CONFLICTS_INSTALL=	libreoffice6
+
 INSTALL_TARGET=	distro-pack-install
-WRKSRC=		${WRKDIR}/${PORTNAME}-${LOVERSION}
 
 SHEBANG_GLOB=	*.py
 
 GNU_CONFIGURE=	yes
+USES=		autoreconf:build bison compiler:c++17-lang cpe desktop-file-utils \
+		gettext-runtime gl gmake gnome jpeg mysql:client perl5 pkgconfig \
+		pkgconfig python:3.6+ shebangfix shared-mime-info ssl tar:xz xorg
 USE_GL=		gl glew glu
+USE_GNOME=	cairo glib20 libxml2 libxslt
 USE_OPENLDAP=	yes
 USE_PERL5=	build
-USE_XORG=	ice sm x11 xaw xext xinerama xrandr xrender
-USES=		autoreconf:build bison compiler:c++14-lang cpe gl gmake gnome \
-		jpeg mysql:client \
-		perl5 pkgconfig python shebangfix shared-mime-info ssl tar:xz \
-		xorg
+USE_XORG=	ice sm x11 xaw xcb xext xinerama xrandr xrender
 
-OPTIONS_DEFINE=	CUPS DOCS GNOME GTK2 GTK3 JAVA KDE5 MMEDIA PGSQL QT5 SDK \
-		SYSTRAY TEST WEBDAV
-OPTIONS_DEFAULT=	CUPS GTK2 MMEDIA
+OPTIONS_DEFINE=	COINMP CUPS DOCS GNOME GTK3 JAVA KF5 MMEDIA PGSQL QT5 SDK TEST WEBDAV
+OPTIONS_DEFAULT=	CUPS MMEDIA QT5
 
-GTK2_DESC=	GTK+ 2 GUI toolkit support
-GTK3_DESC=	GTK+ 3 GUI toolkit support (experimental)
+.if !defined(DEFAULT_VERSIONS) || ! ${DEFAULT_VERSIONS:Mssl=*}
+# Blocked by net/qt5-network: cannot use QT5 with default OpenSSL
+OPTIONS_EXCLUDE_FreeBSD_11+=	QT5
+.endif
+
+COINMP_DESC=	Enable CoinMP (deprecated) math solver
+GTK3_DESC=	GTK+ 3 GUI toolkit support (incomplete visual style)
 JAVA_DESC=	Add Java support (XML filters, macros, DB connections)
-KDE5_DESC=	KF5/Qt5 GUI toolkit support (require QT5)
+KF5_DESC=	KF5/Qt5 GUI toolkit support (implies QT5)
 MMEDIA_DESC=	Enable multimedia backend for Impress
 PGSQL_DESC=	Build with PostgreSQL-SDBC driver
-QT5_DESC=	Qt5 GUI toolkit support
+QT5_DESC=	Qt5 GUI toolkit support (default visual style)
 SDK_DESC=	Build with SDK
-SYSTRAY_DESC=	Enable systemtray quickstarter
 TEST_DESC=	Run all regression tests
 WEBDAV_DESC=	Enable WebDAV protocol
+
+COINMP_CONFIGURE_ENABLE=	coinmp
+COINMP_CONFIGURE_ON=	--with-system-coinmp
+COINMP_LIB_DEPENDS=	libCoinMP.so:math/coinmp
 
 CUPS_CONFIGURE_ENABLE=	cups
 CUPS_LIB_DEPENDS=	libcups.so:print/cups
@@ -138,41 +146,31 @@ CUPS_LIB_DEPENDS=	libcups.so:print/cups
 DOCS_CONFIGURE_WITH=	help
 
 GNOME_CONFIGURE_ENABLE=	dbus dconf
-GNOME_IMPLIES=	GTK2
-GNOME_LIB_DEPENDS=	libdbus-glib-1.so:devel/dbus-glib
+GNOME_IMPLIES=	GTK3
+GNOME_LIB_DEPENDS=	libdbus-1.so:devel/dbus \
+			libdbus-glib-1.so:devel/dbus-glib
 GNOME_USE=	GNOME=dconf
 
-GTK_USE_GNOME=	gtk-update-icon-cache
-GTK_USES=	desktop-file-utils
-GTK_VARS=	POST_PLIST=add-plist-gnome
-
-GTK2_CONFIGURE_ENABLE=	gtk
-GTK2_USE=	GNOME=gtk20,${GTK_USE_GNOME}
-GTK2_USES=	${GTK_USES}
-GTK2_VARS=	${GTK_VARS}
-
 GTK3_CONFIGURE_ENABLE=	gtk3
-GTK3_USE=	GNOME=gtk30,${GTK_USE_GNOME}
-GTK3_USES=	${GTK_USES}
-GTK3_VARS=	${GTK_VARS}
+GTK3_USE=	GNOME=gtk30,gtk-update-icon-cache
+GTK3_VARS=	POST_PLIST=add-plist-gnome
 
 JAVA_BUILD_DEPENDS=	ant:devel/apache-ant \
 			${JAVAJARDIR}/commons-codec.jar:java/apache-commons-codec \
 			${JAVAJARDIR}/commons-httpclient.jar:java/apache-commons-httpclient \
-			${JAVAJARDIR}/commons-lang.jar:java/apache-commons-lang \
+			${JAVAJARDIR}/commons-lang3.jar:java/apache-commons-lang3 \
 			${JAVAJARDIR}/commons-logging.jar:java/apache-commons-logging \
-			${JAVAJARDIR}/junit.jar:java/junit \
-			${JAVAJARDIR}/bsh.jar:lang/bsh
+			${JAVAJARDIR}/junit.jar:java/junit
 JAVA_CATEGORIES=	java
 JAVA_CONFIGURE_ON=	--with-ant-home=${LOCALBASE}/share/java/apache-ant \
-			--with-beanshell-jar=${JAVAJARDIR}/bsh.jar \
 			--with-commons-codec-jar=${JAVAJARDIR}/commons-codec.jar \
 			--with-commons-httpclient-jar=${JAVAJARDIR}/commons-httpclient.jar \
-			--with-commons-lang-jar=${JAVAJARDIR}/commons-lang.jar \
+			--with-commons-lang-jar=${JAVAJARDIR}/commons-lang3.jar \
 			--with-commons-logging-jar=${JAVAJARDIR}/commons-logging.jar \
 			--with-jdk-home="${JAVA_HOME}" \
 			--with-junit=${JAVAJARDIR}/junit.jar \
 			--with-hamcrest=${JAVAJARDIR}/hamcrest.jar \
+			--without-system-beanshell \
 			--without-system-jfreereport
 JAVA_CONFIGURE_WITH=	java
 # XXX jni.h from GNU classpath causes ABI conflicts.
@@ -189,17 +187,18 @@ JAVA_DISTFILES=	17410483b5b5f267aa18b7e00b65e6e0-hsqldb_1_8_0.zip:src \
 		a084cd548b586552cb7d3ee51f1af969-odfvalidator-1.1.8-incubating-SNAPSHOT-jar-with-dependencies.jar:ext \
 		ace6ab49184e329db254e454a010f56d-libxml-1.1.7.zip:src \
 		ba2930200c9f019c2d93a8c88c651a0f-flow-engine-0.9.4.zip:src \
+		beeca87be45ec87d241ddd0e1bad80c1-bsh-2.0b6-src.zip:src \
 		d8bd5eed178db6e2b18eeed243f85aa8-flute-1.1.6.zip:src \
 		db60e4fde8dd6d6807523deb71ee34dc-liblayout-0.2.10.zip:src \
 		eeb2c7ddf0d302fba4bfc6e97eac9624-libbase-1.1.6.zip:src \
 		f94d9870737518e3b597f9265f4e9803-libserializer-1.1.6.zip:src
 JAVA_USE=	JAVA=yes
-JAVA_VARS=	JAVA_BUILD=yes
+JAVA_VARS=	JAVA_BUILD=yes JAVA_VERSION=11+
 
-KDE5_CONFIGURE_ENABLE=	kde5
-KDE5_USE=	kde=config,coreaddons,i18n,kio,windowsystem
-KDE5_USES=	kde:5
-KDE5_IMPLIES=	QT5
+KF5_CONFIGURE_ENABLE=	kf5
+KF5_USE=	kde=config,coreaddons,i18n,kio,windowsystem
+KF5_USES=	kde:5
+KF5_IMPLIES=	QT5
 
 MMEDIA_CONFIGURE_ENABLE=	gstreamer-1-0
 MMEDIA_USE=	GSTREAMER1=yes
@@ -218,22 +217,17 @@ SDK_CONFIGURE_OFF=	--without-doxygen
 SDK_CONFIGURE_ON=	--with-doxygen=${LOCALBASE}/bin/doxygen
 SDK_DISTFILES=	185d60944ea767075d27247c3162b3bc-unowinreg.dll:ext
 
-SYSTRAY_CONFIGURE_ENABLE=	systray
-
+TEST_ALL_TARGET=	build
 TEST_ALL_TARGET_OFF=	build-nocheck
 TEST_CONFIGURE_ENABLE=	cve-tests
 
+WEBDAV_CONFIGURE_ON=	--with-webdav=neon
+WEBDAV_CONFIGURE_OFF=	--with-webdav=no
 WEBDAV_CONFIGURE_ENABLE=	neon
 WEBDAV_LIB_DEPENDS=	libneon.so:www/neon
 
 CPPFLAGS+=	-isystem ${LOCALBASE}/include
 LDFLAGS+=	-L${LOCALBASE}/lib
-
-COLLADA_MODS=	COLLADABaseUtils COLLADAFramework \
-		COLLADASaxFrameworkLoader GeneratedSaxParser
-COLLADA_CFLAGS=	${COLLADA_MODS:S|^|-isystem ${LOCALBASE}/include/opencollada/|}
-COLLADA_LIBS=	-L${LOCALBASE}/lib/opencollada \
-		${COLLADA_MODS:S|^COLLADA|OpenCOLLADA|:S|^|-l|}
 
 CONFIGURE_ARGS=	--disable-dependency-tracking \
 		--disable-epm \
@@ -246,7 +240,6 @@ CONFIGURE_ARGS=	--disable-dependency-tracking \
 		--enable-release-build \
 		--disable-pdfium \
 		--exec-prefix=${PREFIX} \
-		--with-alloc=system \
 		--with-boost=${LOCALBASE} \
 		--with-build-version="FreeBSD ports ${PKGVERSION}" \
 		--with-external-dict-dir=${LOCALBASE}/share/hunspell \
@@ -260,7 +253,6 @@ CONFIGURE_ARGS=	--disable-dependency-tracking \
 		--with-system-dicts \
 		--with-system-libs \
 		--with-system-libxml \
-		--with-system-opencollada \
 		--with-system-ucpp \
 		--with-system-zlib \
 		--with-vendor="FreeBSD ports" \
@@ -270,11 +262,9 @@ CONFIGURE_ARGS=	--disable-dependency-tracking \
 CONFIGURE_ENV=	DMAKE=${LOCALBASE}/bin/dmake \
 		FLEX=${LOCALBASE}/bin/flex \
 		GNUTAR="${TAR}" \
-		GPERF=${LOCALBASE}/bin/gperf31 \
+		GPERF=${LOCALBASE}/bin/gperf \
 		ICU_CFLAGS="`icu-config --cflags`" \
 		ICU_LIBS="`icu-config --ldflags`" \
-		OPENCOLLADA_CFLAGS="${COLLADA_CFLAGS}" \
-		OPENCOLLADA_LIBS="${COLLADA_LIBS}" \
 		PYTHON_CFLAGS="`${PYTHON_VERSION}-config --cflags`" \
 		PYTHON_LIBS="`${PYTHON_VERSION}-config --libs`" \
 		ac_cv_path_SED=${LOCALBASE}/bin/gsed
@@ -288,6 +278,10 @@ MAKE_ENV+=	verbose=1
 .include <bsd.port.options.mk>
 
 .include <bsd.port.pre.mk>
+
+.if ${ARCH} == powerpc || ${ARCH} == powerpcspe || ${ARCH} == powerpc64
+CONFIGURE_ARGS+=	--disable-skia
+.endif
 
 .if ${CHOSEN_COMPILER_TYPE} == clang
 CXXFLAGS_WARN=	-Woverloaded-virtual -Wno-unused-parameter -Wno-unused-local-typedefs
@@ -314,7 +308,7 @@ post-install:
 	    -exec ${ECHO_CMD} "@dir {}" \; >> ${TMPPLIST}
 	@cd ${STAGEDIR}${PREFIX} && \
 	${FIND} -s bin lib man -not -type d >> ${TMPPLIST}
-.for subdir in appdata application-registry applications bash-completion icons mime mime-info
+.for subdir in applications bash-completion icons metainfo mime
 	@cd ${STAGEDIR}${PREFIX} && \
 	${FIND} -s share/${subdir} -not -type d >> ${TMPPLIST}
 .endfor
@@ -324,9 +318,6 @@ post-install-SDK-on:
 	@cd ${STAGEDIR}${PREFIX} && \
 	${FIND} -s ${subdir}/libreoffice -not -type d >> ${TMPPLIST}
 .endfor
-
-post-install-GTK3-on:
-	@${ECHO_CMD} "share/gir-1.0/LOKDocView-0.1.gir" >> ${TMPPLIST}
 
 add-plist-gnome:
 .for subdir in gnome hicolor locolor

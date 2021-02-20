@@ -2,9 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	mysqlwsrep
-PORTVERSION?=	5.6.46
+PORTVERSION?=	5.6.49
 DISTVERSIONPREFIX?=	wsrep_
-DISTVERSIONSUFFIX?=	-25.28
+DISTVERSIONSUFFIX?=	-25.31
 PORTREVISION?=	0
 CATEGORIES=	databases
 PKGNAMESUFFIX=	56-server
@@ -18,8 +18,6 @@ NOT_FOR_ARCHS=		aarch64 armv6 armv7 powerpc64
 NOT_FOR_ARCHS_REASON=	error: Unsupported platform
 
 RUN_DEPENDS=	bash:shells/bash \
-		lsof:sysutils/lsof \
-		netcat:net/netcat \
 		rsync:net/rsync \
 		socat:net/socat
 LIB_DEPENDS=	libevent.so:devel/libevent liblz4.so:archivers/liblz4
@@ -34,6 +32,7 @@ USES=		bison \
 		cmake:noninja \
 		compiler:c++11-lib \
 		compiler:c11 \
+		mysql:56 \
 		libedit \
 		perl5 \
 		shebangfix \
@@ -145,6 +144,12 @@ SUB_LIST+=	LEGACY_LIMITS="" MODERN_LIMITS="@comment "
 .endif
 
 .include <bsd.port.pre.mk>
+
+# Plugin innodb_memcached requires -fcommon to avoid duplicate symbol linker
+# error with llmv11.
+.if ${CHOSEN_COMPILER_TYPE} == clang && ${OPSYS} == FreeBSD && ${OSVERSION} >= 1300109
+CFLAGS+=	-fcommon
+.endif
 
 post-patch:
 	${REINPLACE_CMD} 's/*.1/${MMAN1}/' ${WRKSRC}/man/CMakeLists.txt

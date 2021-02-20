@@ -3,6 +3,7 @@
 PORTNAME=		vcflib
 DISTVERSIONPREFIX=	v
 DISTVERSION=		1.0.0-rc1-130
+PORTREVISION=	1
 DISTVERSIONSUFFIX=	-g7e3d806
 CATEGORIES=		biology
 
@@ -12,6 +13,7 @@ COMMENT=	C++ library and CLI tools for parsing and manipulating VCF files
 LICENSE=	MIT
 
 BROKEN_aarch64=		fails to compile: mmintrin.h:47:5: use of undeclared identifier '__builtin_ia32_emms'; did you mean '__builtin_isless'?
+BROKEN_riscv64=		fails to compile: mmintrin.h:47:5: use of undeclared identifier '__builtin_ia32_emms'; did you mean '__builtin_isless'?
 
 LIB_DEPENDS=	libhts.so:biology/htslib \
 		libtabix.so:biology/tabixpp \

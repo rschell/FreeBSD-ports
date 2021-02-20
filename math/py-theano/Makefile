@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	theano
-DISTVERSION=	1.0.4
-PORTREVISION=	2
+DISTVERSION=	1.0.5
 CATEGORIES=	math python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -19,7 +18,7 @@ RUN_DEPENDS=	${PYNUMPY} \
 		${PYTHON_PKGNAMEPREFIX}scipy>=0.8.0:science/py-scipy@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}six>=1.9.0:devel/py-six@${PY_FLAVOR}
 
-USES=		compiler:openmp python
+USES=		compiler:openmp python:3.6+
 USE_PYTHON=	concurrent distutils autoplist
 
 NO_ARCH=	yes

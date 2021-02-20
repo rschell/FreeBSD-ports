@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	libosip2
-PORTVERSION=	5.1.0
-PORTREVISION=	1
+PORTVERSION=	5.2.0
 CATEGORIES=	net
 MASTER_SITES=	GNU/osip
 
@@ -17,6 +16,7 @@ USE_LDCONFIG=	yes
 GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--disable-trace
 INSTALL_TARGET=	install-strip
+PLIST_SUB=	ABIVER=14
 
 post-patch:
 	@${REINPLACE_CMD} -e "/^SUBDIRS/s| help | |g" ${WRKSRC}/Makefile.in

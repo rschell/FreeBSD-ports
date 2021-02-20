@@ -42,8 +42,10 @@ FreeBSD_MAINTAINER=	portmgr@FreeBSD.org
 # OPSYS			- Portability clause.  This is the operating system the
 #				  makefile is being used on.  Automatically set to
 #				  "FreeBSD," "NetBSD," or "OpenBSD" as appropriate.
-# OSREL			- The release version (numeric) of the operating system.
-# OSVERSION		- The value of __FreeBSD_version.
+# OSREL			- The release version of the operating system as a text
+#				  string (e.g., "12.2").
+# OSVERSION		- The operating system version as a comparable integer;
+#				  the value of __FreeBSD_version (e.g., 1202000).
 #
 # This is the beginning of the list of all variables that need to be
 # defined in a port, listed in order that they should be included
@@ -605,7 +607,7 @@ FreeBSD_MAINTAINER=	portmgr@FreeBSD.org
 #				  for this port.
 # install-missing-packages
 #               - Install missing dependencies from package and mark
-#                 them as automatically installed 
+#                 them as automatically installed.
 # extract		- Unpacks ${DISTFILES} into ${WRKDIR}.
 # patch			- Apply any provided patches to the source.
 # configure		- Runs either GNU configure, one or more local configure
@@ -801,7 +803,7 @@ FreeBSD_MAINTAINER=	portmgr@FreeBSD.org
 # MAKE_JOBS_NUMBER_LIMIT
 #				- Set a limit for maximum number of make jobs allowed to be
 #				  used.
-## cacche
+## ccache
 #
 # WITH_CCACHE_BUILD
 # 				- Enable CCACHE support (devel/ccache).  User settable.
@@ -1032,6 +1034,7 @@ NOTPHONY?=
 FLAVORS?=
 FLAVOR?=
 OVERLAYS?=
+REWARNFILE=	${WRKDIR}/reinplace_warnings.txt
 # Disallow forced FLAVOR as make argument since we cannot change it to the
 # proper default.
 .if empty(FLAVOR) && !empty(.MAKEOVERRIDES:MFLAVOR)
@@ -1044,7 +1047,7 @@ _FLAVOR:=	${FLAVOR}
 .if !defined(PORTS_FEATURES) && empty(${PORTS_FEATURES:MFLAVORS})
 PORTS_FEATURES+=	FLAVORS
 .endif
-MINIMAL_PKG_VERSION=	1.6.0
+MINIMAL_PKG_VERSION=	1.15.9
 
 _PORTS_DIRECTORIES+=	${PKG_DBDIR} ${PREFIX} ${WRKDIR} ${EXTRACT_WRKDIR} \
 						${STAGEDIR}${PREFIX} ${WRKDIR}/pkg ${BINARY_LINKDIR}
@@ -1174,7 +1177,7 @@ OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${SRC
 .endif
 _EXPORTED_VARS+=	OSVERSION
 
-.if (${OPSYS} == FreeBSD && ${OSVERSION} < 1103000) || \
+.if (${OPSYS} == FreeBSD && (${OSVERSION} < 1104000 || (${OSVERSION} >= 1200000 && ${OSVERSION} < 1202000))) || \
     (${OPSYS} == DragonFly && ${DFLYVERSION} < 400400)
 _UNSUPPORTED_SYSTEM_MESSAGE=	Ports Collection support for your ${OPSYS} version has ended, and no ports\
 								are guaranteed to build on this system. Please upgrade to a supported release.
@@ -1360,6 +1363,9 @@ PKGCOMPATDIR?=		${LOCALBASE}/lib/compat/pkg
 .if defined(USE_LOCAL_MK)
 .include "${PORTSDIR}/Mk/bsd.local.mk"
 .endif
+.for odir in ${OVERLAYS}
+.sinclude "${odir}/Mk/bsd.overlay.mk"
+.endfor
 
 .if defined(USE_XORG) && (!defined(USES) || !${USES:Mxorg})
 DEV_WARNING+=		"Using USE_XORG alone is deprecated, please use USES=xorg"
@@ -1375,7 +1381,7 @@ USES+=	php
 .include "${PORTSDIR}/Mk/bsd.java.mk"
 .endif
 
-.if defined(USE_RUBY) || defined(USE_LIBRUBY)
+.if defined(USE_RUBY)
 .include "${PORTSDIR}/Mk/bsd.ruby.mk"
 .endif
 
@@ -1488,9 +1494,9 @@ DEV_ERROR+=		"FLAVORS contains flavors that are not all [a-z0-9_]: ${_BAD_FLAVOR
 
 .if !empty(FLAVOR)
 .  if empty(FLAVORS)
-IGNORE=	FLAVOR is defined (to ${FLAVOR}) while this port does not have FLAVORS.
+IGNORE=	FLAVOR is defined (to ${FLAVOR}) while this port does not have FLAVORS
 .  elif ! ${FLAVORS:M${FLAVOR}}
-IGNORE=	Unknown flavor '${FLAVOR}', possible flavors: ${FLAVORS}.
+IGNORE=	Unknown flavor '${FLAVOR}', possible flavors: ${FLAVORS}
 .  endif
 .endif
 
@@ -1622,6 +1628,7 @@ QA_ENV+=		STAGEDIR=${STAGEDIR} \
 				PREFIX=${PREFIX} \
 				LINUXBASE=${LINUXBASE} \
 				LOCALBASE=${LOCALBASE} \
+				REWARNFILE=${REWARNFILE} \
 				"STRIP=${STRIP}" \
 				TMPPLIST=${TMPPLIST} \
 				CURDIR='${.CURDIR}' \
@@ -1942,6 +1949,9 @@ _FORCE_POST_PATTERNS=	rmdir kldxref mkfontscale mkfontdir fc-cache \
 .if defined(USE_LOCAL_MK)
 .include "${PORTSDIR}/Mk/bsd.local.mk"
 .endif
+.for odir in ${OVERLAYS}
+.sinclude "${odir}/Mk/bsd.overlay.mk"
+.endfor
 
 .if defined(USE_XORG) && (!defined(USES) || ( defined(USES) && !${USES:Mxorg} ))
 DEV_WARNING+=	"Using USE_XORG alone is deprecated, please use USES=xorg"
@@ -2008,9 +2018,16 @@ CONFIGURE_ENV+=	LANG=${USE_LOCALE} LC_ALL=${USE_LOCALE}
 MAKE_ENV+=		LANG=${USE_LOCALE} LC_ALL=${USE_LOCALE}
 .endif
 
-# Macro for doing in-place file editing using regexps
+# Macro for doing in-place file editing using regexps.  REINPLACE_ARGS may only
+# be used to set or override the -i argument.  Any other use is considered
+# invalid.
 REINPLACE_ARGS?=	-i.bak
+.if defined(DEVELOPER)
+REINPLACE_CMD?=	${SETENV} WRKSRC=${WRKSRC} REWARNFILE=${REWARNFILE} ${SCRIPTSDIR}/sed_checked.sh
+.else
 REINPLACE_CMD?=	${SED} ${REINPLACE_ARGS}
+.endif
+FRAMEWORK_REINPLACE_CMD?=	${SED} -i.bak
 
 # Names of cookies used to skip already completed stages
 EXTRACT_COOKIE?=	${WRKDIR}/.extract_done.${PORTNAME}.${PREFIX:S/\//_/g}
@@ -2023,6 +2040,10 @@ STAGE_COOKIE?=		${WRKDIR}/.stage_done.${PORTNAME}.${PREFIX:S/\//_/g}
 
 # How to do nothing.  Override if you, for some strange reason, would rather
 # do something.
+# In general, however, DO_NADA is a relic of the past in the ports
+# infrastructure, and most of its usage has been removed. If you need to define
+# a target with DO_NADA, then there is a high chance that the ports
+# infrastructure should be fixed instead.
 DO_NADA?=		${TRUE}
 
 # Use this as the first operand to always build dependency.
@@ -2571,16 +2592,20 @@ check-categories:
 .else
 
 VALID_CATEGORIES+= accessibility afterstep arabic archivers astro audio \
-	benchmarks biology cad chinese comms converters databases \
-	deskutils devel docs dns editors elisp emulators enlightenment finance french ftp \
-	games geography german gnome gnustep graphics hamradio haskell hebrew hungarian \
-	irc japanese java kde ${_KDE_CATEGORIES_SUPPORTED} kld korean lang linux lisp \
-	mail mate math mbone misc multimedia net net-im net-mgmt net-p2p net-vpn news \
-	parallel pear perl5 plan9 polish portuguese ports-mgmt \
+	benchmarks biology cad chinese comms converters \
+	databases deskutils devel dns docs \
+	editors education elisp emulators enlightenment finance french ftp \
+	games geography german gnome gnustep graphics \
+	hamradio haskell hebrew hungarian irc japanese java \
+	kde ${_KDE_CATEGORIES_SUPPORTED} kld korean \
+	lang linux lisp \
+	mail mate math mbone misc multimedia \
+	net net-im net-mgmt net-p2p net-vpn news \
+	parallel pear perl5 plan9 polish ports-mgmt portuguese \
 	print python ruby rubygems russian \
 	scheme science security shells spanish sysutils \
 	tcl textproc tk \
-	ukrainian vietnamese windowmaker wayland www \
+	ukrainian vietnamese wayland windowmaker www \
 	x11 x11-clocks x11-drivers x11-fm x11-fonts x11-servers x11-themes \
 	x11-toolkits x11-wm xfce zope base
 
@@ -2674,6 +2699,7 @@ SCRIPTS_ENV+=	BATCH=yes
 MANPREFIX?=	/usr/share
 .else
 MANPREFIX?=	${PREFIX}
+MANDIRS+=	${PREFIX}/share/man
 .endif
 
 MANDIRS+=	${MANPREFIX}/man
@@ -3144,6 +3170,7 @@ do-extract: ${EXTRACT_WRKDIR}
 	@for file in ${EXTRACT_ONLY}; do \
 		if ! (cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS});\
 		then \
+			${ECHO_MSG} "===>  Failed to extract \"${_DISTDIR}/$$file\"."; \
 			exit 1; \
 		fi; \
 	done
@@ -3172,6 +3199,7 @@ do-patch:
 			dp_PATCH_ARGS=${PATCH_ARGS:Q} \
 			dp_PATCH_DEBUG_TMP="${PATCH_DEBUG_TMP}" \
 			dp_PATCH_DIST_ARGS="${PATCH_DIST_ARGS}" \
+			dp_PATCH_CONTINUE_ON_FAIL=${PATCH_CONTINUE_ON_FAIL:Dyes} \
 			dp_PATCH_SILENT="${PATCH_SILENT}" \
 			dp_PATCH_WRKSRC=${PATCH_WRKSRC} \
 			dp_PKGNAME="${PKGNAME}" \
@@ -4324,7 +4352,8 @@ missing-packages:
 # Install missing dependencies from package
 install-missing-packages:
 	@_dirs=$$(${MISSING-DEPENDS-LIST}); \
-	${PKG_BIN} install -A $$(${ECHO} $${_dirs} | ${SED} "s%${PORTSDIR}/%%g")
+	${ECHO_CMD} "$${_dirs}" | ${SED} "s%${PORTSDIR}/%%g" | \
+		${SU_CMD} "${XARGS} -o ${PKG_BIN} install -A"
 
 ################################################################
 # Everything after here are internal targets and really
@@ -4484,6 +4513,7 @@ generate-plist: ${WRKDIR}
 .for f in ${PLIST}
 	@if [ -f "${f}" ]; then \
 		${SED} ${PLIST_SUB:S/$/!g/:S/^/ -e s!%%/:S/=/%%!/} ${f} >> ${TMPPLIST}; \
+		for i in owner group mode; do ${ECHO_CMD} "@$$i"; done >> ${TMPPLIST}; \
 	fi
 .endfor
 .endif
@@ -4556,7 +4586,7 @@ install-rc-script:
 		_prefix=${PREFIX}; \
 		[ "${PREFIX}" = "/usr" ] && _prefix="" ; \
 		${INSTALL_SCRIPT} ${WRKDIR}/$${i} ${STAGEDIR}$${_prefix}/etc/rc.d/$${i%.sh}; \
-		${ECHO_CMD} "$${_prefix}/etc/rc.d/$${i%.sh}" >> ${TMPPLIST}; \
+		${ECHO_CMD} "@(root,wheel,0755) $${_prefix}/etc/rc.d/$${i%.sh}" >> ${TMPPLIST}; \
 	done
 .endif
 .endif
@@ -5114,7 +5144,12 @@ install-desktop-entries:
 .if !target(create-binary-alias)
 create-binary-alias: ${BINARY_LINKDIR}
 .for target src in ${BINARY_ALIAS:C/=/ /}
-	@${RLN} `which ${src}` ${BINARY_LINKDIR}/${target}
+	@if srcpath=`which -- ${src}`; then \
+		${RLN} $${srcpath} ${BINARY_LINKDIR}/${target}; \
+	else \
+		${ECHO_MSG} "===>  Missing \"${src}\" to create a binary alias at \"${BINARY_LINKDIR}/${target}\""; \
+		${FALSE}; \
+	fi
 .endfor
 .endif
 .endif

@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	zeitwerk
-PORTVERSION=	2.2.2
+PORTVERSION=	2.4.2
 CATEGORIES=	devel rubygems
 MASTER_SITES=	RG
 

@@ -1,13 +1,13 @@
-# Created by: Loïc BARTOLETTI <lbartoletti@tuxfamily.org>
+# Created by: Loïc BARTOLETTI <lbartoletti@FreeBSD.org>
 # $FreeBSD$
 
 PORTNAME=	postgis
-PORTVERSION=	3.0.0
+PORTVERSION=	3.0.3
 CATEGORIES=	databases geography
 MASTER_SITES=	https://download.osgeo.org/postgis/source/
 PKGNAMESUFFIX=	30
 
-MAINTAINER=	lbartoletti@tuxfamily.org
+MAINTAINER=	lbartoletti@FreeBSD.org
 COMMENT=	Geographic objects support for PostgreSQL databases
 
 LICENSE=	GPLv2
@@ -59,7 +59,7 @@ SFCGAL_LIB_DEPENDS=		libSFCGAL.so:databases/sfcgal
 TOPOLOGY_CONFIGURE_WITH=	topology
 WAGYU_CONFIGURE_WITH=		wagyu
 
-CONFLICTS_INSTALL=	postgis20 postgis21 postgis22 postgis23 postgis24 postgis25
+CONFLICTS_INSTALL=	postgis20 postgis21 postgis22 postgis23 postgis24 postgis25 postgis31
 
 VER=		${PORTVERSION:R}
 

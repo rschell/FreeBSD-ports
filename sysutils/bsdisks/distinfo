@@ -1,3 +1,3 @@
-TIMESTAMP = 1576067660
-SHA256 (bsdisks-0.11.tar.gz) = f3f3a8cde444f490e7c682ee9b64360a4db20fb07b4256af075db9a3774e754e
-SIZE (bsdisks-0.11.tar.gz) = 101455
+TIMESTAMP = 1607361012
+SHA256 (bsdutils-bsdisks-6ee813b8ddba4e8c7958c712575b62b796c1fb60_GL0.tar.gz) = 89ade6bfb3102fa4948d1e0f1b619a852c36813b5fe0c718debca89442cf6895
+SIZE (bsdutils-bsdisks-6ee813b8ddba4e8c7958c712575b62b796c1fb60_GL0.tar.gz) = 107924

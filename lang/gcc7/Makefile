@@ -3,17 +3,19 @@
 
 PORTNAME=	gcc
 PORTVERSION=	7.5.0
+PORTREVISION=	2
 CATEGORIES=	lang
 MASTER_SITES=	GCC
 PKGNAMESUFFIX=	${SUFFIX}
 
-MAINTAINER=	gerald@FreeBSD.org
+MAINTAINER=	leres@FreeBSD.org
 COMMENT=	GNU Compiler Collection 7
 
 LICENSE=	GPLv3 GPLv3RLE
 LICENSE_COMB=	multi
 
-ONLY_FOR_ARCHS=	aarch64 amd64 arm armv6 armv7 i386 powerpc powerpc64 powerpcspe sparc64
+DEPRECATED=	Unsupported by upstream. Use GCC 9 or newer instead.
+ONLY_FOR_ARCHS=	amd64
 
 LIB_DEPENDS=	libgmp.so:math/gmp \
 		libmpfr.so:math/mpfr \
@@ -28,61 +30,35 @@ USES=		compiler cpe gmake iconv libtool makeinfo perl5 tar:xz
 USE_BINUTILS=	yes
 USE_PERL5=	build
 
-CONFLICTS=	gcc7-devel-7.*
-
 CPE_VENDOR=	gnu
 
 GCC_VERSION=	${PORTVERSION}
 SUFFIX=		${PORTVERSION:C/([0-9]+).*/\1/}
-SSP_UNSAFE=	yes
 CFLAGS:=	${CFLAGS:N-mretpoline}
 CXXFLAGS:=	${CXXFLAGS:N-mretpoline}
-
-OPTIONS_DEFINE=		BOOTSTRAP GRAPHITE
-OPTIONS_DEFAULT=	BOOTSTRAP
-BOOTSTRAP_DESC=		Build using a full bootstrap
-GRAPHITE_DESC=		Support for Graphite loop optimizations
-
-.if exists(/usr/lib32/libc.so)
-OPTIONS_DEFINE_powerpc64+=	MULTILIB
-OPTIONS_DEFAULT_powerpc64+=	MULTILIB
-MULTILIB_DESC=		Build support for 32-bit and 64-bit targets
-MULTILIB_CONFIGURE_ENABLE=	multilib
-.else
-CONFIGURE_ARGS+=	--disable-multilib
-.endif
 
 .include <bsd.port.pre.mk>
 
 .if ${ARCH} == amd64
 CONFIGURE_TARGET=	x86_64-portbld-${OPSYS:tl}${OSREL}
-
-.elif ${ARCH} == powerpc64
-CONFIGURE_ENV+=	UNAME_m="powerpc64"
-MAKE_ARGS+=	CFLAGS_FOR_TARGET="-O1" CXXFLAGS_FOR_TARGET="-O1" BOOT_CFLAGS="-O1" # PR235975
-
-.elif ${ARCH} == powerpcspe
-CONFIGURE_ARGS+=	--with-cpu=8548 --enable-e500_double --without-fp
 .endif
 
-LANGUAGES:=	c,c++,objc,fortran
+LANGUAGES:=	c,c++
 TARGLIB=	${PREFIX}/lib/gcc${SUFFIX}
 TARGLIB32=	${PREFIX}/lib32	# The version information is added later
 LIBEXEC=	${PREFIX}/libexec/gcc${SUFFIX}
 GNU_CONFIGURE=	yes
 CONFIGURE_OUTSOURCE=	yes
-.if empty(PORT_OPTIONS:MBOOTSTRAP)
-CONFIGURE_ARGS+=--disable-bootstrap
-.else
 CONFIGURE_ARGS+=--with-build-config=bootstrap-debug
 ALL_TARGET=	bootstrap-lean
-.endif
 INSTALL_TARGET=	install-strip
 .if ${UID} != 0
 BINMODE=	755
 .endif
 CONFIGURE_ARGS+=--disable-nls \
+		--disable-multilib \
 		--enable-gnu-indirect-function \
+		--enable-languages=${LANGUAGES} \
 		--libdir=${TARGLIB} \
 		--libexecdir=${LIBEXEC} \
 		--program-suffix=${SUFFIX} \
@@ -111,13 +87,6 @@ INFO+=		gcc${SUFFIX}/libquadmath \
 SUB_FILES=	pkg-message
 SUB_LIST+=	TARGLIB=${TARGLIB}
 
-.if ${PORT_OPTIONS:MGRAPHITE}
-LIB_DEPENDS+=	libisl.so:devel/isl
-CONFIGURE_ARGS+=--with-isl=${LOCALBASE}
-.endif
-
-CONFIGURE_ARGS+=--enable-languages=${LANGUAGES}
-
 pre-everything::
 	@${ECHO_MSG} "Making GCC ${PORTVERSION} for ${CONFIGURE_TARGET} [${LANGUAGES}]"
 
@@ -136,11 +105,6 @@ post-stage:
 	${RM} -r ${STAGEDIR}${TARGLIB}/gcc/*/${GCC_VERSION}/include-fixed/
 	# Add target libraries and include files to packaging list.
 	${RM} ${WRKDIR}/PLIST.lib
-
-.if ${ARCH} == powerpc64 && ${PORT_OPTIONS:MMULTILIB}
-	${MKDIR} ${STAGEDIR}${TARGLIB32}
-	${MV} ${STAGEDIR}${PREFIX}/lib/lib32 ${STAGEDIR}${TARGLIB32}/gcc${SUFFIX}
-.endif
 
 .for d in ${TARGLIB:S/^${PREFIX}\///} ${TARGLIB32:S/^${PREFIX}\///} ${LIBEXEC:S/^${PREFIX}\///}
 	cd ${STAGEDIR}${PREFIX} ; if [ -d $d ]; then \

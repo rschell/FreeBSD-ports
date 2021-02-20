@@ -1,11 +1,12 @@
 # $FreeBSD$
 
 PORTNAME=	libva
-PORTVERSION=	2.6.0
+PORTVERSION=	2.10.0
 CATEGORIES=	multimedia
 
 PATCH_SITES=	https://github.com/${GH_ACCOUNT}/${GH_PROJECT}/commit/
-PATCHFILES+=	c2a431cc3cab.patch:-p1 5cfcd31635b1.patch:-p1
+PATCHFILES+=	c2a431cc3cab.patch:-p1 # https://github.com/intel/libva/pull/292
+PATCHFILES+=	5cfcd31635b1.patch:-p1 # https://github.com/intel/libva/pull/292
 
 MAINTAINER=	jbeich@FreeBSD.org
 COMMENT?=	VAAPI wrapper and dummy driver
@@ -19,10 +20,6 @@ USES=		meson pkgconfig
 USE_GITHUB=	yes
 USE_LDCONFIG=	yes
 GH_ACCOUNT=	intel
-# -lpthread is not necessary if pthread_getthreadid_np is a libc stub
-LDFLAGS+=	${LDFLAGS_${OPSYS}_${OSREL}}
-LDFLAGS_FreeBSD_11.3=	-lpthread
-LDFLAGS_FreeBSD_12.0=	-lpthread
 
 OPTIONS_DEFINE=	GLX WAYLAND X11
 OPTIONS_DEFAULT=GLX WAYLAND X11
@@ -41,8 +38,5 @@ WAYLAND_MESON_YES=	with_wayland
 X11_USES=		xorg
 X11_USE=		XORG=x11,xorgproto,xext,xfixes
 X11_MESON_YES=		with_x11
-
-post-patch:
-	@${REINPLACE_CMD} 's,/etc,${PREFIX}&,' ${WRKSRC}/va/va.c
 
 .include <bsd.port.mk>

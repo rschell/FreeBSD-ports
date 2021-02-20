@@ -12,7 +12,8 @@ COMMENT=	Cross GNU Compiler Collection for ${PKGNAMEPREFIX:C/-//g}
 LICENSE=	GPLv3 GPLv3RLE
 LICENSE_COMB=	multi
 
-BUILD_DEPENDS=	${PKGNAMEPREFIX}binutils>0:devel/binutils@${PKGNAMEPREFIX:C/-$//}
+BUILD_DEPENDS=	${PKGNAMEPREFIX}binutils>0:devel/binutils@${PKGNAMEPREFIX:C/-$//} \
+		objdump:devel/binutils
 RUN_DEPENDS=	${PKGNAMEPREFIX}binutils>0:devel/binutils@${PKGNAMEPREFIX:C/-$//}
 LIB_DEPENDS=	libgmp.so:math/gmp \
 		libmpfr.so:math/mpfr \
@@ -69,7 +70,5 @@ post-install:
 	@if [ -d ${STAGEDIR}${PREFIX}/${INFO_PATH} ] ; then ${RM} -r ${STAGEDIR}${PREFIX}/${INFO_PATH}; fi
 	@${RM} ${STAGEDIR}${PREFIX}/man/man7/*
 	@${RM} -r ${STAGEDIR}${PREFIX}/lib/gcc/${GCC_TARGET}/${PORTVERSION}/include-fixed
-
-BROKEN_aarch64=		fails to package
 
 .include <bsd.port.mk>

@@ -2,8 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	vlc
-DISTVERSION=	3.0.8
-PORTREVISION=	15
+DISTVERSION=	3.0.11
+PORTREVISION=	9
 PORTEPOCH=	4
 CATEGORIES=	multimedia audio net www
 MASTER_SITES=	http://download.videolan.org/pub/videolan/${PORTNAME}/${DISTVERSION:S/a$//}/ \
@@ -21,24 +21,26 @@ LIB_DEPENDS=	libgcrypt.so:security/libgcrypt \
 		libfreetype.so:print/freetype2 \
 		libidn.so:dns/libidn \
 		libmatroska.so:multimedia/libmatroska
-BUILD_DEPENDS=	ffmpeg>=3.4.1,1:multimedia/ffmpeg \
+BUILD_DEPENDS=	gsed:textproc/gsed \
+		ffmpeg>=3.4.1,1:multimedia/ffmpeg \
 		yasm:devel/yasm
 RUN_DEPENDS=	ffmpeg>=3.4.1,1:multimedia/ffmpeg
 
-USES=		compiler:c++11-lib desktop-file-utils gettext-tools gmake gnome \
+USES=		compiler:c++17-lang desktop-file-utils gettext-tools gmake gnome \
 		iconv libtool localbase pathfix pkgconfig tar:xz
 
 # VLC git (post 2.2.4) requires C++11 support and passes the appropriate flag
 # to the compiler. Until the port is updated, we explicitly pass -std=c++11 to
 # the compiler because Qt 5.7+ requires C++11 support, and FreeBSD 10's clang
 # does not default to C++11 mode.
-USE_CXXSTD=	c++11
+# USE_CXXSTD=	c++11
 
 USE_GNOME=	libxml2
 USE_LDCONFIG=	yes
 INSTALL_TARGET=	install-strip
 
 GNU_CONFIGURE=	yes
+BINARY_ALIAS=	sed=${LOCALBASE}/bin/gsed
 CONFIGURE_ARGS=	--enable-avcodec --enable-avformat --enable-dvbpsi \
 		--enable-fontconfig --enable-freetype --enable-libgcrypt \
 		--enable-libxml2 --enable-oss --enable-postproc \
@@ -61,7 +63,7 @@ CONFIGURE_ARGS+=--enable-debug
 CFLAGS_i386=	-fomit-frame-pointer
 
 OPTIONS_DEFINE=	A52 AALIB AOM ASS AVAHI CACA CHROMECAST DAV1D DBUS DCA DOCS DVDREAD \
-		DVDNAV FAAD FLAC FLUID FREERDP FRIBIDI GME GNUTLS \
+		DEBUG DVDNAV FAAD FLAC FLUID FREERDP FRIBIDI GME GNUTLS \
 		GOOM HARFBUZZ JACK JPEG KATE LIBBLURAY LIBPLACEBO LIBRSVG2 LIBSSH2 LIRC \
 		LIVEMEDIA LUA MAD MFX MODPLUG MPEG2 MTP MUSEPACK \
 		NCURSES NFS NLS NOTIFY OGG OGGSPOTS OPTIMIZED_CFLAGS OPUS PNG PULSEAUDIO \
@@ -70,13 +72,18 @@ OPTIONS_DEFINE=	A52 AALIB AOM ASS AVAHI CACA CHROMECAST DAV1D DBUS DCA DOCS DVDR
 		TWOLAME UPNP V4L VAAPI VCD VDPAU VPX VORBIS WAYLAND X11 X264 X265 ZVBI
 OPTIONS_DEFINE_powerpc=	ALTIVEC
 OPTIONS_DEFINE_powerpc64=	ALTIVEC
-OPTIONS_DEFAULT=A52 AVAHI DAV1D DBUS DCA DVDREAD DVDNAV FAAD FLAC GNUTLS JPEG \
-		LIVEMEDIA LUA MAD MPEG2 OGG OPTIMIZED_CFLAGS \
+OPTIONS_DEFAULT=AVAHI DAV1D DBUS DVDREAD DVDNAV GNUTLS JPEG \
+		LIVEMEDIA LUA OGG OPTIMIZED_CFLAGS \
 		OPUS PNG QT5 SAMPLERATE STREAM SPEEX TAGLIB THEORA TWOLAME \
 		V4L VAAPI VCD VDPAU VORBIS WAYLAND X11
 OPTIONS_DEFAULT_powerpc=	ALTIVEC
 OPTIONS_DEFAULT_powerpc64=	ALTIVEC
 OPTIONS_SUB=	yes
+
+.if !defined(DEFAULT_VERSIONS) || ! ${DEFAULT_VERSIONS:Mssl=*}
+# Blocked by net/qt5-network: cannot use QT5 with default OpenSSL
+OPTIONS_EXCLUDE_FreeBSD_11+=	QT5
+.endif
 
 AOM_DESC=	AV1 video encoding/decoding via libaom
 ASS_DESC=	ASS/SSA subtitle rendering
@@ -200,6 +207,7 @@ LIRC_LIB_DEPENDS=	liblirc_client.so:comms/lirc
 LIRC_CONFIGURE_ENABLE=	lirc
 LIRC_CONFIGURE_ENV=	LIBS_lirc="-L${LOCALBASE}/lib -llirc_client"
 
+LIVEMEDIA_USES=		ssl
 LIVEMEDIA_LIB_DEPENDS=	libliveMedia.so:net/liveMedia
 LIVEMEDIA_CONFIGURE_ENABLE=	live555
 LIVEMEDIA_CONFIGURE_ENV= \
@@ -209,7 +217,8 @@ LIVEMEDIA_CONFIGURE_ENV= \
 			-I${LOCALBASE}/include/BasicUsageEnvironment" \
 	LIVE555_LIBS="-L${LOCALBASE}/lib -lliveMedia \
 			-lgroupsock -lBasicUsageEnvironment \
-			-lUsageEnvironment"
+			-lUsageEnvironment \
+			-L${OPENSSLLIB} -lssl -lcrypto"
 
 LUA_USES=		lua
 LUA_CONFIGURE_ENABLE=	lua
@@ -373,6 +382,13 @@ WITH_DVD_DEVICE?=/dev/cd0
 
 .if ${PORT_OPTIONS:MX11}
 INSTALLS_ICONS=	yes
+.endif
+
+.if ${PORT_OPTIONS:MDEBUG}
+WITH_DEBUG=yes
+CONFIGURE_ARGS+=--enable-debug --disable-optimizations
+CFLAGS+=-g -O0
+CXXFLAGS+=-g -O0
 .endif
 
 post-patch:

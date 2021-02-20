@@ -32,8 +32,6 @@ DVDNAV_DESC?=	DVD navigation features support
 LZO_DESC?=	Enable external liblzo library
 RTCPU_DESC?=	Use runtime CPU detection
 
-RESTRICTED=	Port has restricted dependencies
-
 PATCHDIR=	${.CURDIR}/../mplayer/files
 FILESDIR=	${PATCHDIR}
 DATADIR=	${PREFIX}/share/mplayer

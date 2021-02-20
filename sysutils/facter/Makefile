@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	facter
-PORTVERSION=	3.14.6
-PORTREVISION=	1
+PORTVERSION=	3.14.14
 CATEGORIES?=	sysutils
 MASTER_SITES=	https://downloads.puppetlabs.com/facter/
 

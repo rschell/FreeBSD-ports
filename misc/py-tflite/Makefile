@@ -1,7 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	tflite
-DISTVERSION=	g20191030
+DISTVERSIONPREFIX=	v
+DISTVERSION=	2.3.0
 CATEGORIES=	misc python # machine-learning
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
@@ -13,11 +14,10 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}flatbuffers>0:devel/py-flatbuffers@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils autoplist
 USE_GITHUB=	yes
 GH_ACCOUNT=	jackwish
-GH_TAGNAME=	7814b03
 
 NO_ARCH=	yes
 

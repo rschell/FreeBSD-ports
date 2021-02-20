@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	kodi-platform
-PORTVERSION=	20180302
+PORTVERSION=	20190726
 CATEGORIES=	devel
 
 MAINTAINER=	decke@FreeBSD.org
@@ -9,15 +9,15 @@ COMMENT=	Kodi platform support library
 
 LICENSE=	GPLv2+
 
-BUILD_DEPENDS=	${LOCALBASE}/lib/kodi/KodiConfig.cmake:multimedia/kodi
+BUILD_DEPENDS=	${LOCALBASE}/share/kodi/cmake/KodiConfig.cmake:multimedia/kodi
 LIB_DEPENDS=	libtinyxml.so:textproc/tinyxml \
 		libp8-platform.so:devel/p8-platform
 
-USES=		cmake
+USES=		cmake compiler:c++11-lang
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	xbmc
-GH_TAGNAME=	e8574b8
+GH_TAGNAME=	809c5e9
 
 USE_LDCONFIG=	yes
 

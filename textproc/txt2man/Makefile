@@ -3,10 +3,10 @@
 
 PORTNAME=	txt2man
 DISTVERSIONPREFIX=	txt2man-
-DISTVERSION=	1.6.0
+DISTVERSION=	1.7.1
 CATEGORIES=	textproc
 
-MAINTAINER=	tobik@FreeBSD.org
+MAINTAINER=	ed.arrakis@gmail.com
 COMMENT=	Converts flat ASCII text to man page format
 
 LICENSE=	GPLv2+
@@ -23,12 +23,23 @@ GH_ACCOUNT=	mvertes
 MAKE_ENV=	prefix=${STAGEDIR}${PREFIX}
 NO_ARCH=	yes
 
-PLIST_FILES=	bin/bookman bin/src2man bin/txt2man \
-		man/man1/bookman.1.gz man/man1/src2man.1.gz man/man1/txt2man.1.gz
+PLIST_FILES=	bin/bookman \
+		bin/src2man \
+		bin/txt2man \
+		share/man/man1/bookman.1.gz \
+		share/man/man1/src2man.1.gz \
+		share/man/man1/txt2man.1.gz
+
+PORTDOCS=	Changelog README
+
+OPTIONS_DEFINE=	DOCS
 
 post-patch:
-	@${REINPLACE_CMD} 's,share/man,man,g' ${WRKSRC}/Makefile
 	@${REINPLACE_CMD} 's,awk,gawk,' ${WRKSRC}/bookman ${WRKSRC}/src2man
-	@${REINPLACE_CMD} '/exec ksh/d' ${WRKSRC}/txt2man
+
+do-install-DOCS-on:
+	@${MKDIR} ${STAGEDIR}${DOCSDIR}
+	${INSTALL_DATA} ${WRKSRC}/Changelog ${STAGEDIR}${DOCSDIR}
+	${INSTALL_DATA} ${WRKSRC}/README ${STAGEDIR}${DOCSDIR}
 
 .include <bsd.port.mk>

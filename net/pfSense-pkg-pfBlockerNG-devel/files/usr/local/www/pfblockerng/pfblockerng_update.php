@@ -3,8 +3,8 @@
  * pfblockerng_update.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016-2020 Rubicon Communications, LLC (Netgate)
- * Copyright (c) 2015-2019 BBcan177@gmail.com
+ * Copyright (c) 2016-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 BBcan177@gmail.com
  * All rights reserved.
  *
  * Portions of this code are based on original work done for
@@ -93,12 +93,10 @@ function pfb_cron_update($type) {
 				break;
 			case 'DNSBL':
 				$type = 'updatednsbl';
-				rmdir_recursive("{$pfb['dnsdir']}");
 				break;
 			case 'All':
 			default:
 				$type = 'update';
-				rmdir_recursive("{$pfb['dnsdir']}");
 		}
 	} else {
 		pfbupdate_status(gettext('Running Force CRON Task'));
@@ -471,6 +469,10 @@ if ($pfb['enable'] == 'on' && isset($pconfig['run']) && !empty($pconfig['pfb_for
 //<![CDATA[
 
 events.push(function(){
+
+	// Expand textarea to full width
+	$('label[class="col-sm-2 control-label"]:eq(6)').remove();
+	$('div[class="col-sm-10"]:eq(4), div[class="col-sm-10"]:eq(5)').removeClass('col-sm-10').addClass('col-sm-12');
 
 	// Hide/Show 'Force Reload' radios
 	function mode_change(mode) {

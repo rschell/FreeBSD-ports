@@ -3,7 +3,7 @@
  * frr_validation.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2017-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2017-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,8 +36,8 @@ function frr_validate_word($word) {
 function frr_validate_community_asvalpair($community) {
 	list ($as, $val) = explode(":", $community);
 	if (is_numeric($as) && is_numeric($val) &&
-	    (($as >= 0) && ($as <= 65535)) &&
-	    (($val >= 0) && ($val <= 65535))) {
+		(($as >= 0) && ($as <= 65535)) &&
+		(($val >= 0) && ($val <= 65535))) {
 		return true;
 	}
 	return false;
@@ -149,6 +149,72 @@ function frr_sort_rows_by_seq() {
 function frr_global_acls_validate_input() {
 	global $config, $input_errors, $pkg;
 	frr_sort_rows_by_seq();
+
+	if (empty($_POST['name'])) {
+		$input_errors[] = "A name is required.";
+	}
+
+	switch ($_POST['type']) {
+		case "standard":
+			if (!is_numeric($_POST['name']) || !(frr_validate_intrange($_POST['name'], 1, 99) || frr_validate_intrange($_POST['name'], 1300, 1999))) {
+				$input_errors[] = "Standard type ACLs must have a numeric name in the range 1-99 or 1300-1999.";
+			}
+			if ($_POST["iptype"] != 'IPv4') {
+				$input_errors[] = "Standard type ACLs are only supported for IPv4.";
+			}
+			break;
+		case "extended":
+			if (!is_numeric($_POST['name']) || !(frr_validate_intrange($_POST['name'], 100, 199) || frr_validate_intrange($_POST['name'], 2000, 2699))) {
+				$input_errors[] = "Extended type ACLs must have a numeric name in the range 100-199 or 2000-2699.";
+			}
+			if ($_POST["iptype"] != 'IPv4') {
+				$input_errors[] = "Extended type ACLs are only supported for IPv4.";
+			}
+			break;
+		case "zebra":
+			if (is_numeric($_POST['name'])) {
+				$input_errors[] = "Zebra type ACLs must have a text name.";
+			}
+			break;
+	}
+
+	foreach ($_POST as $key => $value) {
+		$matches = array();
+		if (preg_match("/^seq(\d+)$/", $key, $matches)) {
+			if (!is_numeric($_POST["seq{$matches[1]}"])) {
+				$input_errors[] = "Sequence in row {$matches[1]} must be a number.";
+			}
+		}
+		if (preg_match("/^action(\d+)$/", $key, $matches)) {
+			if (!in_array($_POST["action{$matches[1]}"], array('deny', 'permit'))) {
+				$input_errors[] = "Action in row {$matches[1]} must be Deny or Permit.";
+			}
+		}
+		if (preg_match("/^source(\d+)$/", $key, $matches)) {
+			if (!is_subnet($_POST["source{$matches[1]}"]) && (($_POST["source{$matches[1]}"] != 'any') && !($_POST["sourceany{$matches[1]}"]))) {
+				$input_errors[] = "Source in row {$matches[1]} must be a subnet.";
+			}
+			if ((is_subnetv4($_POST["source{$matches[1]}"]) && ($_POST["iptype"] != 'IPv4')) ||
+				(is_subnetv6($_POST["source{$matches[1]}"]) && ($_POST["iptype"] != 'IPv6'))) {
+				$input_errors[] = "Source in row {$matches[1]} IP Type mismatch.";
+			}
+		}
+		if (preg_match("/^destination(\d+)$/", $key, $matches)) {
+			if ($_POST['type'] == 'extended') {
+				if (!is_subnet($_POST["destination{$matches[1]}"]) && (($_POST["destination{$matches[1]}"] != 'any')  && !($_POST["destinationany{$matches[1]}"])))  {
+					$input_errors[] = "Destination in row {$matches[1]} must be a subnet.";
+				}
+				if ((is_subnetv4($_POST["destination{$matches[1]}"]) && ($_POST["iptype"] != 'IPv4')) ||
+					(is_subnetv6($_POST["destination{$matches[1]}"]) && ($_POST["iptype"] != 'IPv6'))) {
+					$input_errors[] = "Destination in row {$matches[1]} IP Type mismatch.";
+				}
+			} else {
+				if (!empty($_POST["destination{$matches[1]}"]) || !empty($_POST["destinationany{$matches[1]}"])) {
+					$input_errors[] = "Destinations are only supported with Extended type ACLs.";
+				}
+			}
+		}
+	}
 }
 
 function frr_global_prefixes_validate_input() {
@@ -172,16 +238,20 @@ function frr_global_prefixes_validate_input() {
 			}
 		}
 		if (preg_match("/^source(\d+)$/", $key, $matches)) {
-			if (!is_subnet($_POST["source{$matches[1]}"]) && ($_POST["source{$matches[1]}"] != 'any')) {
+			if (!is_subnet($_POST["source{$matches[1]}"]) && (($_POST["source{$matches[1]}"] != 'any') && !($_POST["any{$matches[1]}"]))) {
 				$input_errors[] = "Network in row {$matches[1]} must be a subnet.";
+			}
+			if ((is_subnetv4($_POST["source{$matches[1]}"]) && ($_POST["iptype"] != 'IPv4')) ||
+				(is_subnetv6($_POST["source{$matches[1]}"]) && ($_POST["iptype"] != 'IPv6'))) {
+				$input_errors[] = "Network in row {$matches[1]} IP Type mismatch.";
 			}
 		}
 		if (preg_match("/^ge(\d+)$/", $key, $matches)) {
 			if (!empty($_POST["ge{$matches[1]}"]) && !is_numeric($_POST["ge{$matches[1]}"])) {
 				$input_errors[] = "Minimum prefix in row {$matches[1]} must be a number.";
 			} elseif (isset($_POST["le{$matches[1]}"]) &&
-				    is_numeric($_POST["le{$matches[1]}"]) &&
-				    ( (int) $_POST["ge{$matches[1]}"] + 1 >= (int) $_POST["le{$matches[1]}"] )) {
+					is_numeric($_POST["le{$matches[1]}"]) &&
+					( (int) $_POST["ge{$matches[1]}"] + 1 >= (int) $_POST["le{$matches[1]}"] )) {
 				$input_errors[] = "Minimum prefix in row {$matches[1]} must be less than maximum, and differ by more than 1.";
 			}
 		}
@@ -191,7 +261,6 @@ function frr_global_prefixes_validate_input() {
 			}
 		}
 	}
-
 }
 
 function frr_global_routemaps_validate_input() {
@@ -209,8 +278,8 @@ function frr_global_raw_validate_input() {
 function frr_ospf_areas_validate_input() {
 	global $config, $id, $input_errors;
 	/* area must be an IP address */
-	if (!is_ipaddr($_POST['area'])) {
-		$input_errors[] = "Area must be a valid ip_address.";
+	if (!(is_ipaddr($_POST['area']) || ctype_digit($_POST['area']))) {
+		$input_errors[] = "Area must be a valid IP address or integer number.";
 	}
 
 	/* type must be ('none', 'stub', 'nosum', 'nssa', 'nssanosum') */
@@ -233,7 +302,7 @@ function frr_ospf_areas_validate_input() {
 		/* rangeprefix must be a subnet */
 		if (preg_match("/^rangeprefix(\d+)$/", $key, $matches)) {
 			if (!empty($_POST["rangeprefix{$matches[1]}"]) &&
-			    !is_subnetv4($_POST["rangeprefix{$matches[1]}"])) {
+				!is_subnetv4($_POST["rangeprefix{$matches[1]}"])) {
 				$input_errors[] = "Summary Prefix in row {$matches[1]} must be a subnet.";
 			}
 		}
@@ -242,8 +311,8 @@ function frr_ospf_areas_validate_input() {
 		if (preg_match("/^rangecost(\d+)$/", $key, $matches)) {
 			frr_validate_intrange_input("Summary Cost in row {$matches[1]}", $_POST['rangecost{$matches[1]}'], 0, 16777215);
 			if (($_POST['rangecost{$matches[1]}'] <> "") &&
-			    (!empty($_POST['notadvertise{$matches[1]}']) ||
-			    !empty($_POST['subprefix{$matches[1]}']))) {
+				(!empty($_POST['notadvertise{$matches[1]}']) ||
+				!empty($_POST['subprefix{$matches[1]}']))) {
 				$input_errors[] = "Only one of Do Not Advertise, Cost, or Substitution Prefix may be chosen in row {$matches[1]}.";
 			}
 		}
@@ -251,16 +320,26 @@ function frr_ospf_areas_validate_input() {
 		/* subprefix must be a subnet */
 		if (preg_match("/^subprefix(\d+)$/", $key, $matches)) {
 			if (($_POST['subprefix{$matches[1]}'] <> "") &&
-			    !is_subnetv4($_POST["subprefix{$matches[1]}"])) {
+				!is_subnetv4($_POST["subprefix{$matches[1]}"])) {
 				$input_errors[] = "Substitute Prefix in row {$matches[1]} must be a subnet.";
 			}
 			if (!empty($_POST['subprefix{$matches[1]}']) &&
-			    (!empty($_POST['notadvertise{$matches[1]}']) ||
-			    !empty($_POST['rangecost{$matches[1]}']))) {
+				(!empty($_POST['notadvertise{$matches[1]}']) ||
+				!empty($_POST['rangecost{$matches[1]}']))) {
 				$input_errors[] = "Only one of Do Not Advertise, Cost, or Substitution Prefix may be chosen in row {$matches[1]}.";
 			}
 		}
 	}
+}
+
+function frr_ospf_neighbors_validate_input() {
+	global $config, $id, $input_errors;
+	if (!is_ipaddrv4($_POST['neighbor'])) {
+		$input_errors[] = "Neighbor must be a valid IPv4 address.";
+	}
+
+	frr_validate_intrange_input("Neighbor Priority", $_POST['priority'], 0, 255);
+	frr_validate_intrange_input("Dead Neighbor Polling interval", $_POST['pollinginterval'], 1, 65535);
 }
 
 function frr_ospf_interfaces_validate_input() {
@@ -277,8 +356,11 @@ function frr_ospf_interfaces_validate_input() {
 		}
 	}
 	frr_validate_intrange_input("Cost", $_POST['metric'], 1, 65535);
-	if (!empty($_POST['interfacearea']) && !is_ipaddr($_POST['interfacearea'])) {
-		$input_errors[] = "Area must be a valid ip_address.";
+	if ((strlen($_POST['interfacearea']) > 0) && !(is_ipaddr($_POST['interfacearea']) || ctype_digit($_POST['interfacearea']))) {
+		$input_errors[] = "Area must be a valid IP address or integer number.";
+	}
+	if ((strlen($_POST['interfacearea']) == 0) && (strlen($config['installedpackages']['frrospfd']['config'][0]['defaultarea']) == 0)) {
+		$input_errors[] = "Area must either be set on the interface or a default area set for the OSPF instance.";
 	}
 	if (!empty($_POST['networktype']) && !in_array($_POST['networktype'], array('broadcast', 'non-broadcast', 'point-to-multipoint', 'point-to-point'))) {
 		$input_errors[] = "Invalid interface type.";
@@ -317,15 +399,25 @@ function frr_ospf_interfaces_validate_input() {
 function frr_ospf_validate_input() {
 	global $config, $input_errors;
 
-	if (!$config['installedpackages']['frrospfdinterfaces']['config']) {
-		$input_errors[] = "Please select an interface to use for FRR OSPFd.";
-	}
-
 	if (!empty($_POST['routerid']) && !is_ipaddr($_POST['routerid'])) {
 		$input_errors[] = "Router ID must be an address.";
 	}
-	if (!is_ipaddr($_POST['area'])) {
-		$input_errors[] = "Area must be a valid ip_address.";
+
+	if (strlen($_POST['defaultarea']) > 0) {
+		if (!(is_ipaddr($_POST['defaultarea']) || ctype_digit($_POST['defaultarea']))) {
+			$input_errors[] = "Default Area must be a valid IP address or integer number.";
+		}
+	} else {
+		if (is_array($config['installedpackages']['frrospfdinterfaces'])) {
+			$interfaces_no_area = array();
+			foreach ($config['installedpackages']['frrospfdinterfaces']['config'] as $interface) {
+				if (strlen($interface['interfacearea']) == 0) { $interfaces_no_area[] = $interface['interface']; }
+			}
+			if (!empty($interfaces_no_area)) {
+				$interfaces_no_area = implode(" ", $interfaces_no_area);
+				$input_errors[] = "Default Area cannot be cleared as there are interfaces configured without specifically defined areas: {$interfaces_no_area}";
+			}
+		}
 	}
 
 	/* spfholdtime 0-60000 */
@@ -366,11 +458,67 @@ function frr_ospf_validate_input() {
 	frr_validate_intrange_input("Max Metric Seconds at Shutdown", $_POST['max_metric_shutdown'], 5, 86400);
 	/* writemultiplier (1-100) */
 	frr_validate_intrange_input("Write Multiplier", $_POST['writemultiplier'], 1, 100);
-
 }
 
 function frr_ospf6_interfaces_validate_input() {
 	global $config, $g, $input_errors;
+
+	if ((strlen($_POST['interfacearea']) > 0) && (!(is_ipaddr($_POST['interfacearea']) || ctype_digit($_POST['interfacearea'])))) {
+		$input_errors[] = "Area must be a valid IP address or integer number.";
+	}
+
+	if ((strlen($_POST['interfacearea']) == 0) && (strlen($config['installedpackages']['frrospf6d']['config'][0]['defaultarea']) == 0)) {
+		$input_errors[] = "Area must either be set on the interface or a default given for the OSPFv3 instance.";
+	}
+}
+
+function frr_ospf6_areas_validate_input() {
+	global $config, $id, $input_errors;
+	/* area must be an IP address */
+	if (!(is_ipaddr($_POST['area']) || ctype_digit($_POST['area']))) {
+		$input_errors[] = "Area must be a valid IP address or integer number.";
+	}
+
+	/* type must be ('none', 'stub', 'nosum', 'nssa', 'nssanosum') */
+	if (!empty($_POST['type']) && !in_array($_POST['type'], array('none', 'stub', 'nosum', 'nssa', 'nssanosum'))) {
+		$input_errors[] = "Invalid Area Type.";
+	}
+
+	/* range array */
+	foreach ($_POST as $key => $value) {
+		$matches = array();
+
+		/* rangeprefix must be a subnet */
+		if (preg_match("/^rangeprefix(\d+)$/", $key, $matches)) {
+			if (!empty($_POST["rangeprefix{$matches[1]}"]) &&
+				!is_subnetv6($_POST["rangeprefix{$matches[1]}"])) {
+				$input_errors[] = "Summary Prefix in row {$matches[1]} must be a subnet.";
+			}
+		}
+
+		/* rangecost 0-16777215 */
+		if (preg_match("/^rangecost(\d+)$/", $key, $matches)) {
+			frr_validate_intrange_input("Summary Cost in row {$matches[1]}", $_POST['rangecost{$matches[1]}'], 0, 16777215);
+			if (($_POST['rangecost{$matches[1]}'] <> "") &&
+				(!empty($_POST['notadvertise{$matches[1]}']) ||
+				!empty($_POST['subprefix{$matches[1]}']))) {
+				$input_errors[] = "Only one of Do Not Advertise, Cost, or Substitution Prefix may be chosen in row {$matches[1]}.";
+			}
+		}
+
+		/* subprefix must be a subnet */
+		if (preg_match("/^subprefix(\d+)$/", $key, $matches)) {
+			if (($_POST['subprefix{$matches[1]}'] <> "") &&
+				!is_subnetv6($_POST["subprefix{$matches[1]}"])) {
+				$input_errors[] = "Substitute Prefix in row {$matches[1]} must be a subnet.";
+			}
+			if (!empty($_POST['subprefix{$matches[1]}']) &&
+				(!empty($_POST['notadvertise{$matches[1]}']) ||
+				!empty($_POST['rangecost{$matches[1]}']))) {
+				$input_errors[] = "Only one of Do Not Advertise, Cost, or Substitution Prefix may be chosen in row {$matches[1]}.";
+			}
+		}
+	}
 }
 
 function frr_ospf6_validate_input() {
@@ -380,18 +528,30 @@ function frr_ospf6_validate_input() {
 		$input_errors[] = "Router ID must be an IP address.";
 	}
 
-	if (empty($_POST['routerid'])) {
-
-		if (!is_array($config['installedpackages']['frr']['config']) ||
-		    empty($config['installedpackages']['frr']['config'][0]['routerid'])) {
-			$input_errors[] = "Router ID is required because the global Router ID is not set.";
+	if (strlen($_POST['defaultarea']) > 0) {
+		if (!(is_ipaddr($_POST['defaultarea']) || ctype_digit($_POST['defaultarea']))) {
+			$input_errors[] = "Default Area must be a valid IP address or integer number.";
+		}
+	} else {
+		if (is_array($config['installedpackages']['frrospf6dinterfaces'])) {
+			$interfaces_no_area = array();
+			foreach ($config['installedpackages']['frrospf6dinterfaces']['config'] as $interface) {
+				if (strlen($interface['interfacearea']) == 0) { $interfaces_no_area[] = $interface['interface']; }
+			}
+			if (!empty($interfaces_no_area)) {
+				$interfaces_no_area = implode(" ", $interfaces_no_area);
+				$input_errors[] = "Default Area cannot be cleared as there are interfaces configured without specifically defined areas: {$interfaces_no_area}";
+			}
 		}
 	}
 }
 
-
 function frr_bgp_validate_input() {
 	global $config, $g, $input_errors;
+
+	if (!empty($_POST['enable']) && empty($_POST['asnum'])) {
+		$input_errors[] = "AS must be provided if BGP is enabled.";
+	}
 
 	if (!empty($_POST['asnum']) && !is_numeric($_POST['asnum'])) {
 		$input_errors[] = "AS must be entered as a number only.";
@@ -408,18 +568,45 @@ function frr_bgp_validate_input() {
 	if (!empty($_POST['listenip']) && !is_ipaddr($_POST['listenip'])) {
 		$input_errors[] = "Listen IP must be an IP address or blank to bind to all IP addresses.";
 	}
+
+	if (strlen($_POST['rpkipollingperiod']) > 0) {
+		if (!is_numeric($_POST['rpkipollingperiod'])) {
+			$input_errors[] = "Polling period must be a number.";
+		}
+		/*polling_period (1-86400)*/
+		frr_validate_intrange_input("Polling period", $_POST['rpkipollingperiod'], 1, 86400);
+	}
+
+	if (strlen($_POST['rpkiexpireinterval']) > 0) {
+		if (!is_numeric($_POST['rpkiexpireinterval'])) {
+			$input_errors[] = "Expire interval must be a number.";
+		}
+		/*expire_interval (600-172800)*/
+		frr_validate_intrange_input("Expire interval", $_POST['rpkiexpireinterval'], 600, 172800);
+	}
+
+	if (strlen($_POST['rpkiretryinterval']) > 0) {
+		if (!is_numeric($_POST['rpkiretryinterval'])) {
+			$input_errors[] = "Retry interval must be a number.";
+		}
+		/*retry_interval (1-7200)*/
+		frr_validate_intrange_input("Polling period", $_POST['rpkiretryinterval'], 1, 7200);
+	}
 }
 
 function frr_bgp_advanced_validate_input() {
 	global $config, $input_errors;
 }
+
 function frr_bgp_neighbors_validate_input() {
 	global $config, $input_errors;
 }
+
 function frr_bgp_aspaths_validate_input() {
 	global $config, $input_errors, $pkg;
 	frr_sort_rows_by_seq();
 }
+
 function frr_bgp_communities_validate_input() {
 	global $config, $input_errors, $pkg;
 	frr_sort_rows_by_seq();
@@ -434,5 +621,117 @@ function frr_bgp_validate_group() {
 
 	if ($_POST['name'] == "") {
 		$input_errors[] = "A name is required.";
+	}
+}
+
+function frr_bgp_rpki_cache_server_validate_input() {
+	global $config, $input_errors;
+
+	if (strlen($_POST['port']) > 0) {
+		if (!is_numeric($_POST['port'])) {
+			$input_errors[] = "Port must be a number.";
+		}
+		/*preference (1-255)*/
+		frr_validate_intrange_input("Port", $_POST['port'], 1, 65535);
+	}
+
+	if (strlen($_POST['preference']) > 0) {
+		if (!is_numeric($_POST['preference'])) {
+			$input_errors[] = "Preference must be a number.";
+		}
+		/*preference (1-255)*/
+		frr_validate_intrange_input("Preference", $_POST['preference'], 1, 255);
+	}
+}
+
+function frr_bfd_validate_input() {
+	global $config, $input_errors;
+}
+
+function frr_bfd_peer_validate_input() {
+	global $config, $input_errors;
+
+	if (!empty($_POST['detectmultiplier'])) {
+		if (!is_numeric($_POST['detectmultiplier'])) {
+			$input_errors[] = "Detect multiplier must be a number.";
+		}
+		/*detect-multiplier (2-255)*/
+		frr_validate_intrange_input("Detect multiplier", $_POST['detectmultiplier'], 2, 255);
+	}
+
+	if (!empty($_POST['receiveinterval'])) {
+		if (!is_numeric($_POST['receiveinterval'])) {
+			$input_errors[] = "Receive interval must be a number.";
+		}
+		/*receive-interval (10-60000)*/
+		frr_validate_intrange_input("Receive interval", $_POST['receiveinterval'], 10, 60000);
+	}
+
+	if (!empty($_POST['transmitinterval'])) {
+		if (!is_numeric($_POST['transmitinterval'])) {
+			$input_errors[] = "Transmit interval must be a number.";
+		}
+		/*transmit-interval (10-60000)*/
+		frr_validate_intrange_input("Transmit interval", $_POST['transmitinterval'], 10, 60000);
+	}
+
+	if (!empty($_POST['echointerval'])) {
+		if (!is_numeric($_POST['echointerval'])) {
+			$input_errors[] = "Echo interval must be a number.";
+		}
+		/*echo-interval (10-60000)*/
+		frr_validate_intrange_input("Echo interval", $_POST['echointerval'], 10, 60000);
+	}
+
+	if (!empty($_POST['minimumttl'])) {
+		if (!is_numeric($_POST['minimumttl'])) {
+			$input_errors[] = "Minimum TTL must be a number.";
+		}
+		/*minimum-ttl (1-254)*/
+		frr_validate_intrange_input("Minimum TTL", $_POST['minimumttl'], 1, 254);
+	}
+}
+
+function frr_bfd_profile_validate_input() {
+	global $config, $input_errors;
+
+	if (!empty($_POST['detectmultiplier'])) {
+		if (!is_numeric($_POST['detectmultiplier'])) {
+			$input_errors[] = "Detect multiplier must be a number.";
+		}
+		/*detect-multiplier (2-255)*/
+		frr_validate_intrange_input("Detect multiplier", $_POST['detectmultiplier'], 2, 255);
+	}
+
+	if (!empty($_POST['receiveinterval'])) {
+		if (!is_numeric($_POST['receiveinterval'])) {
+			$input_errors[] = "Receive interval must be a number.";
+		}
+		/*receive-interval (10-60000)*/
+		frr_validate_intrange_input("Receive interval", $_POST['receiveinterval'], 10, 60000);
+	}
+
+	if (!empty($_POST['transmitinterval'])) {
+		if (!is_numeric($_POST['transmitinterval'])) {
+			$input_errors[] = "Transmit interval must be a number.";
+		}
+		/*transmit-interval (10-60000)*/
+		frr_validate_intrange_input("Transmit interval", $_POST['transmitinterval'], 10, 60000);
+	}
+
+	if (!empty($_POST['echointerval'])) {
+		if (!is_numeric($_POST['echointerval'])) {
+			$input_errors[] = "Echo interval must be a number.";
+		}
+		/*echo-interval (10-60000)*/
+		frr_validate_intrange_input("Echo interval", $_POST['echointerval'], 10, 60000);
+	}
+
+	if (!empty($_POST['minimumttl'])) {
+		if (!is_numeric($_POST['minimumttl'])) {
+			$input_errors[] = "Minimum TTL must be a number.";
+		}
+		/*minimum-ttl (1-254)*/
+		frr_validate_intrange_input("Minimum TTL", $_POST['minimumttl'], 1, 254);
 	}
 }

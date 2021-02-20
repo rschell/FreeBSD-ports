@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	javaservicewrapper
-PORTVERSION=	3.5.37
+PORTVERSION=	3.5.43
 CATEGORIES=	sysutils java
 MASTER_SITES=	https://wrapper.tanukisoftware.com/download/${PORTVERSION}/
 DISTNAME=	wrapper_${PORTVERSION}_src
@@ -13,10 +13,12 @@ COMMENT=	JSW enables a Java application to be run as a Unix daemon
 LICENSE=	GPLv2 GPLv3
 LICENSE_COMB=	dual
 
-ONLY_FOR_ARCHS=	amd64 i386
+ONLY_FOR_ARCHS=	amd64 i386 powerpc64 powerpc64le
 
 USES=		gmake iconv
-USE_JAVA=	1.8+
+USE_JAVA=	yes
+JAVA_VERSION=	8+
+
 USE_ANT=	yes
 USE_LDCONFIG=	${PREFIX}/lib/javaservicewrapper/lib
 
@@ -26,7 +28,7 @@ OPTIONS_DEFINE=	DOCS
 
 .include <bsd.port.options.mk>
 
-.if (${ARCH} == amd64)
+.if ${ARCH} == amd64 || ${ARCH:Mpowerpc64*}
 MAKE_ARGS+=	-Dbits=64
 .else
 MAKE_ARGS+=	-Dbits=32
@@ -39,6 +41,12 @@ post-patch:
 			s|-liconv|${ICONV_LIB}|' \
 		${WRKSRC}/src/c/Makefile-freebsd-x86-32.gmake \
 		${WRKSRC}/src/c/Makefile-freebsd-x86-64.gmake
+	@${REINPLACE_CMD} -e 's|\(javac\.target\.version\)=.*|\1=1.8|' \
+		${WRKSRC}/default.properties
+	@${CP} ${WRKSRC}/src/c/Makefile-freebsd-x86-64.gmake \
+		${WRKSRC}/src/c/Makefile-freebsd-ppcbe-64.gmake
+	@${CP} ${WRKSRC}/src/c/Makefile-freebsd-x86-64.gmake \
+		${WRKSRC}/src/c/Makefile-freebsd-ppcle-64.gmake
 
 do-install:
 	@${MKDIR} ${STAGEDIR}${DATADIR}

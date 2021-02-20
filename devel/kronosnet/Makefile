@@ -2,11 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	kronosnet
-PORTVERSION=	1.13
+PORTVERSION=	1.20
 CATEGORIES=	devel
 MASTER_SITES=	https://kronosnet.org/releases/
 
-MAINTAINER=	dpejesh@yahoo.com
+MAINTAINER=	egypcio@FreeBSD.org
 COMMENT=	Network abstraction layer designed for high availability
 
 LICENSE=	GPLv2
@@ -15,7 +15,7 @@ LIB_DEPENDS=	liblzo2.so:archivers/lzo2 \
 		liblz4.so:archivers/liblz4 \
 		libnspr4.so:devel/nspr \
 		libnss3.so:security/nss \
-		libqb.so.0:devel/libqb \
+		libqb.so:devel/libqb \
 		libzstd.so:archivers/zstd
 
 USES=		autoreconf gmake localbase libtool pkgconfig ssl

@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	biscuits
-PORTVERSION=	0.2.1
+PORTVERSION=	0.3.0
 CATEGORIES=	www python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -14,10 +14,10 @@ LICENSE=	MIT
 
 BUILD_DEPENDS=	${PY_PATHLIB}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 post-install:
-	${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/biscuits.so
+	${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/biscuits*.so
 
 .include <bsd.port.mk>

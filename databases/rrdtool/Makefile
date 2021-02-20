@@ -3,7 +3,7 @@
 
 PORTNAME=	rrdtool
 PORTVERSION=	1.7.2
-PORTREVISION=	1
+PORTREVISION=	4
 CATEGORIES=	databases graphics
 MASTER_SITES=	http://oss.oetiker.ch/rrdtool/pub/
 
@@ -100,7 +100,7 @@ post-install-PERL-off:
 	${RM} -r ${STAGEDIR}${EXAMPLESDIR}/rrdcached
 
 post-install-PYTHON-on:
-	${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/rrdtool.so
+	${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/rrdtool*.so
 
 post-install-PYTHON-off:
 	${RM} ${STAGEDIR}${EXAMPLESDIR}/stripes.py

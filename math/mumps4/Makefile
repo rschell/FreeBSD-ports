@@ -30,11 +30,7 @@ LIBS=		cmumps dmumps mumps_common pord smumps zmumps
 
 CONFLICTS+=	mumps-mpich-4*
 
-OPTIONS_DEFINE=	METIS4 DOCS EXAMPLES
-
-METIS4_DESC=	Use math/metis4 for Ordering
-
-METIS4_LIB_DEPENDS+=	libmetis.so.1:math/metis4
+OPTIONS_DEFINE=	DOCS EXAMPLES
 
 LIBS+=		mpiseq
 
@@ -51,10 +47,6 @@ PLIST_SUB+=	MUMPSVERSION=${PORTVERSION} MUMPSV=${VEM}
 
 .include <bsd.port.pre.mk>
 
-.if ${PORT_OPTIONS:MMETIS4}
-MAKE_ENV+=	ORDERINGSF=-Dmetis
-.endif
-
 # This is like blaslapack, except we don't use lapack at all
 .if exists(${LOCALBASE}/lib/libatlas.so) && !defined(WITH_BLAS)
 WITH_ATLAS=	yes
@@ -67,6 +59,11 @@ BLASLIB=	-lf77blas
 LIB_DEPENDS+=	libblas.so:math/blas
 BLASLIB=	-lblas
 #LAPACKLIB=	-llapack
+.endif
+
+.if ${GCC_DEFAULT} >= 10
+# workaround for Type mismatch in argument 's' at (1); passed INTEGER(4) to LOGICAL(4)
+FCFLAGS+=	-fallow-argument-mismatch
 .endif
 
 pre-configure:
@@ -87,9 +84,6 @@ pre-build:
 	s+@LOCALBASE@+${LOCALBASE}+g;' \
 		${WRKSRC}/${MF}
 .endfor
-.if ${PORT_OPTIONS:MMETIS4}
-	${REINPLACE_CMD} -e 's+#LMETIS+LMETIS+' ${WRKSRC}/Makefile.inc
-.endif
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/include/${PORTNAME}

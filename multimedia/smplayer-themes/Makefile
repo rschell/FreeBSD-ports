@@ -2,12 +2,12 @@
 # $FreeBSD$
 
 PORTNAME=	smplayer-themes
-PORTVERSION=	18.6.0
+PORTVERSION=	20.11.0
 PORTEPOCH=	1
 CATEGORIES=	multimedia audio kde
 MASTER_SITES=	SF/smplayer/SMPlayer-themes/${PORTVERSION}/
 
-MAINTAINER=	kikadf.01@gmail.com
+MAINTAINER=	vvd@unislabs.com
 COMMENT=	Themes for SMPlayer
 
 USES=		qt:5 tar:bzip2

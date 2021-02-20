@@ -2,7 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	libfido2
-PORTVERSION=	0.4.0
+PORTVERSION=	1.5.0
+PORTREVISION=	1
 CATEGORIES=	security
 MASTER_SITES=	https://developers.yubico.com/libfido2/Releases/
 
@@ -15,21 +16,21 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 LIB_DEPENDS=	libcbor.so:devel/libcbor \
 		libhidapi.so.0:comms/hidapi
 
-USES=		cmake compiler pkgconfig ssl
+USES=		cmake compiler:c11 pkgconfig ssl
 
 CFLAGS+=	-D_WITH_GETLINE
-LDFLAGS+=	-lcrypto
+CMAKE_ON=	USE_HIDAPI
+
+PLIST_SUB=	PORTVERSION=${PORTVERSION}
 
 OPTIONS_DEFINE=	DOCS
 
 .include <bsd.port.pre.mk>
 
 post-patch:
-	@${REINPLACE_CMD} -e '/libcrypto/d' ${WRKSRC}/CMakeLists.txt
-	@${REINPLACE_CMD} -e 's|share/man|man|' ${WRKSRC}/man/CMakeLists.txt
-	@${REINPLACE_CMD} -e 's|endian.h|sys/&|' ${WRKSRC}/CMakeLists.txt ${WRKSRC}/openbsd-compat/openbsd-compat.h
-.if ${CHOSEN_COMPILER_TYPE} == gcc
-	@${REINPLACE_CMD} -e '/-Wno-unused-result/d; /-Wno-discarded-qualifiers/d' ${WRKSRC}/CMakeLists.txt
+# we do not ship libcrypto.pc in base system
+.if ${SSL_DEFAULT} == base
+	@${REINPLACE_CMD} -e '/libcrypto/d' ${WRKSRC}/CMakeLists.txt ${WRKSRC}/src/libfido2.pc.in
 .endif
 
 .include <bsd.port.post.mk>

@@ -1,13 +1,12 @@
 # $FreeBSD$
 
 PORTNAME=	wx
-PORTVERSION=	3.0.4
+PORTVERSION=	3.0.5.1
 DISTVERSIONPREFIX=	v
-PORTREVISION=	8
 CATEGORIES=	x11-toolkits
 PKGNAMESUFFIX=	30-gtk3
 
-MAINTAINER=	ports@FreeBSD.org
+MAINTAINER=	lbartoletti@FreeBSD.org
 COMMENT=	The wxWidgets GUI toolkit with GTK+ bindings
 
 LICENSE=	GPLv2+
@@ -17,6 +16,7 @@ LIB_DEPENDS=	libexpat.so:textproc/expat2 \
 		libfontconfig.so:x11-fonts/fontconfig \
 		libfreetype.so:print/freetype2 \
 		libpng.so:graphics/png \
+		libsoup-2.4.so:devel/libsoup \
 		libtiff.so:graphics/tiff
 
 USE_GITHUB=	yes
@@ -44,7 +44,8 @@ CONFIGURE_ARGS=	--with-libpng=sys \
 		--enable-backtrace \
 		--enable-ipv6 \
 		--enable-optimise \
-		--enable-utf8 \
+		--enable-unicode \
+		--enable-std_string \
 		--enable-graphics_ctx \
 		--enable-compat26 \
 		--enable-compat28
@@ -59,7 +60,7 @@ OPTIONS_SUB=	yes
 NLS_USES=	gettext
 
 GSTREAMER_CONFIGURE_ENABLE=	mediactrl
-GSTREAMER_USE=	GNOME=gconf2 GSTREAMER1=yes
+GSTREAMER_USE=	GSTREAMER1=yes
 
 NOTIFY_CONFIGURE_WITH=	libnotify
 NOTIFY_LIB_DEPENDS=	libnotify.so:devel/libnotify

@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	btest
-DISTVERSION=	0.58
-PORTREVISION=	1
+DISTVERSION=	0.62
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -13,7 +12,7 @@ COMMENT=	Simple driver for basic unit tests
 LICENSE=	BSD3CLAUSE
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils autoplist concurrent
 
 NO_ARCH=	YES

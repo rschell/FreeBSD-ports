@@ -3,7 +3,7 @@
 
 PORTNAME=	libdrizzle
 PORTVERSION=	0.8
-PORTREVISION=	6
+PORTREVISION=	7
 CATEGORIES=	databases
 MASTER_SITES=	http://launchpadlibrarian.net/41155299/ \
 		LOCAL/bdrewery/${PORTNAME}/
@@ -36,6 +36,8 @@ ALL_TARGET=	all doxygen
 
 .if ${ARCH} == "i386"
 CONFIGURE_ARGS+=--disable-64bit
+.elif ${ARCH:Mpowerpc*}
+USES+=		compiler:gcc-c++11-lib
 .endif
 
 post-install:

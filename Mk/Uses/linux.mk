@@ -34,7 +34,7 @@ linux_ARGS=		${LINUX_DEFAULT}
 .endif
 
 .if ${linux_ARGS} == c7
-LINUX_DIST_VER?=	7.7.1908
+LINUX_DIST_VER?=	7.8.2003
 .else
 IGNORE=			Invalid Linux distribution: ${linux_ARGS}
 .endif
@@ -61,6 +61,7 @@ _linux_${linux_ARGS}_cyrus-sasl2=	linux-${linux_ARGS}-cyrus-sasl-lib>0:security/
 _linux_${linux_ARGS}_dbusglib=		linux-${linux_ARGS}-dbus-glib>0:devel/linux-${linux_ARGS}-dbus-glib
 _linux_${linux_ARGS}_dbuslibs=		linux-${linux_ARGS}-dbus-libs>0:devel/linux-${linux_ARGS}-dbus-libs
 _linux_${linux_ARGS}_devtools=		linux-${linux_ARGS}-devtools>0:devel/linux-${linux_ARGS}-devtools
+_linux_c7_dosfstools=			linux-c7-dosfstools>0:sysutils/linux-c7-dosfstools
 _linux_${linux_ARGS}_dri=		linux-${linux_ARGS}-dri>0:graphics/linux-${linux_ARGS}-dri
 _linux_${linux_ARGS}_elfutils-libelf=	linux-${linux_ARGS}-elfutils-libelf>0:devel/linux-${linux_ARGS}-elfutils-libelf
 _linux_c7_elfutils-libs=		linux-c7-elfutils-libs>0:devel/linux-c7-elfutils-libs
@@ -72,6 +73,7 @@ _linux_c7_fribidi=			linux-c7-fribidi>0:converters/linux-c7-fribidi
 _linux_${linux_ARGS}_gdkpixbuf2=	linux-${linux_ARGS}-gdk-pixbuf2>0:graphics/linux-${linux_ARGS}-gdk-pixbuf2
 _linux_${linux_ARGS}_gnutls=		linux-${linux_ARGS}-gnutls>0:security/linux-${linux_ARGS}-gnutls
 _linux_c7_graphite2=			linux-c7-graphite2>0:graphics/linux-c7-graphite2
+_linux_c7_gsm=				linux-c7-gsm>0:audio/linux-c7-gsm
 _linux_${linux_ARGS}_gtk2=		linux-${linux_ARGS}-gtk2>0:x11-toolkits/linux-${linux_ARGS}-gtk2
 _linux_c7_gtk3=				linux-c7-gtk3>0:x11-toolkits/linux-c7-gtk3
 _linux_c7_harfbuzz=			linux-c7-harfbuzz>0:print/linux-c7-harfbuzz
@@ -79,8 +81,10 @@ _linux_${linux_ARGS}_icu=		linux-${linux_ARGS}-icu>0:devel/linux-${linux_ARGS}-i
 _linux_${linux_ARGS}_jasper=		linux-${linux_ARGS}-jasper-libs>0:graphics/linux-${linux_ARGS}-jasper
 _linux_c7_jbigkit=			linux-c7-jbigkit-libs>0:graphics/linux-c7-jbigkit
 _linux_${linux_ARGS}_jpeg=		linux-${linux_ARGS}-jpeg>0:graphics/linux-${linux_ARGS}-jpeg
+_linux_c7_libaio=			linux-c7-libaio>0:devel/linux-c7-libaio
 _linux_${linux_ARGS}_libasyncns=	linux-${linux_ARGS}-libasyncns>0:dns/linux-${linux_ARGS}-libasyncns
 _linux_c7_libaudiofile=			linux-c7-audiofile>0:audio/linux-c7-audiofile
+_linux_c7_libcroco=			linux-c7-libcroco>0:textproc/linux-c7-libcroco
 _linux_c7_libdrm=			linux-c7-libdrm>0:graphics/linux-c7-libdrm
 _linux_c7_libepoxy=			linux-c7-libepoxy>0:graphics/linux-c7-libepoxy
 _linux_${linux_ARGS}_libgcrypt=		linux-${linux_ARGS}-libgcrypt>0:security/linux-${linux_ARGS}-libgcrypt
@@ -89,6 +93,7 @@ _linux_c7_libglvnd=			linux-c7-libglvnd>0:graphics/linux-c7-libglvnd
 _linux_${linux_ARGS}_libgpg-error=	linux-${linux_ARGS}-libgpg-error>0:security/linux-${linux_ARGS}-libgpg-error
 _linux_${linux_ARGS}_libogg=		linux-${linux_ARGS}-libogg>0:audio/linux-${linux_ARGS}-libogg
 _linux_${linux_ARGS}_libpciaccess=	linux-${linux_ARGS}-libpciaccess>0:devel/linux-${linux_ARGS}-libpciaccess
+_linux_c7_librsvg2=			linux-c7-librsvg2>0:graphics/linux-c7-librsvg2
 _linux_${linux_ARGS}_libsndfile=	linux-${linux_ARGS}-libsndfile>0:audio/linux-${linux_ARGS}-libsndfile
 _linux_${linux_ARGS}_libssh2=		linux-${linux_ARGS}-libssh2>0:security/linux-${linux_ARGS}-libssh2
 _linux_${linux_ARGS}_libtasn1=		linux-${linux_ARGS}-libtasn1>0:security/linux-${linux_ARGS}-libtasn1
@@ -105,6 +110,7 @@ _linux_c7_make=				linux-c7-make>0:devel/linux-c7-make
 _linux_c7_nettle=			linux-c7-nettle>0:security/linux-c7-nettle
 _linux_${linux_ARGS}_nspr=		linux-${linux_ARGS}-nspr>0:devel/linux-${linux_ARGS}-nspr
 _linux_${linux_ARGS}_nss=		linux-${linux_ARGS}-nss>0:security/linux-${linux_ARGS}-nss
+_linux_c7_numactl-libs=			linux-c7-numactl-libs>0:sysutils/linux-c7-numactl-libs
 _linux_${linux_ARGS}_openal-soft=	linux-${linux_ARGS}-openal-soft>0:audio/linux-${linux_ARGS}-openal-soft
 _linux_${linux_ARGS}_openldap=		linux-${linux_ARGS}-openldap>0:net/linux-${linux_ARGS}-openldap
 _linux_c7_openmotif=			linux-c7-motif>0:x11-toolkits/linux-c7-openmotif

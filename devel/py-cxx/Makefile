@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	cxx
-PORTVERSION=	7.1.3
+PORTVERSION=	7.1.4
 CATEGORIES=	devel python
 MASTER_SITES=	SF/${PORTNAME}/CXX/PyCXX%20V${PORTVERSION}
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -11,7 +11,10 @@ DISTNAME=	pycxx-${PORTVERSION}
 MAINTAINER=	lwhsu@FreeBSD.org
 COMMENT=	Make it easier to extend Python with C++
 
-USES=		python
+LICENSE=	BSD3CLAUSE
+LICENSE_FILE=	${WRKSRC}/COPYRIGHT
+
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils pythonprefix
 PYDISTUTILS_PKGNAME=	CXX
 

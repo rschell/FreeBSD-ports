@@ -2,6 +2,7 @@
 
 PORTNAME=	widgets
 DISTVERSION=	${QT5_VERSION}
+PORTREVISION=	1
 CATEGORIES=	x11-toolkits
 PKGNAMEPREFIX=	qt5-
 
@@ -12,13 +13,13 @@ USES=		compiler:c++11-lang qmake:no_env qt-dist:5,base xorg
 USE_QT=		core gui qmake_build buildtools_build
 USE_XORG=	x11
 HAS_CONFIGURE=	yes
-USE_LDCONFIG=	${PREFIX}/${QT_LIBDIR_REL}
 
 BUILD_WRKSRC=	${WRKSRC}/src/${PORTNAME}
 INSTALL_WRKSRC=	${BUILD_WRKSRC}
 
 MORE_WRKSRCS=	src/tools/uic
 
+QT_BINARIES=	yes
 QT_DEFINES=	ACCESSIBILITY WIDGETS XSYNC
 QT_CONFIG=	accessibility accessibility-atspi-bridge xlib
 

@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	gnupg
-PORTVERSION=	2.2.19
+PORTVERSION=	2.2.26
 CATEGORIES=	security
 MASTER_SITES=	GNUPG
 
@@ -18,8 +18,6 @@ LIB_DEPENDS=	libassuan.so:security/libassuan \
 		libgpg-error.so:security/libgpg-error \
 		libksba.so:security/libksba \
 		libnpth.so:devel/npth
-BUILD_DEPENDS=	libassuan>=2.5.1:security/libassuan \
-		libgpg-error>=1.16:security/libgpg-error
 RUN_DEPENDS=	pinentry:security/pinentry
 
 USES=		compiler:c11 cpe gmake iconv makeinfo pkgconfig readline sqlite tar:bzip2
@@ -31,6 +29,7 @@ CONFIGURE_ARGS=	--disable-ntbtls --enable-gpg-is-gpg2 --enable-symcryptrun
 GNU_CONFIGURE=	yes
 INFO=		gnupg
 TEST_TARGET=	check
+TEST_ARGS=	TESTARGS=--parallel
 
 SUB_FILES=	pkg-message
 
@@ -63,9 +62,10 @@ WKS_SERVER_CONFIGURE_ENABLE=	wks-tools
 # Touch the texinfo files to force makeinfo to run.  This fixes Linuxisms in
 # the paths in the man pages.
 pre-build:
-	@${TOUCH} ${WRKSRC}/doc/*.texi
+	${TOUCH} ${WRKSRC}/doc/*.texi
 
 post-install:
-	@${MV} ${STAGEDIR}${DATADIR}/help*.txt ${STAGEDIR}${DOCSDIR}
+	${MV} ${STAGEDIR}${PREFIX}/bin/gpgsplit ${STAGEDIR}${PREFIX}/bin/gpgsplit2
+	${MV} ${STAGEDIR}${DATADIR}/help*.txt ${STAGEDIR}${DOCSDIR}
 
 .include <bsd.port.mk>

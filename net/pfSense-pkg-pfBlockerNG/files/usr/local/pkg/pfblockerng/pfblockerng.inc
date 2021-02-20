@@ -3,7 +3,7 @@
  * pfblockerng.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2015-2019 BBcan177@gmail.com
  * All rights reserved.
  *
@@ -1870,7 +1870,7 @@ function pfb_download($list_url, $file_dwn, $pflex=FALSE, $header, $format, $log
 		unset($retval);
 
 		// Decompress file if required
-		if ($file_type == 'application/x-gzip') {
+		if ($file_type == 'application/x-gzip' || $file_type == 'application/gzip') {
 			if ($logtype == 3) {
 				// Extras - MaxMind downloads
 				@rename("{$file_dwn}.raw", strstr("{$file_dwn}.raw", '.raw', TRUE));
@@ -2358,14 +2358,14 @@ function pfb_firewall_rule($action, $pfb_alias, $vtype='', $pfb_log, $agateway_i
 }
 
 
-// Archive IP aliastables and DNSBL database. ( NanoBSD and Ramdisk installations only )
+// Archive IP aliastables and DNSBL database. ( Ramdisk installations only )
 function pfb_aliastables($mode) {
 	global $g, $config, $pfb;
 	$earlyshellcmd = '/usr/local/pkg/pfblockerng/pfblockerng.sh aliastables';
 	$msg = '';
 
-	// Only execute function if platform is NanoBSD or Ramdisks are used.
-	if (($g['platform'] != 'pfSense') || isset($config['system']['use_mfs_tmpvar'])) {
+	// Only execute function if Ramdisks are used.
+	if (isset($config['system']['use_mfs_tmpvar'])) {
 		if ($mode == 'update') {
 			// Archive aliastable folder
 			pfb_logger("\n\nArchiving Aliastable folder\n", 1);
@@ -2632,7 +2632,7 @@ function sync_package_pfblockerng($cron='') {
 		}
 	}
 
-	// Call function for NanoBSD/Ramdisk processes.
+	// Call function for Ramdisk processes.
 	pfb_aliastables('conf');
 
 	// If table limit not defined, set default to 2M
@@ -3956,7 +3956,7 @@ function sync_package_pfblockerng($cron='') {
 		if (isset($config['installedpackages']['pfblockerng' . strtolower(str_replace(' ', '', $continent))]['config'])) {
 			$continent_config = $config['installedpackages']['pfblockerng' . strtolower(str_replace(' ', '', $continent))]['config'][0];
 			$cc_name = 'pfblockerng' . strtolower(str_replace(' ', '', $continent));
-			if ($continent_config['action'] != 'Disabled' && $pfb['enable'] == 'on') {
+			if (isset($continent_config['action']) && $continent_config['action'] != 'Disabled' && $pfb['enable'] == 'on') {
 
 				// Maxmind License Key verification and user notification
 				if ($maxmind_run_once && !$maxmind_verify) {
@@ -5086,7 +5086,7 @@ function sync_package_pfblockerng($cron='') {
 		filter_configure();		// Load filter_configure which will create the pfctl tables
 		$pfb_filter_configure = TRUE;	// Flag to skip State removal function due to pf reloading
 
-		// Call function for NanoBSD/Ramdisk processes.
+		// Call function for Ramdisk processes.
 		pfb_aliastables('update');
 	} else {
 		// Don't execute on user 'save'
@@ -5126,7 +5126,7 @@ function sync_package_pfblockerng($cron='') {
 				}
 				pfb_logger("\n", 1);
 
-				// Call function for NanoBSD/Ramdisk processes.
+				// Call function for Ramdisk processes.
 				pfb_aliastables('update');
 			} else {
 				$log = "No Changes to Aliases, Skipping pfctl Update\n";

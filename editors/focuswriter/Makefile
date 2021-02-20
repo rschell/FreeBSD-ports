@@ -3,10 +3,10 @@
 
 PORTNAME=	focuswriter
 DISTVERSIONPREFIX=	v
-DISTVERSION=	1.7.3
+DISTVERSION=	1.7.6
 CATEGORIES=	editors
 
-MAINTAINER=	lightside@gmx.com
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Simple, distraction-free writing environment
 
 LICENSE=	GPLv3+ LGPL3+

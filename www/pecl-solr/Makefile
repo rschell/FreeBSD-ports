@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	solr
-PORTVERSION=	2.5.0
+PORTVERSION=	2.5.1
 CATEGORIES=	www
 
 MAINTAINER=	gaod@hychen.org
@@ -16,6 +16,8 @@ LIB_DEPENDS=	libcurl.so:ftp/curl \
 
 USES=		php:pecl
 USE_PHP=	json:build
-IGNORE_WITH_PHP=	74
+
+CONFIGURE_ARGS=	LIBXML_CFLAGS=-I${LOCALBASE}/include/libxml2 \
+		LIBXML_LIBS=-L${LOCALBASE}/include/libxml2
 
 .include <bsd.port.mk>

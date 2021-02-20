@@ -1,6 +1,6 @@
---- build/BSD.inc.orig	2019-12-18 22:42:41 UTC
+--- build/BSD.inc.orig	2020-07-10 13:18:01 UTC
 +++ build/BSD.inc
-@@ -22,17 +22,26 @@ ifndef arch
+@@ -22,17 +22,32 @@ ifndef arch
          ifeq ($(shell uname -m),amd64)
                  export arch:=intel64
          endif
@@ -12,6 +12,12 @@
 +        endif
 +        ifeq ($(shell uname -p),powerpc64)
 +                export arch:=powerpc64
++        endif
++        ifeq ($(shell uname -p),powerpc64le)
++                export arch:=powerpc64le
++        endif
++        ifeq ($(shell uname -p),powerpc)
++                export arch:=powerpc
 +        endif
  endif
  
@@ -30,7 +36,7 @@
  debugger ?= gdb
  
  CMD=$(SHELL) -c
-@@ -42,7 +51,7 @@ RD?=rmdir
+@@ -42,7 +57,7 @@ RD?=rmdir
  MD?=mkdir -p
  NUL= /dev/null
  SLASH=/

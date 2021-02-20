@@ -1,3 +1,3 @@
-TIMESTAMP = 1575623511
-SHA256 (KDE/applications/19.12.0/krdc-19.12.0.tar.xz) = 52bff08687abe86b274af77855dce923945ac998d11b1b309c6b1854febdd40b
-SIZE (KDE/applications/19.12.0/krdc-19.12.0.tar.xz) = 1425400
+TIMESTAMP = 1607111073
+SHA256 (KDE/release-service/20.12.0/krdc-20.12.0.tar.xz) = c5c73594018f3774ff828ff0e90c22e79bf5b7a9a41447b2d8bd27c6eee62b4a
+SIZE (KDE/release-service/20.12.0/krdc-20.12.0.tar.xz) = 1563948

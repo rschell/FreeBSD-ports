@@ -11,8 +11,8 @@ MASTER_SITES=	GNU/gnu-arch \
 MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Original arch source control management CLI written in C
 
-BROKEN_SSL=	openssl111
-BROKEN_SSL_REASON_openssl111=	incomplete definition of type 'struct X509_name_entry_st'
+BROKEN_SSL=	openssl
+BROKEN_SSL_REASON_openssl=	incomplete definition of type 'struct X509_name_entry_st'
 
 BUILD_DEPENDS=	gpatch:devel/patch \
 		gdiff:textproc/diffutils \
@@ -41,6 +41,7 @@ OPTIONS_DEFINE=	DOCS
 .if ${SSL_DEFAULT} == base
 BROKEN_FreeBSD_12=	could not find library containing SSL_library_init
 BROKEN_FreeBSD_13=	could not find library containing SSL_library_init
+BROKEN_FreeBSD_14=	could not find library containing SSL_library_init
 .endif
 
 pre-patch:

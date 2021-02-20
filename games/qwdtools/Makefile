@@ -10,6 +10,9 @@ PKGMESSAGE=	/nonexistent
 BUILD_WRKSRC=	${WRKSRC}/tools/qwdtools/source
 GH_PROJECT=	mvdsv
 
+CFLAGS+=	-DQWE_VERSION=\\\"${PORTVERSION}\\\" \
+		-DPROJECT_NAME=SERVER_NAME -DPROJECT_URL=HOMEPAGE_URL
+
 MASTERDIR=	${.CURDIR}/../mvdsv
 
 .include "${MASTERDIR}/Makefile"

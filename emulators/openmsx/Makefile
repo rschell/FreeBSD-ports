@@ -1,27 +1,34 @@
 # $FreeBSD$
 
 PORTNAME=	openmsx
-PORTVERSION=	0.15.0
-PORTREVISION=	1
+PORTVERSION=	16.0
 CATEGORIES=	emulators
-MASTER_SITES=	https://github.com/openMSX/openMSX/releases/download/RELEASE_${PORTVERSION:S/./_/g}/
 
-MAINTAINER=	ports@FreeBSD.org
+MAINTAINER=	menelkir@itroll.org
 COMMENT=	Open source MSX emulator
 
 LICENSE=	GPLv2
+LICENSE_FILE=	${WRKSRC}/doc/GPL.txt
 
 LIB_DEPENDS=	libpng.so:graphics/png \
 		libogg.so:audio/libogg \
 		libvorbis.so:audio/libvorbis \
 		libtheora.so:multimedia/libtheora \
 		libao.so:audio/libao \
-		libfreetype.so:print/freetype2
+		libfreetype.so:print/freetype2 \
+		libasound.so:audio/alsa-lib
 
-USES=		gl gmake python:2.7 sdl tcl
+USES=		gl gmake python sdl tcl
 USE_GCC=	yes
 USE_GL=		gl glew
-USE_SDL=	sdl ttf
+USE_SDL=	sdl2 ttf2
+
+USE_GITHUB=	yes
+GH_ACCOUNT=	openMSX
+GH_PROJECT=	openMSX
+GH_TAGNAME=	a46a814
+
+BINARY_ALIAS=	python3=${PYTHON_CMD}
 
 MAKEFILE=	GNUmakefile
 MAKE_ARGS=	INSTALL_BINARY_DIR=${PREFIX}/bin \

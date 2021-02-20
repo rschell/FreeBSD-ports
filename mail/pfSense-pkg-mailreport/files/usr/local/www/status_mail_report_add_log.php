@@ -3,7 +3,7 @@
  * status_mail_report_add_log.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2011-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2011-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2007-2011 Seth Mos <seth.mos@dds.nl>
  * All rights reserved.
  *
@@ -73,7 +73,7 @@ if ($_POST) {
 
 	$a_mailreports[$reportid]['log']['row'] = $a_logs;
 
-	write_config();
+	write_config("mailreport: Logs settings updated");
 	header("Location: status_mail_report_edit.php?id={$reportid}");
 	return;
 }

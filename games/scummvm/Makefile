@@ -2,11 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	scummvm
-PORTVERSION=	2.1.0
+PORTVERSION=	2.2.0
 CATEGORIES=	games emulators
-MASTER_SITES=	http://www.scummvm.org/frs/scummvm/${PORTVERSION}/
+MASTER_SITES=	https://downloads.scummvm.org/frs/${PORTNAME}/${PORTVERSION}/
 
-MAINTAINER=	lme@FreeBSD.org
+MAINTAINER=	kai@FreeBSD.org
 COMMENT=	Interpreter for several adventure games
 
 LICENSE=	GPLv2+
@@ -14,10 +14,11 @@ LICENSE_FILE=	${WRKSRC}/COPYING
 
 LIB_DEPENDS=	libfaad.so:audio/faad \
 		libfreetype.so:print/freetype2 \
+		libfribidi.so:converters/fribidi \
 		libmpeg2.so:multimedia/libmpeg2 \
 		libtheoradec.so:multimedia/libtheora
 
-USES=		gmake gnome jpeg sdl tar:xz
+USES=		gmake gnome iconv jpeg sdl tar:xz
 HAS_CONFIGURE=	yes
 USE_SDL=	sdl2
 INSTALLS_ICONS=	yes
@@ -33,16 +34,27 @@ CONFIGURE_ARGS=	--disable-alsa \
 
 LDFLAGS+=	-lpthread
 
-OPTIONS_DEFINE=		DOCS FLAC FLUIDSYNTH MP3 MT32EMU PNG SNDIO VORBIS
-OPTIONS_DEFAULT=	MP3 MT32EMU PNG VORBIS
+OPTIONS_DEFINE=		A52 CURL DOCS FLAC FLUIDSYNTH MP3 MT32EMU PNG SNDIO VORBIS
+OPTIONS_DEFAULT=	A52 MP3 MT32EMU PNG VORBIS
+OPTIONS_SUB=		yes
 
+CURL_DESC=	Enable ScummVM cloud storage backend
 MT32EMU_DESC=	MT-32 emulator
+
+A52_LIB_DEPENDS=	liba52.so:audio/liba52
+A52_CONFIGURE_ON=	--with-a52-prefix=${LOCALBASE}
+A52_CONFIGURE_OFF=	--disable-a52
+
+CURL_LIB_DEPENDS=	libcurl.so:ftp/curl
+CURL_CONFIGURE_ON=	--with-libcurl-prefix=${LOCALBASE}
+CURL_CONFIGURE_OFF=	--disable-libcurl
 
 VORBIS_LIB_DEPENDS=	libogg.so:audio/libogg \
 			libvorbis.so:audio/libvorbis
 VORBIS_CONFIGURE_ON=	--with-ogg-prefix=${LOCALBASE} \
 			--with-vorbis-prefix=${LOCALBASE}
-VORBIS_CONFIGURE_OFF=	--disable-vorbis
+VORBIS_CONFIGURE_OFF=	--disable-vorbis \
+			--disable-ogg
 
 MP3_LIB_DEPENDS=	libmad.so:audio/libmad
 MP3_CONFIGURE_ON=	--with-mad-prefix=${LOCALBASE}
@@ -73,7 +85,7 @@ CONFIGURE_ENV+=	ASFLAGS=-meabi=5
 .endif
 
 post-patch:
-	@${REINPLACE_CMD} -e '/^mandir=/s/datarootdir/prefix/' \
+	@${REINPLACE_CMD} -e 's|%%LOCALBASE%%|${LOCALBASE}|' \
 		${WRKSRC}/configure
 
 post-install:

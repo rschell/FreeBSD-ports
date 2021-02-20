@@ -3,7 +3,7 @@
 PORTNAME=	libccp4
 DISTVERSION=	6.5.1
 PORTREVISION=	4
-CATEGORIES=	science
+CATEGORIES=	science education
 MASTER_SITES=	ftp://ftp.ccp4.ac.uk/opensource/
 
 MAINTAINER=	yuri@FreeBSD.org
@@ -25,7 +25,7 @@ INSTALL_TARGET=	install-strip
 USE_LDCONFIG=	yes
 
 CFLAGS+=	-fPIC
-FFLAGS+=	-fPIC
+FFLAGS+=	-fPIC -std=legacy
 
 post-configure:
 	${REINPLACE_CMD} -e 's| -Wl,--as-needed||; s| -Wl,--no-as-needed||' ${WRKSRC}/Makefile

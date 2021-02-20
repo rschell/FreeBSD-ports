@@ -3,7 +3,6 @@
 
 PORTNAME=	apache-openoffice
 PORTVERSION=	${AOOVERSION}
-PORTREVISION=	2
 CATEGORIES=	editors java
 MASTER_SITES=	APACHE/openoffice/${PORTVERSION}/source \
 		http://tools.openoffice.org/unowinreg_prebuild/680/:unoreg \
@@ -15,7 +14,7 @@ PKGNAMEPREFIX=		${LANG_PKGNAME}-
 .if defined(LANG_SUFFIX)
 PKGNAMESUFFIX=		-${LANG_SUFFIX}
 .endif
-DISTFILES=	${AOOSRC} ${EXTSRC}:extsrc
+DISTFILES=	${AOOSRC} ${EXTSRC}:extsrc ${PYTHON_DISTFILE}:sf
 DIST_SUBDIR=	openoffice
 EXTRACT_ONLY=	${AOOSRC}
 
@@ -97,7 +96,7 @@ RUN_DEPENDS=								\
 
 USES=		autoreconf bison compiler:c++11-lib cpe desktop-file-utils \
 		gettext-runtime gl gmake gnome iconv jpeg perl5 pkgconfig \
-		python:2.7 shared-mime-info ssl tar:bzip2 xorg
+		shared-mime-info ssl tar:bzip2 xorg
 USE_GL=		gl glu
 USE_GNOME=	gtk20 libxslt libidl glib20
 USE_JAVA=	yes
@@ -112,10 +111,10 @@ CONFLICTS_INSTALL=	apache-openoffice-devel-*
 
 AOOVERSION1=	4
 AOOVERSION2=	1
-AOOVERSION3=	7
+AOOVERSION3=	8
 # From solenv/inc/minor.mk SOURCEREVISION LAST_MINOR BUILD
-AOOTAG=		AOO417m1\(Build:9800\)
-GITREVISION=	46059c9192
+AOOTAG=		AOO418m3\(Build:9803\)
+GITREVISION=	18848f57b6
 EXTSRC=		ApacheOpenOffice.ext_sources.${AOOVERSION1}.x.x.20150707.tar.gz
 
 AOOVERSION=	${AOOVERSION1}.${AOOVERSION2}.${AOOVERSION3}
@@ -136,20 +135,18 @@ WITHOUT_CPU_CFLAGS=	true
 CPE_PRODUCT=	${PORTNAME:S|apache-||}
 CPE_VENDOR=	apache
 
-OPTIONS_DEFINE=		CRASHDUMP CUPS DBGUTIL DEBUG GNOME GNOMEVFS MMEDIA \
+OPTIONS_DEFINE=		CRASHDUMP CUPS DBGUTIL DEBUG GNOME GNOMEVFS \
 			SDK WIKI_PUBLISHER
-OPTIONS_DEFAULT=	CUPS GNOME GNOMEVFS MMEDIA WIKI_PUBLISHER
-CRASHDUMP_DESC=		Enable crashdumps, sets WITH_DEBUG
+OPTIONS_DEFAULT=	CUPS GNOME GNOMEVFS WIKI_PUBLISHER
+CRASHDUMP_DESC=		Enable crashdumps, you also need to set WITH_DEBUG_PORTS+=${PKGORIGIN}
 DBGUTIL_DESC=		Enable assertions, object counting. (non-production)
-DEBUG_DESC=		Compile with -O0, sets WITH_DEBUG
+DEBUG_DESC=		Compile with -O0, you also need to set WITH_DEBUG_PORTS+=${PKGORIGIN}
 GNOME_DESC=		GConf + screensaver presentation control via DBUS
 GNOMEVFS_DESC=		GNOME Virtual File System
-MMEDIA_DESC=		Multimedia backend for impress
 SDK_DESC=		Build and install software development kit
 WIKI_PUBLISHER_DESC=	Build and install Wiki Publisher extension
 
 CRASHDUMP_CONFIGURE_ENABLE=	crashdump
-CRASHDUMP_VARS=			WITH_DEBUG=yes
 
 CUPS_CONFIGURE_ENABLE=		cups
 CUPS_LIB_DEPENDS=		libcups.so:print/cups
@@ -167,10 +164,6 @@ GNOMEVFS_CONFIGURE_ENABLE=	gnome-vfs
 GNOMEVFS_CONFIGURE_OFF=		--enable-gio
 GNOMEVFS_CONFIGURE_ON=		--disable-gio
 GNOMEVFS_USE=			GNOME=gnomevfs2
-
-MMEDIA_CONFIGURE_ENABLE=	gstreamer
-MMEDIA_LIB_DEPENDS=		libgstreamer-0.10.so:multimedia/gstreamer
-MMEDIA_USE=			GSTREAMER=yes
 
 SDK_CONFIGURE_ENABLE=		odk
 SDK_DISTFILES=			unowinreg.dll:unoreg
@@ -205,6 +198,7 @@ CONFIGURE_ARGS+=	--enable-symbols
 
 .include <${FILESDIR}/Makefile.localized>
 
+PYTHON_DISTFILE=	38c84292658ed4456157195f1c9bcbe1-Python-2.7.18.tgz
 GCC_EXTRA_DISTFILES=	d6eef4b4cacb2183f2bf265a5a03a354-boost_1_55_0.tar.bz2 \
 			d62650a6f908e85643e557a236ea989c-vigra1.6.0.tar.gz
 
@@ -239,7 +233,7 @@ PACKAGE_PREFIX=		Apache_OpenOffice
 
 LOCALIZED_LANG?=	en-US
 
-AOO_MAKE_ENV=	${MAKE_ENV:NCPPFLAGS=*:NCFLAGS=*:NCXXFLAGS=*}
+AOO_MAKE_ENV=	${MAKE_ENV:NCPPFLAGS=*:NCFLAGS=*:NCXXFLAGS=*:NLDFLAGS=*}
 
 GNU_CONFIGURE=	yes
 WRKSUBDIR=	${WRKDIR}/aoo-${AOOVERSION}
@@ -292,7 +286,7 @@ CONFIGURE_ARGS+=							\
 			--enable-opengl					\
 			--with-system-openssl				\
 			--with-package-format="archive"			\
-			--with-system-python				\
+			--without-system-python				\
 			--with-system-redland				\
 			--with-system-sane				\
 			--with-system-serf				\
@@ -334,6 +328,7 @@ do-extract-SDK-on:
 
 post-extract:
 	${TAR} -C ${WRKSUBDIR} -xzf ${DISTDIR}/${DIST_SUBDIR}/${EXTSRC}
+	${CP} ${DISTDIR}/${DIST_SUBDIR}/${PYTHON_DISTFILE} ${WRKSUBDIR}/ext_sources/${PYTHON_DISTFILE}
 .if ${CHOSEN_COMPILER_TYPE} == gcc
 .  for f in ${GCC_EXTRA_DISTFILES}
 	${CP} ${DISTDIR}/${DIST_SUBDIR}/${f} ${WRKSUBDIR}/ext_sources/${f}
@@ -367,10 +362,14 @@ post-extract:
 		-e d  ${WRKSRC}/LICENSE_category_b >> ${LICENSE_FILE_MIT}
 	${SED}  -e '\|^For Saxon|,/^__/p'				\
 		-e d ${WRKSRC}/LICENSE_category_b > ${LICENSE_FILE_MPL10}
-	${SED}  -e '\|^For Saxon|,$$d'					\
-		      ${WRKSRC}/LICENSE_category_b > ${LICENSE_FILE_MPL11}
+	${SED}  -e '\|^The following Licenses have some restrictions|,/^- For Network/p' \
+		-e d ${WRKSRC}/LICENSE_category_b |			\
+		${SED} -e :a -e '$d;N;2,3ba' -e 'P;D' > ${LICENSE_FILE_MPL11}
 	${SED}  -e '\|^For main/filter/source/config/tools/merge/pyAltFCFGMerge|,/^__/p'	\
 		-e d  ${WRKSRC}/LICENSE > ${LICENSE_FILE_PSFL}
+	${ECHO} '' >> ${LICENSE_FILE_PSFL}
+	${SED}  -e '\|^For Python|,/^__/p'	\
+		-e d  ${WRKSRC}/LICENSE >> ${LICENSE_FILE_PSFL}
 	${SED}  -e '\|^For main/twain|,/^__/p'				\
 		-e d  ${WRKSRC}/LICENSE > ${LICENSE_FILE_TWAIN}
 	${SED}  -e '\|^For main/MathMLDTD|,/^__/p'			\
@@ -381,8 +380,6 @@ post-patch:
 		${WRKSRC}/sysui/desktop/productversion.mk
 	${REINPLACE_CMD} -e "s|%%JAVA_HOME%%|${JAVA_HOME}|" \
 		${WRKSRC}/desktop/scripts/soffice.sh
-	${REINPLACE_CMD} -e "/#test/i\\${.newline}	return '${GITREVISION}';" \
-		${WRKSRC}/solenv/bin/modules/SvnRevision.pm
 	${REINPLACE_CMD} -e '/^mkdir -p/,$$d' ${CREATE_TREE}
 .if ${CHOSEN_COMPILER_TYPE} == gcc
 	# g++49 -Os sometimes leaves inline class methods undefined,

@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	pystemmer
-PORTVERSION=	1.3.0
-PORTREVISION=	2
+PORTVERSION=	2.0.0.1
 CATEGORIES=	textproc python
 MASTER_SITES=	CHEESESHOP \
 		http://snowball.tartarus.org/wrappers/
@@ -20,6 +19,6 @@ USES=		python
 USE_PYTHON=	autoplist cython distutils
 
 post-install:
-	${STRIP_CMD} ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/Stemmer.so
+	${STRIP_CMD} ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/Stemmer*.so
 
 .include <bsd.port.mk>

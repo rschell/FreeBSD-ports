@@ -1,11 +1,12 @@
 # $FreeBSD$
 
 PORTNAME=	openal-soft
-PORTVERSION=	1.20.0
+PORTVERSION=	1.20.1
+PORTREVISION=	2
 CATEGORIES=	audio
 MASTER_SITES=	https://openal-soft.org/openal-releases/
 
-MAINTAINER=	tobik@FreeBSD.org
+MAINTAINER=	multimedia@FreeBSD.org
 COMMENT=	Software implementation of the OpenAL specification
 
 LICENSE=	LGPL20+
@@ -24,10 +25,6 @@ CMAKE_ON=	ALSOFT_BACKEND_WAVE ALSOFT_UTILS
 # do not link with librt and libdl.
 LDFLAGS+=	-Wl,--as-needed
 LDFLAGS_i386=	-Wl,-z,notext
-# XXX Drop after FreeBSD 12.0 EOL
-.if exists(/usr/lib/clang/6.0.1)
-LLD_UNSAFE=	yes
-.endif
 
 PLIST_SUB=	SOVERSION=${PORTVERSION}
 

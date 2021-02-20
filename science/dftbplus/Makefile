@@ -2,6 +2,7 @@
 
 PORTNAME=	dftbplus
 DISTVERSION=	19.1
+PORTREVISION=	1
 CATEGORIES=	science
 
 MAINTAINER=	yuri@FreeBSD.org
@@ -9,11 +10,13 @@ COMMENT=	DFTB+: Package for performing fast atomistic simulations
 
 LICENSE=	GPLv3 # main code is under LGPL3+, the bundled dftd3-lib is under GPLv1+, this makes the result GPLv3 (based on https://www.gnu.org/licenses/gpl-faq.html#AllCompatibility)
 
+BROKEN_powerpc64=	fails to compile: lbfgs.f90:18:19: Cannot find an intrinsic module named 'ieee_arithmetic' at (1)
+
 LIB_DEPENDS=	libblas.so:math/blas \
 		liblapack.so:math/lapack
 RUN_DEPENDS=	${PYNUMPY}
 
-USES=		compiler:gcc-c++11-lib fortran gmake python:2.7 shebangfix
+USES=		compiler:gcc-c++11-lib fortran gmake python shebangfix
 SHEBANG_FILES=	tools/dptools/bin/* tools/misc/* utils/srcmanip/* utils/build/* external/fypp/bin/* utils/get_opt_externals \
 		external/fypp/bin/fypp utils/test/testlist_to_fypp test/prog/dftb+/bin/tagdiff
 SHEBANG_GLOB=	*.py
@@ -30,6 +33,8 @@ LDFLAGS+=	-llapack -lblas -lgfortran -lm
 
 MAKE_ARGS=	PYTHON=${PYTHON_CMD} FC=${FC} FXX=${FC} LN=${CC} \
 		INSTALLDIR=${STAGEDIR}${PREFIX} FREEBSD_PYDISTUTILS_INSTALLARGS="${PYDISTUTILS_INSTALLARGS} --root=${STAGEDIR}"
+
+BINARY_ALIAS=		python=${PYTHON_CMD}
 
 OPTIONS_DEFINE=		DFTD3 MPI SOCKETS ARPACK
 OPTIONS_DEFAULT=	DFTD3 MPI SOCKETS
@@ -57,6 +62,14 @@ ARPACK_PREVENTS=	MPI # ARPACK is only used in a single-core application
 
 MAKE_JOBS_UNSAFE=	yes # race conditions when some options are ON
 
+.include <bsd.port.pre.mk>
+
+.if ${GCC_DEFAULT} >= 10
+# workaround for Type mismatch between actual argument at (1) and actual argument at (2) (COMPLEX(8)/CHARACTER(*)).
+# in theory, this should set FCFLAGS, but the port does not conform
+FFLAGS+=	-fallow-argument-mismatch
+.endif
+
 post-extract:
 	@${RM} ${WRKSRC}/external/scalapackfx/origin/test/psyr_result.dat.orig
 	@cd ${WRKSRC} && ${CP} sys/make.x86_64-linux-gnu make.arch
@@ -64,4 +77,4 @@ post-extract:
 post-install:
 	@cd ${STAGEDIR}${PREFIX}/bin && ${STRIP_CMD} dftb+ modes waveplot
 
-.include <bsd.port.mk>
+.include <bsd.port.post.mk>

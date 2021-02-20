@@ -1,13 +1,13 @@
-# Created by: Loïc BARTOLETTI <coder@tuxfamily.org>
+# Created by: Loïc BARTOLETTI <lbartoletti@FreeBSD.org>
 # $FreeBSD$
 
 PORTNAME=	readosm
-PORTVERSION=	1.0.0
+PORTVERSION=	1.1.0
 CATEGORIES=	astro geography devel
 MASTER_SITES=	http://www.gaia-gis.it/gaia-sins/
-DISTNAME=	${PORTNAME}-${PORTVERSION}e
+DISTNAME=	${PORTNAME}-${PORTVERSION}a
 
-MAINTAINER=	lbartoletti@tuxfamily.org
+MAINTAINER=	lbartoletti@FreeBSD.org
 COMMENT=	Extract valid data from within an Open Street Map input file
 
 LICENSE=	MPL11 LGPL21 GPLv2
@@ -15,7 +15,6 @@ LICENSE_COMB=	dual
 
 LIB_DEPENDS=	libexpat.so:textproc/expat2
 
-WRKSRC=		${WRKDIR}/${PORTNAME}-${PORTVERSION}e
 GNU_CONFIGURE=	yes
 USES=		gmake libtool pathfix pkgconfig
 

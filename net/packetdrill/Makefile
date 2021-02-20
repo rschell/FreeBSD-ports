@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	packetdrill
-PORTVERSION=	0.0.2019022601
+PORTVERSION=	0.0.2020082101
 CATEGORIES=	net
 
 MAINTAINER=	kbowling@FreeBSD.org
@@ -9,10 +9,12 @@ COMMENT=	Network stack testing tool
 
 LICENSE=	GPLv2
 
+BROKEN_FreeBSD_11=	TCP Fast Open struct changes
+
 USES=		bison python:run uidfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freebsd-net
-GH_TAGNAME=	f626eee
+GH_TAGNAME=	f7cbdaa
 WRKSRC_SUBDIR=	gtests/net/packetdrill
 PLIST_FILES=	bin/${PORTNAME}
 PORTDATA=	packetdrill.el packetdrill.vim

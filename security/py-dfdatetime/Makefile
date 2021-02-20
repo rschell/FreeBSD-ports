@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	dfdatetime
-PORTVERSION=	20190517
+PORTVERSION=	20200824
 CATEGORIES=	security devel python
 MASTER_SITES=	CHEESESHOP \
 		https://github.com/log2timeline/dfdatetime/releases/download/${PORTVERSION}/
@@ -16,7 +16,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}mock>0:devel/py-mock@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.5+
 USE_PYTHON=	distutils autoplist concurrent
 
 NO_ARCH=	yes

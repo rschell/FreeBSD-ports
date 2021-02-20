@@ -2,7 +2,7 @@
 
 PORTNAME?=	pfSense-pkg-zabbix-agent
 PORTVERSION=	1.0.4
-PORTREVISION=	3
+PORTREVISION=	7
 CATEGORIES=	net-mgmt
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -14,8 +14,9 @@ COMMENT=	pfSense package zabbix-agent
 LICENSE=	APACHE20
 
 CONFLICTS?=	pfSense-pkg-zabbix-agent4 \
-		pfSense-pkg-zabbix-agent42 \
-		pfSense-pkg-zabbix-agent44
+		pfSense-pkg-zabbix-agent44 \
+		pfSense-pkg-zabbix-agent5 \
+		pfSense-pkg-zabbix-agent52
 
 RUN_DEPENDS?=	zabbix_agentd:net-mgmt/zabbix3-agent
 

@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	git
-DISTVERSION=	2.24.1
+DISTVERSION=	2.30.1
 CATEGORIES=	devel
 MASTER_SITES=	KERNEL_ORG/software/scm/git
 DISTFILES=	${DISTNAME}${EXTRACT_SUFX} \
@@ -12,12 +12,28 @@ EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX} \
 		${PORTNAME}-manpages-${DISTVERSION}${EXTRACT_SUFX}
 
 MAINTAINER=	garga@FreeBSD.org
-COMMENT?=	Distributed source code management tool
+COMMENT=	Distributed source code management tool ${COMMENT_${FLAVOR}}
 
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-CONFLICTS_INSTALL?=	git-gui-[0-9]* git-lite-[0-9]*
+FLAVORS=	default gui lite tiny
+default_CONFLICTS_INSTALL=	git-gui git-lite git-tiny
+gui_CONFLICTS_INSTALL=		git git-lite git-tiny
+gui_DESCR=			${.CURDIR}/pkg-descr-gui
+gui_PKGNAMESUFFIX=		-gui
+lite_CONFLICTS_INSTALL=		git git-gui git-tiny
+lite_DESCR=			${.CURDIR}/pkg-descr-lite
+lite_PKGNAMESUFFIX=		-lite
+tiny_CONFLICTS_INSTALL=		git git-gui git-lite
+tiny_DESCR=			${.CURDIR}/pkg-descr-tiny
+tiny_PKGNAMESUFFIX=		-tiny
+
+USES=		autoreconf gmake iconv shebangfix ssl tar:xz
+
+COMMENT_gui=	(GUI enabled flavor)
+COMMENT_lite=	(lite flavor)
+COMMENT_tiny=	(tiny flavor)
 
 USERS=		git_daemon
 GROUPS=		git_daemon
@@ -25,7 +41,6 @@ GROUPS=		git_daemon
 SUB_FILES=	pkg-message gitweb.conf
 
 GNU_CONFIGURE=	yes
-USES=		autoreconf gmake iconv shebangfix ssl tar:xz
 CPPFLAGS+=	-isystem${LOCALBASE}/include
 LDFLAGS+=	-L${LOCALBASE}/lib
 MAKE_ARGS+=	DEVELOPER=
@@ -42,9 +57,8 @@ SHEBANG_FILES=	*.perl */*.perl */*/*.perl */*.pl */*/*.pl */*/*/*.pl \
 		contrib/fast-import/import-zips.py \
 		contrib/remote-helpers/git-remote-bzr \
 		contrib/remote-helpers/git-remote-hg \
-		contrib/credential/netrc/git-credential-netrc \
+		contrib/credential/netrc/git-credential-netrc.perl \
 		contrib/buildsystems/generate contrib/contacts/git-contacts \
-		contrib/svn-fe/svnrdump_sim.py \
 		templates/hooks--fsmonitor-watchman.sample
 TEST_TARGET=	test
 
@@ -56,7 +70,20 @@ OPTIONS_DEFINE=	GUI SVN GITWEB CONTRIB P4 CVS HTMLDOCS PERL ICONV CURL \
 		SEND_EMAIL NLS SUBTREE
 OPTIONS_DEFAULT=	CONTRIB P4 CVS PERL GITWEB ICONV CURL SEND_EMAIL PCRE \
 			SUBTREE SVN
+.if ${FLAVOR:U} == gui
+OPTIONS_SLAVE+=		GUI
+.elif ${FLAVOR:U} == lite
+OPTIONS_EXCLUDE=	GUI SVN GITWEB CONTRIB P4 CVS PERL
+.elif ${FLAVOR:U} == tiny
+OPTIONS_EXCLUDE:=	${OPTIONS_DEFINE:NCURL} ${OPTIONS_RADIO_PCRE_VERSION}
+OPTIONS_SLAVE=		CURL
+.endif
+
 OPTIONS_SUB=	yes
+
+.if !empty(FLAVOR) && ${FLAVOR:U} != default
+OPTIONS_FILE=		${PORT_DBDIR}/${OPTIONS_NAME}/${FLAVOR}-options
+.endif
 
 CONTRIB_DESC=	Install contributed scripts
 CURL_DESC=	Install curl support (provides HTTPS transport)
@@ -90,7 +117,6 @@ SEND_EMAIL_IMPLIES=	PERL
 SEND_EMAIL_RUN_DEPENDS=	p5-Authen-SASL>=0:security/p5-Authen-SASL \
 			p5-IO-Socket-SSL>=0:security/p5-IO-Socket-SSL
 
-ICONV_USES=		iconv
 ICONV_MAKE_ARGS_OFF=	NO_ICONV=1
 
 CURL_MAKE_ENV=		CURLDIR=${LOCALBASE}
@@ -105,17 +131,15 @@ GUI_USES=		tk
 GUI_MAKE_ARGS=		TCL_PATH=${TCLSH} TCLTK_PATH=${WISH}
 GUI_MAKE_ARGS_OFF=	NO_TCLTK=yes
 
-# While this port does not explicitly honor WITH_SUBVERSION_VER knob it does
-# depend upon devel/p5-subversion, which does honor that knob. If you want
-# to have git use devel/subversion18 it will be brought in through
-# devel/p5-subversion if you set WITH_SUBVERSION_VER=18. Otherwise
-# devel/subversion will be brought in.
-SVN_RUN_DEPENDS=	p5-Term-ReadKey>=0:devel/p5-Term-ReadKey \
-			p5-subversion>=0:devel/p5-subversion
+SVN_RUN_DEPENDS=	p5-Term-ReadKey>=0:devel/p5-Term-ReadKey
+.if ${WITH_SUBVERSION_VER:U} == LTS
+SVN_RUN_DEPENDS+=	p5-subversion-lts>=0:devel/p5-subversion
+.else
+SVN_RUN_DEPENDS+=	p5-subversion>=0:devel/p5-subversion
+.endif
 
-SUBTREE_BUILD_DEPENDS=	xmlto:textproc/xmlto \
-			asciidoc:textproc/asciidoc \
-			docbook-xml>0:textproc/docbook-xml
+SUBTREE_BUILD_DEPENDS=	asciidoctor:textproc/rubygem-asciidoctor\
+			xmlto:textproc/xmlto
 
 CVS_RUN_DEPENDS=	cvsps:devel/cvsps
 
@@ -186,8 +210,6 @@ post-patch-GITWEB-off:
 
 post-patch-P4-off:
 	@${REINPLACE_CMD} -e '/^SCRIPT_PYTHON += git-p4.py$$/d' ${WRKSRC}/Makefile
-	@${REINPLACE_CMD} -e 's|/bin/bash|/bin/sh|' \
-		${WRKSRC}/contrib/subtree/git-subtree.sh
 
 .if ${PORT_OPTIONS:MP4} || ${PORT_OPTIONS:MCONTRIB}
 post-build:
@@ -220,7 +242,7 @@ post-install-HTMLDOCS-on:
 
 post-install-SUBTREE-on:
 	cd ${WRKSRC}/contrib/subtree && ${SETENV} ${MAKE_ENV} \
-		${MAKE_CMD} ${MAKE_FLAGS} Makefile ${MAKE_ARGS} install install-doc
+		${MAKE_CMD} ${MAKE_FLAGS} Makefile USE_ASCIIDOCTOR=1 ${MAKE_ARGS} install install-doc
 
 post-install-CONTRIB-on:
 	@${ECHO_MSG} "===> Installing contributed scripts"

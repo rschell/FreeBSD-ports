@@ -1,8 +1,8 @@
 # $FreeBSD$
 
 PORTNAME=	poudriere
-DISTVERSION=	3.3.99.20191210
-PORTREVISION=	0
+DISTVERSION=	3.3.99.20200326
+PORTREVISION=	2
 CATEGORIES=	ports-mgmt
 MASTER_SITES=	LOCAL/bdrewery/${PORTNAME}/ \
 		http://mirror.shatow.net/freebsd/${PORTNAME}/ \
@@ -18,7 +18,7 @@ CONFLICTS_INSTALL=	poudriere-[0-9]*
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	freebsd
-GH_TAGNAME=	3.3.0-229-gce2011f23
+GH_TAGNAME=	3.3.0-257-g153d8f14c
 #DISTNAME=	${GH_ACCOUNT}-${GH_PROJECT}-${GH_TAGNAME}
 
 GNU_CONFIGURE=	yes
@@ -52,11 +52,9 @@ PLIST_SUB+=	RM="@comment "
 .endif
 
 post-patch:
-	${CP} -f ${WRKSRC}/src/bin/poudriere ${WRKSRC}/poudriere
 	${REINPLACE_CMD} \
 	    -e "s,^\(POUDRIERE_VERSION\)=.*,\1='${PKGVERSION}'," \
-	    ${WRKSRC}/poudriere
-	${REINPLACE_CMD} '/.PHONY: poudriere/d' ${WRKSRC}/Makefile.*
+	    ${WRKSRC}/src/bin/poudriere
 
 post-install:
 	${LN} -fs ${LOCALBASE}/share/freebsd/MANIFESTS \

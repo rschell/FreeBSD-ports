@@ -1,24 +1,42 @@
---- example/Makefile.in.orig	2019-10-21 13:36:38 UTC
+--- example/Makefile.in.orig	2020-10-19 14:18:25 UTC
 +++ example/Makefile.in
-@@ -5,6 +5,7 @@ LIBNDPI=../src/lib/libndpi.a
- LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread -lm @LDFLAGS@
- OBJS=ndpiReader.o reader_util.o
+@@ -9,17 +9,12 @@ HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)
+         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
+ OBJS=ndpiReader.o reader_util.o intrusion_detection.o
  PREFIX?=@prefix@
 +EXAMPLESDIR?=share/examples/ndpi
  
+-ifneq ($(BUILD_MINGW),)
+-all:
+-	@echo 'Examples disabled due to mingw build.'
+-
+-else
+-
  all: ndpiReader @DPDK_TARGET@
  
-@@ -16,10 +17,10 @@ ndpiReader: $(OBJS) $(LIBNDPI)
+ EXECUTABLE_SOURCES := ndpiReader.c ndpiSimpleIntegration.c
+-COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
++COMMON_SOURCES=intrusion_detection.c reader_util.c
  
- install:
+ libndpiReader.a: $(COMMON_SOURCES:%.c=%.o) $(LIBNDPI)
+ 	ar rsv libndpiReader.a $(COMMON_SOURCES:%.c=%.o)
+@@ -35,10 +30,10 @@ ndpiSimpleIntegration: ndpiSimpleIntegration.o
+ 
+ install: ndpiReader
  	mkdir -p $(DESTDIR)$(PREFIX)/bin/
--	mkdir -p $(DESTDIR)$(PREFIX)/sbin/ndpi
+-	mkdir -p $(DESTDIR)$(PREFIX)/share/ndpi
 +	mkdir -p $(DESTDIR)$(PREFIX)/$(EXAMPLESDIR)/
  	cp ndpiReader $(DESTDIR)$(PREFIX)/bin/
--	cp protos.txt $(DESTDIR)$(PREFIX)/sbin/ndpi/ndpiProtos.txt
--	cp mining_hosts.txt $(DESTDIR)$(PREFIX)/sbin/ndpi/ndpiCustomCategory.txt
+-	cp protos.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiProtos.txt
+-	cp mining_hosts.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiCustomCategory.txt
 +	cp protos.txt $(DESTDIR)$(PREFIX)/$(EXAMPLESDIR)/ndpiProtos.txt
 +	cp mining_hosts.txt $(DESTDIR)$(PREFIX)/$(EXAMPLESDIR)/ndpiCustomCategory.txt
  	[ -f build/app/ndpiReader.dpdk ] && cp build/app/ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
  	[ -f ndpiReader.dpdk ] && cp ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
  
+@@ -61,5 +56,3 @@ distdir:
+ distclean: clean
+ 	/bin/rm -f Makefile.dpdk
+ 	/bin/rm -f Makefile
+-
+-endif

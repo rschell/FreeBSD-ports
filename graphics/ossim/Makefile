@@ -1,12 +1,11 @@
 # $FreeBSD$
 
 PORTNAME=	ossim
-DISTVERSIONPREFIX=	Neptune-
-DISTVERSION=	2.10.0
-PORTREVISION=	1
+DISTVERSIONPREFIX=	OrchidIsland-
+DISTVERSION=	2.11.1
 CATEGORIES=	graphics geography
 
-MAINTAINER=	lbartoletti@tuxfamily.org
+MAINTAINER=	lbartoletti@FreeBSD.org
 COMMENT=	Powerful suite of geospatial libraries and applications
 
 LICENSE=	MIT

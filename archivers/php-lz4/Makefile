@@ -6,7 +6,7 @@ CATEGORIES=	archivers
 PKGNAMEPREFIX=	${PHP_PKGNAMEPREFIX}
 
 MAINTAINER=	pave@FreeBSD.org
-COMMENT=	This is the lz4 extension for PHP
+COMMENT=	LZ4 extension for PHP
 
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
@@ -14,6 +14,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 LIB_DEPENDS=	liblz4.so:archivers/liblz4
 
 USES=		php:ext
+IGNORE_WITH_PHP=	80
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	kjdev

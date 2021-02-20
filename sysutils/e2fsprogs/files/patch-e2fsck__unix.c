@@ -1,4 +1,8 @@
---- e2fsck/unix.c.orig	2019-07-15 01:03:14 UTC
+// SIGINFO is a Berkeley extension, so we need to
+// remove the #define _XOPEN_SOURCE 600
+// It would hide all non-POSIX declarations, including SIGINFO.
+
+--- e2fsck/unix.c.orig	2021-01-29 05:51:02 UTC
 +++ e2fsck/unix.c
 @@ -9,8 +9,6 @@
   * %End-Header%

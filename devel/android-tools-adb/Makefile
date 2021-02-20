@@ -2,11 +2,11 @@
 
 PORTNAME=	android-tools-adb
 DISTVERSIONPREFIX=	platform-tools-
-DISTVERSION?=	29.0.5
-PORTREVISION?=	0
+DISTVERSION?=	29.0.6
+PORTREVISION?=	1
 CATEGORIES=	devel comms
 
-MAINTAINER=	jbeich@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Android debug bridge command line tool
 
 LICENSE=	APACHE20
@@ -27,12 +27,6 @@ ALL_TARGET=	all
 TEST_TARGET=	test
 PLIST_FILES=	bin/adb
 PORTDOCS=	*
-
-# XXX Remove after FreeBSD 11.2/12.0 reach EOL i.e., around 2020-02-01
-# XXX Switch to bundled libc++ to avoid error-prone reverts
-.if !exists(/usr/include/c++/v1/charconv) && exists(/usr/lib/libc++.so)
-EXTRA_PATCHES+=	${PATCHDIR}/extra-patch-revert-d3d650628c8c
-.endif
 
 OPTIONS_DEFINE+=MDNSRESPONDER BASH DOCS TEST TEST_PYTHON
 OPTIONS_DEFAULT=MDNSRESPONDER
@@ -59,7 +53,7 @@ TEST_ALL_TARGET=	adb_test
 TEST_PYTHON_DESC=	${TEST_DESC:S/tests/python &/}
 TEST_PYTHON_GH_TUPLE=	aosp-mirror:platform_development:${DISTVERSIONFULL}:development
 TEST_PYTHON_BUILD_DEPENDS=${PYTHON_PKGNAMEPREFIX}mock>0:devel/py-mock@${PY_FLAVOR}
-TEST_PYTHON_USES=	python:2.7,build
+TEST_PYTHON_USES=	python:build
 
 post-patch:
 # XXX Hidden by poudriere/tinderbox, see lindev(4) for FreeBSD < 11.0

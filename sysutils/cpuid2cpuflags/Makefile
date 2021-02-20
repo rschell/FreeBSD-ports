@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	cpuid2cpuflags
-PORTVERSION=	8
+PORTVERSION=	11
 DISTVERSIONPREFIX=	v
 CATEGORIES=	sysutils
 
@@ -12,11 +12,14 @@ COMMENT=	Tool to generate CPU_FLAGS_* for your CPU
 LICENSE=	BSD2CLAUSE
 
 BROKEN_powerpc64=	fails to build: error "Platform not supported (only Linux supported at the moment)"
+BROKEN_powerpc64le=	fails to build: error "Platform not supported (only Linux supported at the moment)"
+BROKEN_riscv64=		fails to build: src/platforms.h:15:4: error: "Unsupported platform, please report"
 
 USES=		autoreconf
 USE_GITHUB=	yes
 GH_ACCOUNT=	mgorny
 GNU_CONFIGURE=	yes
+TEST_TARGET=	check
 
 PLIST_FILES=	bin/${PORTNAME}
 PORTDOCS=	README

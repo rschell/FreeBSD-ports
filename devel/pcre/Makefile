@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	pcre
-PORTVERSION=	8.43
-PORTREVISION=	2
+PORTVERSION=	8.44
 CATEGORIES=	devel
 MASTER_SITES=	https://ftp.pcre.org/pub/pcre/ \
 		SF
@@ -15,10 +14,11 @@ LICENSE=	BSD3CLAUSE
 LICENSE_FILE=	${WRKSRC}/LICENCE
 
 USES=		${USES_${ARCH}} cpe libtool pathfix tar:bzip2
-USES_powerpc=	compiler:c++11-lang
+USES_powerpc=		compiler:c++11-lang
+USES_powerpc64=		compiler:c++11-lang
+USES_powerpc64le=	compiler:c++11-lang
 USES_powerpcspe=	compiler:c++11-lang
-USES_powerpc64=	compiler:c++11-lang
-USES_sparc64=	compiler:c++11-lang
+USES_sparc64=		compiler:c++11-lang
 USE_LDCONFIG=	yes
 
 GNU_CONFIGURE=	yes
@@ -83,7 +83,7 @@ CONFIGURE_ARGS+=	--with-parens-nest-limit=${WITH_PARENS_NEST_LIMIT}
 CONFIGURE_ARGS+=	--with-posix-malloc-threshold=${WITH_POSIX_MALLOC_THRESHOLD}
 .endif
 
-.if ${ARCH} != "sparc64" && empty(ARCH:Mmips64*)
+.if ${ARCH} != "sparc64" && empty(ARCH:Mmips64*) && empty(ARCH:Mriscv64*)
 CONFIGURE_ARGS+=	--enable-jit
 .else
 CONFIGURE_ARGS+=	--disable-jit

@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	cbsd
-DISTVERSION=	12.1.2
+DISTVERSION=	13.0.0
 CATEGORIES=	sysutils
 
 MAINTAINER=	olevole@olevole.ru
@@ -31,6 +31,8 @@ GROUPS=	${PORTNAME}
 BIN_FILES=	\
 		bin/cbsdsh/mknodes \
 		bin/cbsdsh/mksyntax
+
+.include <bsd.port.options.mk>
 
 do-install:
 	@${ECHO} "Installing in ${CBSD_HOME}"

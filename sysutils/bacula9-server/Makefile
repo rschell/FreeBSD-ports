@@ -2,8 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	bacula
-PORTVERSION=	9.4.3
-PORTREVISION=	1
+PORTVERSION=	9.6.7
 CATEGORIES?=	sysutils
 MASTER_SITES=	SF/bacula/bacula/${PORTVERSION}
 PKGNAMEPREFIX?=	#
@@ -17,7 +16,6 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 USES+=		libtool readline shebangfix ssl
 SHEBANG_FILES=	src/cats/make_catalog_backup.pl.in
-python_OLD_CMD=	@PYTHON@
 
 CONFLICTS?=	bacula5-server-* bacula-server-*
 
@@ -34,7 +32,7 @@ USE_LDCONFIG=	yes
 CPPFLAGS+=	-I/usr/include/readline -I${LOCALBASE}/include
 LDFLAGS+=	-L${LOCALBASE}/lib
 
-OPTIONS_DEFINE?=	MTX PYTHON NLS IPV6
+OPTIONS_DEFINE?=	MTX NLS IPV6
 MTX_DESC=		Install mtx for control of autochanger devices
 
 .if ${PKGNAMESUFFIX} == "9-server"
@@ -46,10 +44,6 @@ OPTIONS_DEFAULT+=	PGSQL
 OPTIONS_SUB=		yes
 
 .if ${PKGNAMESUFFIX} == "9-client" || ${PKGNAMESUFFIX} == "9-server"  #Till end of the file
-
-PYTHON_USES=		python
-PYTHON_CONFIGURE_ON=	--with-python=yes
-PYTHON_BROKEN=	Does not package
 
 .if !defined(WITH_CLIENT_ONLY)
 LIB_DEPENDS+=	libbac-${PORTVERSION}.so:sysutils/bacula9-client
@@ -184,9 +178,6 @@ post-patch:
 
 .if !target(post-install)
 post-install:
-.if ! ${PORT_OPTIONS:MPYTHON}
-	${RM} ${STAGEDIR}${DATADIR}/dvd-handler
-.endif
 .if defined(WITH_CLIENT_ONLY)
 	${MV} ${STAGEDIR}${ETCDIR}/bconsole.conf ${STAGEDIR}${ETCDIR}/bconsole.conf.sample
 	${INSTALL_DATA} ${WRKSRC}/examples/sample-query.sql ${STAGEDIR}${LOCALBASE}/share/bacula/query.sql.sample

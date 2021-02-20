@@ -3,6 +3,7 @@
 
 PORTNAME=	Pmw
 PORTVERSION=	2.0.1
+PORTREVISION=	1
 CATEGORIES=	x11-toolkits python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -13,8 +14,8 @@ COMMENT=	High-level compound graphics widgets for Python
 LIB_DEPENDS=	libBLT25.so:x11-toolkits/blt
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}tkinter>0:x11-toolkits/py-tkinter@${PY_FLAVOR}
 
-USES=		dos2unix python shebangfix
-USE_PYTHON=	autoplist distutils
+USES=		dos2unix python:3.6+ shebangfix
+USE_PYTHON=	autoplist concurrent distutils
 NO_ARCH=	yes
 SHEBANG_FILES=	Pmw/Pmw_*/bin/bundlepmw.py
 

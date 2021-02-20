@@ -458,6 +458,7 @@
 %%QT_QMLDIR%%/QtQuick/Controls.2/designer/DialSpecifics.qml
 %%QT_QMLDIR%%/QtQuick/Controls.2/designer/FrameSpecifics.qml
 %%QT_QMLDIR%%/QtQuick/Controls.2/designer/GroupBoxSpecifics.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/designer/InsetSection.qml
 %%QT_QMLDIR%%/QtQuick/Controls.2/designer/ItemDelegateSection.qml
 %%QT_QMLDIR%%/QtQuick/Controls.2/designer/ItemDelegateSpecifics.qml
 %%QT_QMLDIR%%/QtQuick/Controls.2/designer/LabelSpecifics.qml
@@ -583,5 +584,17 @@
 %%DEBUG%%%%QT_QMLDIR%%/QtQuick/Templates.2/libqtquicktemplates2plugin.so.debug
 %%QT_QMLDIR%%/QtQuick/Templates.2/plugins.qmltypes
 %%QT_QMLDIR%%/QtQuick/Templates.2/qmldir
+%%QT_INCDIR%%/QtQuickTemplates2/%%FULLVER%%/QtQuickTemplates2/private/qquickheaderview_p.h
+%%QT_INCDIR%%/QtQuickTemplates2/%%FULLVER%%/QtQuickTemplates2/private/qquickheaderview_p_p.h
+%%QT_QMLDIR%%/QtQuick/Controls.2/Fusion/HorizontalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/Fusion/VerticalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/HorizontalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/Imagine/HorizontalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/Imagine/VerticalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/Material/HorizontalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/Material/VerticalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/Universal/HorizontalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/Universal/VerticalHeaderView.qml
+%%QT_QMLDIR%%/QtQuick/Controls.2/VerticalHeaderView.qml
 libdata/pkgconfig/Qt5QuickControls2.pc
 libdata/pkgconfig/Qt5QuickTemplates2.pc

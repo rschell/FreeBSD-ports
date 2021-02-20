@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	py-ubjson
-PORTVERSION=	0.14.0
+PORTVERSION=	0.16.1
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -13,10 +13,10 @@ COMMENT=	Universal Binary JSON encoder/decoder
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 post-install:
-	${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/_ubjson.so
+	${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/_ubjson*.so
 
 .include <bsd.port.mk>

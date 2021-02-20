@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	rnc2rng
-DISTVERSION=	2.6.1
-PORTREVISION=	1
+DISTVERSION=	2.6.4
 CATEGORIES=	textproc python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -14,7 +13,7 @@ LICENSE=	PD
 
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}rply>0:devel/py-rply@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils concurrent autoplist
 NO_ARCH=	yes
 

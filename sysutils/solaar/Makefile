@@ -2,9 +2,10 @@
 
 PORTNAME=	solaar
 DISTVERSION=	1.0.1
+PORTREVISION=	1
 CATEGORIES=	sysutils
 
-MAINTAINER=	tobik@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Device manager for the Logitech Unifying Receiver
 
 LICENSE=	GPLv2+
@@ -13,7 +14,7 @@ LICENSE_FILE=	${WRKSRC}/COPYING
 # libhidapi.so is only loaded at runtime via ctypes (dlopen)
 RUN_DEPENDS=	${LOCALBASE}/lib/libhidapi.so:comms/hidapi
 
-USES=		python
+USES=		python:3.6+
 USE_GITHUB=	yes
 GH_ACCOUNT=	pwr-Solaar
 GH_PROJECT=	Solaar

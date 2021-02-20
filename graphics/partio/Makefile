@@ -1,22 +1,19 @@
 # $FreeBSD$
 
 PORTNAME=	partio
-PORTVERSION=	1.10.1
-PORTREVISION=	1
+PORTVERSION=	1.14.0
 DISTVERSIONPREFIX=	v
 CATEGORIES=	graphics math
 
-MAINTAINER=	ports@FreeBSD.org
-COMMENT=	C++ library for manipulating animation particle formats
-
-DEPRECATED=	Unmaintained, uses EOLed python27
-EXPIRATION_DATE=	2020-01-27
+MAINTAINER=	danfe@FreeBSD.org
+COMMENT=	C++ library for particle I/O and manipulation
 
 LICENSE=	BSD3CLAUSE
+LICENSE_FILE=	${WRKSRC}/LICENSE
 
-BUILD_DEPENDS=	swig3.0:devel/swig30
+BUILD_DEPENDS=	swig:devel/swig
 
-USES=		cmake compiler:c++11-lang gl python:2.7 shebangfix xorg
+USES=		cmake compiler:c++11-lang gl python:run shebangfix xorg
 SHEBANG_FILES=	src/tools/partedit.py src/tools/partinspect.py \
 		src/tools/partjson.py
 USE_GL=		gl glu glut
@@ -26,8 +23,11 @@ USE_XORG=	xi xmu
 USE_GITHUB=	yes
 GH_ACCOUNT=	wdas
 
-OPTIONS_DEFINE=		DOCS DOXYGEN EXAMPLES
-OPTIONS_DEFAULT=	DOCS
+PORTDOCS=	*
+PORTEXAMPLES=	*
+
+OPTIONS_DEFINE=		DOCS DOXYGEN EXAMPLES PYQT
+PYQT_DESC=		Install PyQt-based auxiliary tools
 
 # DOCS must be selected for PORTDOCS to work
 DOXYGEN_IMPLIES=	DOCS
@@ -36,25 +36,27 @@ DOXYGEN_ALL_TARGET=	all doc
 
 DOCS_BUILD_DEPENDS=	doxygen:devel/doxygen
 
-BINARY_ALIAS=	swig=swig3.0
-
-PORTDOCS=	*
-PORTEXAMPLES=	*
+PYQT_USES=		pyqt:5
+PYQT_USE=		PYQT=core,gui,widgets
+PYQT_PLIST_FILES=	bin/partinspect
 
 post-patch:
-	@${REINPLACE_CMD} -e 's|python -c|${PYTHON_CMD} -c|' \
-		${WRKSRC}/src/py/CMakeLists.txt \
+	@${REINPLACE_CMD} -e \
+	    '/^project/s,${PORTNAME},& VERSION ${PORTVERSION},' \
+		${WRKSRC}/CMakeLists.txt
+	@${REINPLACE_CMD} -e 's,OpenGL::OpenGL,$${OPENGL_LIBRARIES},' \
 		${WRKSRC}/src/tools/CMakeLists.txt
-	@${REINPLACE_CMD} -e '/install(TARGETS/d' \
-		${WRKSRC}/src/tests/CMakeLists.txt
+	@${REINPLACE_CMD} -e 's,^from Qt,from PyQt5,' \
+		${WRKSRC}/src/tools/partinspect.py
+	@${REINPLACE_CMD} -e '/^install/d' ${WRKSRC}/src/tests/CMakeLists.txt
 
 post-patch-DOCS-off:
-	@${REINPLACE_CMD} -e '/ADD_SUBDIRECTORY.*src\/doc.*/d' \
+	@${REINPLACE_CMD} -e '/add_subdirectory(src\/doc)/d' \
 		${WRKSRC}/CMakeLists.txt
 
 # Remove those files that don't yet work
 post-install:
-	${RM} ${STAGEDIR}${PREFIX}/bin/partedit ${STAGEDIR}${PREFIX}/bin/partinspect
+	${RM} ${STAGEDIR}${PREFIX}/bin/partedit
 
 post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}
@@ -63,5 +65,8 @@ post-install-DOCS-on:
 post-install-EXAMPLES-on:
 	@${MKDIR} ${STAGEDIR}${EXAMPLESDIR}
 	cd ${WRKSRC}/src/data && ${INSTALL_DATA} * ${STAGEDIR}${EXAMPLESDIR}
+
+post-install-PYQT-off:
+	cd ${STAGEDIR}${PREFIX} && ${RM} ${PYQT_PLIST_FILES}
 
 .include <bsd.port.mk>

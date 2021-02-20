@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	gretl
-DISTVERSION=	2019d
+DISTVERSION=	2020e
 CATEGORIES=	math finance
 MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}/${DISTVERSIONFULL}/
 
@@ -85,20 +85,11 @@ CONFIGURE_ARGS+=	--enable-sse2=yes
 CONFIGURE_ARGS+=	--enable-sse2=no
 .endif
 
-.include <bsd.port.pre.mk>
-
-# XXX Drop after FreeBSD 12.0 EOL
-.if !exists(/usr/include/omp.h)
-LIB_DEPENDS+=	libomp.so:devel/openmp
-.endif
-
 post-patch:
 	@${SED} -i '.orig' -E -e '/#include[[:blank:]]+<sys\/socket\.h>/\
 		{x; s/.*/#include <netinet\/in.h>/; H; x;}' \
 		${WRKSRC}/configure \
 		${WRKSRC}/plugin/mailer.c
-	@${REINPLACE_CMD} -e 's| DOMAIN| CEPHES_DOMAIN|g' \
-		${WRKSRC}/cephes/iv.c
 
 regression-test test check: build
 	@cd ${BUILD_WRKSRC} && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} \
@@ -108,4 +99,4 @@ post-install:
 	@${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/gretl-gtk2/*.so
 	@${RMDIR} ${STAGEDIR}${DATADIR}/doc
 
-.include <bsd.port.post.mk>
+.include <bsd.port.mk>

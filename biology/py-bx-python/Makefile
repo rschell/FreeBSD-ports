@@ -3,7 +3,7 @@
 
 PORTNAME=	bx-python
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.8.6
+DISTVERSION=	0.8.9
 CATEGORIES=	biology python
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
@@ -13,11 +13,12 @@ COMMENT=	Python module for reading, manipulating and writing genomic data sets
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-BUILD_DEPENDS=	${PYNUMPY} \
-		${PYTHON_PKGNAMEPREFIX}python-lzo>0:archivers/py-python-lzo@${PY_FLAVOR}
-RUN_DEPENDS:=	${BUILD_DEPENDS}
+PY_DEPENDS=	${PYNUMPY} \
+		${PYTHON_PKGNAMEPREFIX}six>0:devel/py-six@${PY_FLAVOR}
+BUILD_DEPENDS=	${PY_DEPENDS}
+RUN_DEPENDS=	${PY_DEPENDS}
 
-USES=		compiler python
+USES=		compiler python:3.6+
 USE_GITHUB=	yes
 GH_ACCOUNT=	bxlab
 USE_PYTHON=	autoplist cython distutils

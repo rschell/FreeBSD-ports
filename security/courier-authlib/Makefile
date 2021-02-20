@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	courier-authlib
-PORTVERSION=	0.69.1
+PORTVERSION=	0.71.0
 CATEGORIES?=	security mail
 .if defined(PKGNAMESUFFIX)
 MASTER_SITES=	SF/courier/authlib/${PORTVERSION}
@@ -54,8 +54,7 @@ CONFIGURE_ARGS=	--enable-unicode \
 		--with-mailgroup=${MAILGRP} \
 		--localstatedir=${LOCALSTATEDIR} \
 		--with-authdaemonvar=${AUTHDAEMONVAR} \
-		--cache-file=${WRKDIR}/courier-authlib.cache \
-		--without-authsqlite
+		--cache-file=${WRKDIR}/courier-authlib.cache
 
 INSTALL_TARGET=	install-strip
 
@@ -140,6 +139,17 @@ USES+=		pgsql
 CONFIGURE_ARGS+=--with-authpgsql
 .else
 CONFIGURE_ARGS+=--without-authpgsql
+.endif
+
+.if ${AUTHMOD} == authsqlite
+RUN_DEPENDS+=	${LOCALBASE}/share/sysconftool/sysconftool:devel/sysconftool
+OPTIONS_DEFINE+=	DOCS
+
+DOCS=		README.authsqlite.html
+USES+=		pkgconfig sqlite
+CONFIGURE_ARGS+=--with-authsqlite
+.else
+CONFIGURE_ARGS+=--without-authsqlite
 .endif
 
 .if ${AUTHMOD} == authvchkpw

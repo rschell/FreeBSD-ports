@@ -10,10 +10,14 @@ MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Multipole-accelerated inductance analysis program
 
 BROKEN_aarch64=	Fails to link: missing sbrk
+BROKEN_riscv64=	Fails to link: missing sbrk
 
 HAS_CONFIGURE=	yes
 CONFIGURE_SCRIPT=	config
 WRKSRC=		${WRKDIR}/fasthenry-3.0wr
+
+# Fix build with clang11
+CFLAGS+=	-fcommon
 
 OPTIONS_DEFINE=	DOCS EXAMPLES
 

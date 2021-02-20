@@ -3,11 +3,11 @@
  * suricata_check_for_rule_updates.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2006-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2006-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2009 Robert Zelaya Sr. Developer
- * Copyright (C) 2019 Bill Meeks
+ * Copyright (C) 2021 Bill Meeks
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -405,6 +405,9 @@ else {
 	file_put_contents(SURICATA_RULES_UPD_LOGFILE, "");
 }
 
+/* Sleep for random number of seconds between 0 and 35 to spread load on rules site */
+sleep(random_int(0, 35));
+
 /* Log start time for this rules update */
 error_log(gettext("Starting rules update...  Time: " . date("Y-m-d H:i:s") . "\n"), 3, SURICATA_RULES_UPD_LOGFILE);
 $last_curl_error = "";
@@ -426,7 +429,7 @@ if ($emergingthreats == 'on') {
 if ($snortdownload == 'on') {
 	$snort_custom_url = $config['installedpackages']['suricata']['config'][0]['enable_snort_custom_url'] == 'on' ? TRUE : FALSE;
 	if (empty($snort_filename)) {
-		syslog(LOG_WARN, gettext("WARNING: No snortrules-snapshot filename has been set on Snort pkg GLOBAL SETTINGS tab.  Snort rules cannot be updated."));
+		syslog(LOG_WARNING, gettext("WARNING: No snortrules-snapshot filename has been set on Snort pkg GLOBAL SETTINGS tab.  Snort rules cannot be updated."));
 		error_log(gettext("\tWARNING-- No snortrules-snapshot filename set on GLOBAL SETTINGS tab. Snort rules cannot be updated!\n"), 3, SURICATA_RULES_UPD_LOGFILE);
 		$snortdownload = 'off';
 	}
@@ -442,7 +445,7 @@ if ($snortdownload == 'on') {
 
 /*  Check for and download any new Snort GPLv2 Community Rules sigs */
 if ($snortcommunityrules == 'on') {
-	if (suricata_check_rule_md5("{$snort_community_rules_url}{$snort_community_rules_filename}/md5", "{$tmpfname}/{$snort_community_rules_filename_md5}", "Snort GPLv2 Community Rules")) {
+	if (suricata_check_rule_md5("{$snort_community_rules_url}{$snort_community_rules_filename_md5}", "{$tmpfname}/{$snort_community_rules_filename_md5}", "Snort GPLv2 Community Rules")) {
 		/* download Snort GPLv2 Community Rules file */
 		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_community_rules_filename_md5}"));
 		if (!suricata_fetch_new_rules("{$snort_community_rules_url}{$snort_community_rules_filename}", "{$tmpfname}/{$snort_community_rules_filename}", $file_md5, "Snort GPLv2 Community Rules"))

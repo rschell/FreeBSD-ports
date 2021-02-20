@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	azure-datalake-store
-PORTVERSION=	0.0.48
+PORTVERSION=	0.0.49
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -16,7 +16,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}adal>=0.4.2:net-mgmt/py-adal@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}requests>=2.20.0:www/py-requests@${PY_FLAVOR} \
 		${PY_FUTURES}
 
-USES=		azurepy python
+USES=		azurepy python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes

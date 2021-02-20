@@ -37,11 +37,8 @@ PLIST_FILES=	bin/${PORTNAME} \
 PORTDATA=	*
 
 .if exists(/usr/lib/libc++fs.a)
-# XXX Remove after FreeBSD 11.3/12.1 EOL
+# XXX Remove after FreeBSD 12.1 EOL
 CMAKE_ARGS+=	-DFILE_SYSTEM_LIB:STRING=c++fs
-.elif !exists(/usr/include/c++/v1/filesystem) && exists(/usr/lib/libc++experimental.a)
-# XXX Remove after FreeBSD 12.0 EOL
-CMAKE_ARGS+=	-DFILE_SYSTEM_LIB:STRING=c++experimental
 .endif
 
 OPTIONS_DEFINE=	SIMD

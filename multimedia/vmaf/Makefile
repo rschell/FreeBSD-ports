@@ -2,32 +2,26 @@
 
 PORTNAME=	vmaf
 DISTVERSIONPREFIX=	v
-DISTVERSION=	1.3.15
+DISTVERSION=	2.1.1
 CATEGORIES=	multimedia
 
 MAINTAINER=	jbeich@FreeBSD.org
 COMMENT=	Perceptual video quality assessment based on multi-method fusion
 
-LICENSE=	APACHE20
+LICENSE=	BSD2CLAUSE+PATENT
+LICENSE_GROUPS=	FSF OSI COPYFREE
+LICENSE_NAME=	BSD-2-Clause Plus Patent License
+LICENSE_FILE=	${WRKSRC:H}/LICENSE
+LICENSE_PERMS=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
-ONLY_FOR_ARCHS=	amd64 i386
+BUILD_DEPENDS=	${BUILD_DEPENDS_${ARCH}}
+BUILD_DEPENDS_amd64=	nasm:devel/nasm
+BUILD_DEPENDS_i386=	nasm:devel/nasm
 
-USES=		compiler:c11 gmake
+USES=		compiler:c++11-lib meson
 USE_GITHUB=	yes
+USE_LDCONFIG=	yes
 GH_ACCOUNT=	Netflix
-MAKE_ARGS=	INSTALL_PREFIX="${PREFIX}"
-CFLAGS_i386=	-msse # https://github.com/Netflix/vmaf/issues/374
-
-post-patch:
-	@${REINPLACE_CMD} -e '/^CC[[:>:]]/d' \
-		-e '/FLAGS =/s/=/+=/' \
-		-e 's/ -O[[:>:]]//; s/ -O[0-9]//; s/ -g//' \
-		-e '/^CCFLAGS/s/$$/ $$(LDFLAGS)/' \
-		${WRKSRC}/ptools/Makefile.VMAF \
-		${WRKSRC}/*/Makefile
-
-post-install:
-	${INSTALL_PROGRAM} ${WRKSRC}/wrapper/vmafossexec \
-		${STAGEDIR}${PREFIX}/bin
+WRKSRC_SUBDIR=	lib${PORTNAME}
 
 .include <bsd.port.mk>

@@ -2,9 +2,9 @@
 
 PORTNAME=	wazuh
 DISTVERSIONPREFIX=	v
-DISTVERSION=	3.10.2
+DISTVERSION=	4.0.3
 CATEGORIES=	security
-MASTER_SITES=	https://packages.wazuh.com/deps/3.10/
+MASTER_SITES=	https://packages.wazuh.com/deps/4.0/
 PKGNAMESUFFIX=	-agent
 DISTFILES=	cJSON.tar.gz src_cpython.tar.gz curl.tar.gz libdb.tar.gz libffi.tar.gz \
 		libyaml.tar.gz openssl.tar.gz procps.tar.gz sqlite.tar.gz  zlib.tar.gz \
@@ -18,11 +18,12 @@ COMMENT=	Security tool to monitor and check logs and intrusions
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
+BROKEN_aarch64=		fails to compile: rootcheck/os_string.c:188:20: use of undeclared identifier '__LDPGSZ'
+BROKEN_i386=		fails to build external OpenSSL dependency
+
 USES=		gmake perl5 readline shebangfix uidfix
-
 USE_GITHUB=	yes
-
-CONFLICTS_INSTALL=	ossec-*
+USE_RC_SUBR=	${PORTNAME}-agent
 
 SHEBANG_FILES=	${WRKSRC}/contrib/util.sh \
 		${WRKSRC}/src/external/openssl/Configurations/unix-checker.pm \
@@ -30,20 +31,22 @@ SHEBANG_FILES=	${WRKSRC}/contrib/util.sh \
 		${WRKSRC}/wodles/oscap/oscap.py \
 		${WRKSRC}/active-response/*.sh
 
+CONFLICTS_INSTALL=	ossec-*
+
 USERS=		ossec ossecm ossecr
 GROUPS=		ossec
 
 OSSEC_GROUP=	ossec
 OSSEC_USER=	ossec
 
-WAZUHPREFIX=	/var/ossec
-
 WAZUHMOD750=	/ /logs/ossec /bin /lib /queue /queue/diff /ruleset /ruleset/sca /wodles \
 		/active-response /active-response/bin /agentless /var /backup /queue/rids \
 		/wodles/oscap /wodles/oscap/content
 
-WAZUHMOD770=	/logs /queue/alerts /queue/ossec /etc /etc/shared /.ssh /var/run /var/upgrade \
-		/var/wodles /var/incoming
+WAZUHMOD770=	/logs /queue/alerts /queue/fim /queue/fim/db /queue/ossec /etc /etc/shared \
+		/.ssh /var/run /var/upgrade /var/wodles /var/incoming
+
+WAZUHPREFIX=	/var/ossec
 
 # extract all extra distfiles in src/external
 post-extract:
@@ -53,11 +56,6 @@ post-extract:
 			exit 1; \
 		fi; \
 	done
-
-post-patch:
-	@${REINPLACE_CMD} -e 's|/usr/bin/perl|${PERL}|g' \
-		${WRKSRC}/src/external/openssl/Makefile \
-		${WRKSRC}/src/external/openssl/configdata.pm
 
 do-build:
 	@cd ${WRKSRC}/src && ${GMAKE} TARGET=agent

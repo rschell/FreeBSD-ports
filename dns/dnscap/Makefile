@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	dnscap
-PORTVERSION=	1.10.3
+PORTVERSION=	1.12.0
 PORTEPOCH=	1
 CATEGORIES=	dns
 MASTER_SITES=	https://www.dns-oarc.net/files/dnscap/ \

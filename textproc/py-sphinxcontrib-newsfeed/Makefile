@@ -12,9 +12,9 @@ COMMENT=	News Feed extension for Sphinx
 LICENSE=	BSD2CLAUSE
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-RUN_DEPENDS=	${PKGNAMEPREFIX}sphinx>=0:textproc/py-sphinx@${PY_FLAVOR}
+RUN_DEPENDS=	${PY_SPHINX}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	distutils autoplist
 
 .include <bsd.port.mk>

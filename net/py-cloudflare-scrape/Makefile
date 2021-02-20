@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	cloudflare-scrape
-DISTVERSION=	2.0.8
+DISTVERSION=	2.1.1
 CATEGORIES=	net python
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
@@ -13,7 +13,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}PyExecJS>=0:devel/py-PyExecJS@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=     distutils autoplist
 
 USE_GITHUB=     yes

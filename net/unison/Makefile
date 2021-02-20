@@ -2,14 +2,15 @@
 # $FreeBSD$
 
 PORTNAME=	unison
-PORTVERSION=	2.51.2
+PORTVERSION=	2.51.3
 DISTVERSIONPREFIX=	v
 CATEGORIES=	net
 
 MAINTAINER=	madpilot@FreeBSD.org
 COMMENT=	User-level file synchronization tool
 
-LICENSE=	GPLv3
+LICENSE=	GPLv3+
+LICENSE_FILE=	${WRKSRC}/COPYING
 
 FLAVORS=	x11 nox11
 FLAVOR?=	${FLAVORS:[1]}
@@ -31,7 +32,6 @@ WRKSRC_SUBDIR=	src
 NO_OCAML_RUNDEPENDS=yes
 CONFLICTS=	unison-devel-[0-9]*
 MAKE_ENV=	CLIBS="${LIBS:S/^-/-ccopt -/}" COFLAGS="${CFLAGS:C/ *(-[^ ]*) */ -ccopt \"\1 \"/gW}"
-MAKE_JOBS_UNSAFE=	yes
 ALL_TARGET=	unison all
 
 USE_GITHUB=     yes
@@ -74,8 +74,9 @@ post-patch:
 		${WRKSRC}/Makefile.OCaml ${WRKSRC}/fsmonitor/linux/Makefile
 .endif
 
-.if ${FLAVOR} == x11
 post-build:
+	(cd ${WRKSRC} && HOME=${WRKSRC} ./unison -selftest -ui text -batch)
+.if ${FLAVOR} == x11
 	@${ECHO} Building text-only version
 	@${ECHO} ${WRKSRC}
 	${SETENV} ${MAKE_ENV} ${MAKE_CMD} -C ${WRKSRC} UISTYLE=text NAME=unison-text
@@ -84,13 +85,15 @@ post-build:
 
 do-install:
 	${INSTALL_PROGRAM} ${WRKSRC}/${PORTNAME} ${STAGEDIR}${PREFIX}/bin
-	@${MKDIR} ${STAGEDIR}${DOCSDIR}
-	cd ${WRKSRC} && ${INSTALL_DATA} ${DOCS} ${STAGEDIR}${DOCSDIR}
 .if ${FLAVOR} == x11
 	${INSTALL_PROGRAM} ${WRKSRC}/${PORTNAME}-text ${STAGEDIR}${PREFIX}/bin
 	${INSTALL_DATA} ${WRKDIR}/${PORTNAME}.desktop ${STAGEDIR}${DESKTOPDIR}
 	${INSTALL_DATA} ${WRKSRC}/win32rc/U_4_48x48x32.png ${STAGEDIR}${PREFIX}/share/pixmaps/${PORTNAME}.png
 .endif
+
+do-install-DOCS-on:
+	@${MKDIR} ${STAGEDIR}${DOCSDIR}
+	cd ${WRKSRC} && ${INSTALL_DATA} ${DOCS} ${STAGEDIR}${DOCSDIR}
 
 do-install-FSMONITOR-on:
 	${INSTALL_PROGRAM} ${WRKSRC}/${PORTNAME}-fsmonitor ${STAGEDIR}${PREFIX}/bin

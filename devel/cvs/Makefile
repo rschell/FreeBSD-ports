@@ -2,11 +2,11 @@
 
 PORTNAME=	cvs
 PORTVERSION=	1.20120905
-PORTREVISION?=	6
+PORTREVISION?=	7
 CATEGORIES=	devel
 MASTER_SITES=	LOCAL/eadler
 
-MAINTAINER?=	ports@FreeBSD.org
+MAINTAINER?=	schaiba@gmail.com
 COMMENT?=	Version control system
 
 LICENSE=	GPLv2+

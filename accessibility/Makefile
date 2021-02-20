@@ -10,6 +10,8 @@
     SUBDIR += atkmm
     SUBDIR += caribou
     SUBDIR += eflite
+    SUBDIR += feedbackd
+    SUBDIR += gammy
     SUBDIR += kdeaccessibility
     SUBDIR += kmag
     SUBDIR += kmousetool
@@ -20,13 +22,14 @@
     SUBDIR += linux-c7-atk
     SUBDIR += orca
     SUBDIR += py-atspi
-    SUBDIR += py-papi
     SUBDIR += py-speech-dispatcher
     SUBDIR += qt5-speech
     SUBDIR += redshift
     SUBDIR += rubygem-atk
     SUBDIR += sct
+    SUBDIR += sctd
     SUBDIR += speech-dispatcher
+    SUBDIR += wlsunset
     SUBDIR += yasr
 
 .include <bsd.port.subdir.mk>

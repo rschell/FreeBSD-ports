@@ -13,6 +13,8 @@ PATCHFILES=	428b331d8efe.patch:-p1
 MAINTAINER=	peter@netkey.at
 COMMENT=	Private and secure decentralised communication platform
 
+BROKEN=		Doesn't build with libmicrohttpd 0.9.71 - PR: 250100
+
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/LICENSE.txt
 
@@ -38,7 +40,8 @@ USE_GNOME=	libxml2 libxslt
 USE_GL=		gl
 USE_QT=		core gui multimedia printsupport network widgets xml \
 		buildtools_build uitools_build
-DOS2UNIX_FILES=	retroshare-nogui/src/retroshare-nogui.pro
+DOS2UNIX_FILES=	retroshare-nogui/src/retroshare-nogui.pro \
+		retroshare-gui/src/gui/elastic/node.cpp
 
 .include <bsd.port.pre.mk>
 

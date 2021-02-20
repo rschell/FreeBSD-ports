@@ -31,7 +31,6 @@ include/nest/clopath_archiving_node.h
 include/nest/clopath_connection.h
 include/nest/common_properties_hom_w.h
 include/nest/common_synapse_properties.h
-include/nest/completed_checker.h
 include/nest/compose.hpp
 include/nest/config.h
 include/nest/conn_builder.h
@@ -66,6 +65,7 @@ include/nest/dictutils.h
 include/nest/diffusion_connection.h
 include/nest/doubledatum.h
 include/nest/dynamicloader.h
+include/nest/enum_bitfield.h
 include/nest/erfc_neuron.h
 include/nest/event.h
 include/nest/event_delivery_manager.h
@@ -92,6 +92,8 @@ include/nest/gif_pop_psc_exp.h
 include/nest/gif_psc_exp.h
 include/nest/gif_psc_exp_multisynapse.h
 include/nest/ginzburg_neuron.h
+include/nest/glif_cond.h
+include/nest/glif_psc.h
 include/nest/gnureadline.h
 include/nest/grid_layer.h
 include/nest/grid_mask.h
@@ -131,6 +133,7 @@ include/nest/integerdatum.h
 include/nest/interpret.h
 include/nest/io_manager.h
 include/nest/iostreamdatum.h
+include/nest/iterator_pair.h
 include/nest/iteratordatum.h
 include/nest/izhikevich.h
 include/nest/kernel_manager.h
@@ -175,6 +178,7 @@ include/nest/name.h
 include/nest/namedatum.h
 include/nest/nest.h
 include/nest/nest_datums.h
+include/nest/nest_impl.h
 include/nest/nest_names.h
 include/nest/nest_time.h
 include/nest/nest_timeconverter.h
@@ -196,6 +200,7 @@ include/nest/parrot_neuron.h
 include/nest/parrot_neuron_ps.h
 include/nest/parser.h
 include/nest/parserdatum.h
+include/nest/per_thread_bool_indicator.h
 include/nest/poisson_generator.h
 include/nest/poisson_generator_ps.h
 include/nest/poisson_randomdev.h
@@ -281,6 +286,9 @@ include/nest/stdp_connection_facetshw_hom.h
 include/nest/stdp_connection_facetshw_hom_impl.h
 include/nest/stdp_connection_hom.h
 include/nest/stdp_dopa_connection.h
+include/nest/stdp_nn_pre-centered_connection.h
+include/nest/stdp_nn_restr_connection.h
+include/nest/stdp_nn_symm_connection.h
 include/nest/stdp_pl_connection_hom.h
 include/nest/stdp_triplet_connection.h
 include/nest/step_current_generator.h
@@ -323,6 +331,7 @@ include/nest/universal_data_logger_impl.h
 include/nest/utils.h
 include/nest/vector_util.h
 include/nest/vogels_sprekeler_connection.h
+include/nest/voltmeter.h
 include/nest/volume_transmitter.h
 include/nest/vose.h
 include/nest/vp_manager.h

@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	tomlkit
-PORTVERSION=	0.5.8
+PORTVERSION=	0.7.0
 CATEGORIES=	textproc python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -16,7 +16,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 RUN_DEPENDS=	${PY_ENUM34} \
 		${PY_TYPING}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 NO_ARCH=	yes

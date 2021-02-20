@@ -1,18 +1,21 @@
 # $FreeBSD$
 
 PORTNAME=	enum-compat
-PORTVERSION=	0.0.2
+PORTVERSION=	0.0.3
 CATEGORIES=	devel python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=	mmokhi@FreeBSD.org
+MAINTAINER=	sunpoet@FreeBSD.org
 COMMENT=	Python 3.4 Enum dummy no-op package
 
 LICENSE=	MIT
 
-USES=		python:-3.3
-USE_PYTHON=	distutils autoplist
+RUN_DEPENDS=	${PY_ENUM34}
+
+USES=		python:3.6+
+USE_PYTHON=	autoplist concurrent distutils
+
 NO_ARCH=	yes
 
 .include <bsd.port.mk>

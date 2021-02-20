@@ -12,8 +12,9 @@ COMMENT=	Simple generic functions
 
 LICENSE=	ZPL21
 
-NO_ARCH=	yes
+USES=		python:3.6+ zip
 USE_PYTHON=	autoplist concurrent distutils
-USES=		python zip
+
+NO_ARCH=	yes
 
 .include <bsd.port.mk>

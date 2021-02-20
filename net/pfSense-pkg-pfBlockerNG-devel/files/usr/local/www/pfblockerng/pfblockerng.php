@@ -3,8 +3,8 @@
  * pfblockerng.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2020 Rubicon Communications, LLC (Netgate)
- * Copyright (c) 2015-2019 BBcan177@gmail.com
+ * Copyright (c) 2015-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 BBcan177@gmail.com
  * All rights reserved.
  *
  * Originally based upon pfBlocker by
@@ -32,7 +32,7 @@ if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1' && $_REQUEST && $_REQUEST['pfb']) {
 
 	$query = htmlspecialchars($_REQUEST['pfb']);
 	if (file_exists("/var/db/aliastables/{$query}_v4.txt")) {
-        	$type = '_v4';
+		$type = '_v4';
 	} elseif (file_exists("/var/db/aliastables/{$query}_v6.txt")) {
 		$type = '_v6';
 	}
@@ -59,10 +59,11 @@ global $config, $g, $pfb;
 if (isset($argv[1])) {
 	if ($argv[1] == 'clearip') {
 		pfBlockerNG_clearip();
+		pfBlockerNG_clearsqlite('clearip');
 		exit;
 	}
 	elseif ($argv[1] == 'cleardnsbl') {
-		pfBlockerNG_cleardnsbl('clearall');
+		pfBlockerNG_clearsqlite('cleardnsbl');
 		exit;
 	}
 }
@@ -84,11 +85,14 @@ $pfb['extras'][1]['folder']	= "{$pfb['geoipshare']}";
 $pfb['extras'][1]['type']	= 'geoip';
 
 $pfb['extras'][2]			= array();
-if ($pfb['dnsbl_alexatype'] == 'Alexa') {
+if ($pfb['dnsbl_alexatype'] == 'alexa') {
 	$pfb['extras'][2]['url']	= 'https://s3.amazonaws.com/alexa-static/top-1m.csv.zip';
+} elseif ($pfb['dnsbl_alexatype'] == 'tranco') {
+	$pfb['extras'][2]['url']	= 'https://tranco-list.eu/top-1m.csv.zip';
 } else {
-	$pfb['extras'][2]['url']	= 'https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip';
+	$pfb['extras'][2]['url']	= 'https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip';  // Cisco
 }
+
 $pfb['extras'][2]['file_dwn']	= 'top-1m.csv.zip';
 $pfb['extras'][2]['file']	= 'top-1m.csv';
 $pfb['extras'][2]['folder']	= "{$pfb['dbdir']}";
@@ -177,11 +181,12 @@ if (in_array($argv[1], array('update', 'updateip', 'updatednsbl', 'dc', 'dcc', '
 			}
 
 			// Proceed with conversion of MaxMind files on download success
-			if (empty($pfb['cc']) && pfblockerng_download_extras(600, $logtype)) {
-				pfblockerng_uc_countries();
-				pfblockerng_get_countries();
+			if (pfblockerng_download_extras(600, $logtype)) {
+				if (empty($pfb['cc'])) {
+					pfblockerng_uc_countries();
+					pfblockerng_get_countries();
+				}
 			}
-
 			break;
 		case 'bu':		// Update MaxMind binary database files only.
 			unset($pfb['extras'][1], $pfb['extras'][2]);
@@ -281,7 +286,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 		// Determine if URL is Remote or Local
 		if (in_array($host['host'], array('127.0.0.1', $pfb['iplocal'], ''))) {
 			clearstatcache();
-			$remote_tds = gmdate('D, d M Y H:i:s T', @filemtime($list_url));
+			$remote_tds = gmdate('D, j M Y H:i:s T', @filemtime($list_url));
 		}
 		else {
 			// Download URL headers and compare previously downloaded file with remote timestamp
@@ -289,6 +294,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 				curl_setopt_array($ch, $pfb['curl_defaults']);		// Load curl default settings
 				curl_setopt($ch, CURLOPT_NOBODY, true);			// Exclude the body from the output
 				curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
 
 				// Allow downgrade of cURL settings if user configured
 				if ($pflex == 'Flex') {
@@ -308,7 +314,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 				}
 
 				if ($remote_stamp_raw != -1) {
-					$remote_tds = gmdate('D, d M Y H:i:s T', $remote_stamp_raw);
+					$remote_tds = gmdate('D, j M Y H:i:s T', $remote_stamp_raw);
 				}
 			}
 			curl_close($ch);
@@ -350,7 +356,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 			$log = "  Remote timestamp: {$remote_tds}\n";
 			pfb_logger("{$log}", 1);
 			clearstatcache();
-			$local_tds = gmdate('D, d M Y H:i:s T', @filemtime($local_file));
+			$local_tds = gmdate('D, j M Y H:i:s T', @filemtime($local_file));
 			$log = "  Local  timestamp: {$local_tds}\t";
 			pfb_logger("{$log}", 1);
 	
@@ -457,7 +463,7 @@ function pfblockerng_sync_cron() {
 	$hour = date('G');
 	$dow  = date('N');
 	$pfb['update_cron'] = FALSE;
-	$log = " CRON  PROCESS  START [ NOW ]\n";
+	$log = " CRON  PROCESS  START [ " . pfb_pkg_ver() . " ] [ NOW ]\n";
 	pfb_logger("{$log}", 1);
 
 	$list_type = array('pfblockernglistsv4' => '_v4', 'pfblockernglistsv6' => '_v6', 'pfblockerngdnsbl' => '_v4');
@@ -571,7 +577,7 @@ function pfblockerng_uc_countries() {
 	}
 
 	// Save Date/Time stamp to MaxMind version file
-	$local_tds	 = @gmdate('D, d M Y H:i:s T', @filemtime($maxmind_cont));
+	$local_tds	 = @gmdate('D, j M Y H:i:s T', @filemtime($maxmind_cont));
 	$maxmind_ver	 = "MaxMind GeoLite2 Date/Time Stamp\n";
 	$maxmind_ver	.= "Last-Modified: {$local_tds}\n";
 	@file_put_contents("{$pfb['logdir']}/maxmind_ver", $maxmind_ver, LOCK_EX);
@@ -1062,7 +1068,7 @@ function pfblockerng_uc_countries() {
 						$pfb_file = "{$pfb['ccdir']}/Top_Spammers_v{$type}.info";
 
 						if (!file_exists($pfb_file)) {
-							$header  = '# Generated from MaxMind Inc. on: ' . date('m/d/y G:i:s', time()) . "\n";
+							$header  = '# Generated from MaxMind Inc. on: ' . date('m/j/y G:i:s', time()) . "\n";
 							$header .= "# Continent IPv{$type}: Top_Spammers\n";
 							$header .= "# Continent en: Top_Spammers\n";
 							@file_put_contents($pfb_file, $header, LOCK_EX);
@@ -1088,7 +1094,7 @@ function pfblockerng_uc_countries() {
 
 							$pfb_file = "{$pfb['ccdir']}/{$geoip['continent_en']}_v{$type}.txt";
 							if (!file_exists($pfb_file)) {
-								$header  = '# Generated from MaxMind Inc. on: ' . date('m/d/y G:i:s', time()) . "\n";
+								$header  = '# Generated from MaxMind Inc. on: ' . date('m/j/y G:i:s', time()) . "\n";
 								$header .= "# Continent IPv{$type}: {$geoip['continent']}\n";
 								$header .= "# Continent en: {$geoip['continent_en']}\n";
 								@file_put_contents($pfb_file, $header, LOCK_EX);
@@ -1311,8 +1317,8 @@ $php_data = <<<EOF
  * pfblockerng_{$continent_en}.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016-2020 Rubicon Communications, LLC (Netgate)
- * Copyright (c) 2015-2019 BBcan177@gmail.com
+ * Copyright (c) 2016-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 BBcan177@gmail.com
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the \"License\");
@@ -1531,7 +1537,7 @@ $section->addInput(new Form_StaticText(
 
 // Maxmind License Key verification
 if (empty($pfb['maxmind_key'])) {
-        print_callout('<br /><br /><p><strong>'
+	print_callout('<br /><br /><p><strong>'
 			. 'MaxMind now requires a License Key! Review the IP tab: MaxMind settings for more information.'
 			. '</strong></p><br />', 'danger', '');
 }
@@ -1832,8 +1838,8 @@ $php_rep = <<<'EOF'
  * pfblockerng_reputation.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016-2020 Rubicon Communications, LLC (Netgate)
- * Copyright (c) 2015-2019 BBcan177@gmail.com
+ * Copyright (c) 2016-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 BBcan177@gmail.com
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the \"License\");

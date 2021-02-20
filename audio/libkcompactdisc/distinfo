@@ -1,3 +1,3 @@
-TIMESTAMP = 1575623342
-SHA256 (KDE/applications/19.12.0/libkcompactdisc-19.12.0.tar.xz) = a6c1c801e61e9cf933c132266857a540584e24a35367430587c7df13e5d7d49b
-SIZE (KDE/applications/19.12.0/libkcompactdisc-19.12.0.tar.xz) = 89284
+TIMESTAMP = 1607111072
+SHA256 (KDE/release-service/20.12.0/libkcompactdisc-20.12.0.tar.xz) = e74c0a2952ab93213482851a2cf2bc3299f33614467d73054f871e26d6092078
+SIZE (KDE/release-service/20.12.0/libkcompactdisc-20.12.0.tar.xz) = 96708

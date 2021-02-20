@@ -1,3 +1,3 @@
-TIMESTAMP = 1576615731
-SHA256 (FreeBSDDesktop-kms-drm-4.16.g20191217-9ea021d_GH0.tar.gz) = fe24529658a96d7cb823f5b41f551b53bcb5c93ed67af32e64e00da994d871b5
-SIZE (FreeBSDDesktop-kms-drm-4.16.g20191217-9ea021d_GH0.tar.gz) = 13091331
+TIMESTAMP = 1611876331
+SHA256 (freebsd-drm-kmod-5.4.92.g20210128-drm_v5.4.92_1_GH0.tar.gz) = 4c16ee4e94d3676c763ffeec0f5ebcb63c881a34e7aa693859b42b6411bbfa54
+SIZE (freebsd-drm-kmod-5.4.92.g20210128-drm_v5.4.92_1_GH0.tar.gz) = 18825277

@@ -1,11 +1,19 @@
---- xgboost/libpath.py.orig	2019-12-14 21:46:06 UTC
+--- xgboost/libpath.py.orig	2020-10-12 22:10:16 UTC
 +++ xgboost/libpath.py
-@@ -20,7 +20,7 @@ def find_lib_path():
+@@ -4,6 +4,7 @@
+ import os
+ import platform
+ import sys
++import sysconfig # from https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=247408#c0
+ 
+ 
+ class XGBoostLibraryNotFound(Exception):
+@@ -20,6 +21,8 @@ def find_lib_path():
      """
      curr_path = os.path.dirname(os.path.abspath(os.path.expanduser(__file__)))
-     # make pythonpack hack: copy this directory one level upper for setup.py
--    dll_path = [curr_path, os.path.join(curr_path, '../../lib/'),
-+    dll_path = [os.getenv('FREEBSD_LIBRARY_PATH'),
-                 os.path.join(curr_path, './lib/'),
-                 os.path.join(sys.prefix, 'xgboost')]
-     if sys.platform == 'win32':
+     dll_path = [
++	sysconfig.get_config_var('LIBDIR'), # from https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=247408#c0
++	os.path.join(sys.prefix, 'xgboost'),
+         # normal, after installation `lib` is copied into Python package tree.
+         os.path.join(curr_path, 'lib'),
+         # editable installation, no copying is performed.

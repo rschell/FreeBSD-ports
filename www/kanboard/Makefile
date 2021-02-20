@@ -2,16 +2,17 @@
 
 PORTNAME=	kanboard
 DISTVERSIONPREFIX=	v
-DISTVERSION=	1.2.11
+DISTVERSION=	1.2.16
 CATEGORIES=	www
+PKGNAMEPREFIX=	${PHP_PKGNAMEPREFIX}
 
-MAINTAINER=	bsd@if0.eu
+MAINTAINER=	daniel.tihanyi@tetragir.com
 COMMENT=	Simple visual task board software
 
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-USES=		php
+USES=		php:flavors
 USE_PHP=	ctype curl dom gd hash filter iconv json mcrypt mbstring \
 		openssl pdo session simplexml zlib xml
 USE_GITHUB=	yes
@@ -27,12 +28,12 @@ PLIST_SUB=	KANBOARD_USERNAME=${KANBOARD_USERNAME} \
 
 OPTIONS_MULTI=	DB
 OPTIONS_MULTI_DB=	MYSQL PGSQL SQLITE
-OPTIONS_DEFAULT=	SQLITE
+OPTIONS_DEFAULT=	OPCACHE SQLITE
 OPTIONS_DEFINE=		OPCACHE
 OPCACHE_DESC=	OPcache support (recommended)
 
 MYSQL_USES=	mysql
-MYSQL_USE=	PHP=pdo_mysqli,mysqli
+MYSQL_USE=	PHP=pdo_mysql,mysqli
 PGSQL_USES=	pgsql
 PGSQL_USE=	PHP=pdo_pgsql,pgsql
 SQLITE_USE=	PHP=pdo_sqlite,sqlite3

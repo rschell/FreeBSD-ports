@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	cld3
-DISTVERSION=	3.2.4
-PORTREVISION=	1
+DISTVERSION=	3.3.0
 CATEGORIES=	textproc rubygems
 MASTER_SITES=	RG
 
@@ -12,8 +11,8 @@ COMMENT=	Compact Language Detection for Ruby
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-RUN_DEPENDS=	protobuf>0:devel/protobuf \
-		rubygem-ffi110>=1.1.0<1.11.0:devel/rubygem-ffi110
+LIB_DEPENDS=	libprotobuf.so:devel/protobuf
+RUN_DEPENDS=	rubygem-ffi110>=1.1.0<1.12.0:devel/rubygem-ffi110
 
 USES=		gem pkgconfig
 USE_RUBY=	yes

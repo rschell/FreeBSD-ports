@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	php74
-DISTVERSION=	7.4.1
+DISTVERSION=	7.4.15
 PORTREVISION?=	0
 CATEGORIES?=	lang devel www
 MASTER_SITES=   PHP/distributions
@@ -39,14 +39,16 @@ OPTIONS_DEFAULT=CLI CGI FPM EMBED MYSQLND LINKTHR DTRACE
 OPTIONS_EXCLUDE_DragonFly=	DTRACE
 # ld(1) fails to link probes: Relocations in generic ELF (EM: 0)
 OPTIONS_EXCLUDE_aarch64=	DTRACE
-OPTIONS_EXCLUDE_powerpc=	DTRACE
-OPTIONS_EXCLUDE_powerpc64=	DTRACE
 # dt_modtext:opensolaris/ib/libdtrace/common/dt_link.c: arm not impemented
 OPTIONS_EXCLUDE_armv6=		DTRACE
 OPTIONS_EXCLUDE_armv7=		DTRACE
 # Bug 197128:  No ASM code for MIPS/MIPS64, disable FPM
 OPTIONS_EXCLUDE_mips=		DTRACE FPM
 OPTIONS_EXCLUDE_mips64=		DTRACE FPM
+OPTIONS_EXCLUDE_powerpc=		DTRACE
+OPTIONS_EXCLUDE_powerpc64=	${OPTIONS_EXCLUDE_${ARCH}_${OSREL:R}}                  
+OPTIONS_EXCLUDE_powerpc64_11=	DTRACE     
+OPTIONS_EXCLUDE_powerpc64_12=	DTRACE
 OPTIONS_EXCLUDE_sparc64=	DTRACE
 OPTIONS_SUB=	yes
 
@@ -64,6 +66,10 @@ CONFLICTS=	php71-* php72-* php73-*
 DESTDIRNAME=	INSTALL_ROOT
 
 .include <bsd.port.pre.mk>
+
+.if defined(PHP_FD_SETSIZE)
+CONFIGURE_ARGS+=	--enable-fd-setsize=${PHP_FD_SETSIZE}
+.endif
 
 .if ${PORT_OPTIONS:MMYSQLND}
 CONFIGURE_ARGS+=--enable-mysqlnd

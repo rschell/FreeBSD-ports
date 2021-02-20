@@ -2,11 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	tig
-PORTVERSION=	2.5.0
+PORTVERSION=	2.5.1
 CATEGORIES=	devel
 MASTER_SITES=	https://github.com/jonas/tig/releases/download/${DISTNAME}/
 
-MAINTAINER=	tobik@FreeBSD.org
+MAINTAINER=	0mp@FreeBSD.org
 COMMENT=	Text-mode interface for git
 
 LICENSE=	GPLv2
@@ -41,6 +41,7 @@ do-test:
 # Tests fail when running as part of a non-interactive Poudriere
 # build, but using script(1) seems to be a good enough workaround and
 # allows them to run successfully anyway.
-	@/usr/bin/script -q /dev/null ${GMAKE} -C ${WRKSRC} test
+	@/usr/bin/script -q /dev/null \
+		${SETENV} SHELL=/bin/sh ${GMAKE} -C ${WRKSRC} test
 
 .include <bsd.port.mk>

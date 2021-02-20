@@ -1,3 +1,5 @@
-TIMESTAMP = 1529481893
-SHA256 (openfire_src_4_2_3.tar.gz) = 9a901bcd06920ccb5b417517db029a4a20b775d49aa39d918a996d4aaf47430c
-SIZE (openfire_src_4_2_3.tar.gz) = 113557155
+TIMESTAMP = 1605483196
+SHA256 (openfire_src_4_6_0.tar.gz) = b88accbfeeb07e0e99b2055d93d1d4604ba2cf84d40b0536e7444e060b96440d
+SIZE (openfire_src_4_6_0.tar.gz) = 6744193
+SHA256 (FreeBSD-openfire-4.6.0-maven-repository.tar.gz) = b8a7eb8929683f781801c931a902af70e7057f3f81e5a374464069c868cae049
+SIZE (FreeBSD-openfire-4.6.0-maven-repository.tar.gz) = 119671982

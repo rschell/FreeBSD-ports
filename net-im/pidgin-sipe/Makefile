@@ -25,7 +25,7 @@ LIB_DEPENDS=	libnss3.so:security/nss \
 		libfarstream-0.2.so:net-im/farstream
 RUN_DEPENDS=	pidgin:net-im/pidgin
 
-USES=		gmake gnome libtool localbase pkgconfig tar:bzip2 ssl
+USES=		compiler:c11 gmake gnome libtool localbase pkgconfig tar:bzip2 ssl
 USE_GNOME=	gtk20 intltool libxml2
 USE_GSTREAMER1=	yes
 
@@ -47,6 +47,8 @@ CONFIGURE_ARGS=	--enable-purple \
 GNU_CONFIGURE=	yes
 INSTALL_TARGET=	install-strip
 PORTDOCS=	AUTHORS ChangeLog HACKING NEWS README TODO
+
+CFLAGS+=	-Wno-error
 
 post-patch:
 	@${REINPLACE_CMD} 's/LDLAGS/LDFLAGS/' ${WRKSRC}/configure

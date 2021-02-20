@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=		talloc
-PORTVERSION=		2.3.0
+PORTVERSION=		2.3.1
 PORTREVISION=		0
 CATEGORIES=		devel
 MASTER_SITES=		SAMBA
@@ -47,16 +47,16 @@ PLIST_FILES+=		include/talloc.h \
 			${PKGCONFIGDIR}/talloc.pc
 
 .if defined(NO_PYTHON)
-USES+=			python:2.7+,build,test
+USES+=			python:build,test
 CONFIGURE_ARGS+=	--disable-python
 .else
 USES+=			python:3.4+
 
 PLIST_FILES+=		include/pytalloc.h \
-			lib/libpytalloc-util.so \
-			lib/libpytalloc-util.so.2 \
-			${PYTHON_SITELIBDIR}/talloc.so \
-			${PKGCONFIGDIR}/pytalloc-util.pc
+			lib/libpytalloc-util${PYTHON_EXT_SUFFIX}.so \
+			lib/libpytalloc-util${PYTHON_EXT_SUFFIX}.so.2 \
+			${PYTHON_SITELIBDIR}/talloc${PYTHON_EXT_SUFFIX}.so \
+			${PKGCONFIGDIR}/pytalloc-util${PYTHON_EXT_SUFFIX}.pc
 .endif
 
 .include <bsd.port.pre.mk>
@@ -100,8 +100,8 @@ pre-build-MANPAGES-off:
 post-install:
 			${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/libtalloc.so
 .if !defined(NO_PYTHON)
-			${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/libpytalloc-util.so
-			${STRIP_CMD} ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/talloc.so
+			${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/libpytalloc-util*.so
+			${STRIP_CMD} ${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}/talloc*.so
 .endif
 
 .include <bsd.port.post.mk>

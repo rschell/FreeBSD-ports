@@ -2,7 +2,7 @@
 
 PORTNAME=	perl
 DISTVERSION=	${PERL_VERSION}
-PORTREVISION=	0
+PORTREVISION=	1
 CATEGORIES=	lang devel perl5
 MASTER_SITES=	CPAN/../../src/5.0
 DIST_SUBDIR=	perl
@@ -16,7 +16,7 @@ LICENSE_FILE_ART10=	${WRKSRC}/Artistic
 LICENSE_FILE_GPLv1+ =	${WRKSRC}/Copying
 
 # Uncomment when the default Perl is switched to 5.32
-#DEPRECATED=	Support end three years after .0 release, please upgrade to a more recent version of Perl
+#DEPRECATED=	Support ends three years after .0 release. Please upgrade to a more recent version of Perl
 #EXPIRATION_DATE=	2022-05-22
 
 USES=	cpe tar:xz
@@ -129,8 +129,8 @@ OPTIONS_EXCLUDE=	DTRACE
 .endif
 .for a in aarch64 arm armv6 armv7 \
 	mips mips64 mips64el mips64elhf mips64hf mipsel mipselhf mipshf mipsn32 \
-	powerpc powerpc64 powerpcspe \
-	sparc64
+	powerpc \
+	riscv64 riscv64sf sparc64
 OPTIONS_EXCLUDE_${a}=	DTRACE
 .endfor
 

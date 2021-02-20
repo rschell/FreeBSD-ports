@@ -1,3 +1,3 @@
-TIMESTAMP = 1575623415
-SHA256 (KDE/applications/19.12.0/konsole-19.12.0.tar.xz) = e1b2cafb25dea65df97fb7b0c766bb6db311c329fa33dc8d3703afbe2322e9fc
-SIZE (KDE/applications/19.12.0/konsole-19.12.0.tar.xz) = 1161060
+TIMESTAMP = 1607111072
+SHA256 (KDE/release-service/20.12.0/konsole-20.12.0.tar.xz) = 6d3ba8a4e5baeda3f8b380f122313de1421836892994f1ddf0e6872696598d59
+SIZE (KDE/release-service/20.12.0/konsole-20.12.0.tar.xz) = 1236116

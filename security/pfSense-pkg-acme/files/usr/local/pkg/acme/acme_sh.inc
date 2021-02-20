@@ -60,6 +60,7 @@ class acme_sh {
 	public $ocspstaple;
 	
 	private function execacmesh($command, $envvariables = null) {
+		global $config;
 		$command = "/usr/local/pkg/acme/acme.sh " . $command;
 		if ($this->debug) {
 			echo "\n{$command}\n";
@@ -68,6 +69,20 @@ class acme_sh {
 		$env = array();
 		$env['path'] = "/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin/";
 		$env['PATH'] = "/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin/";
+
+		/* Setup Proxy Variables */
+		if (!empty($config['system']['proxyurl'])) {
+			$proxy_url = $config['system']['proxyurl'];
+			if (!empty($config['system']['proxyport'])) {
+				$proxy_url .= ":{$config['system']['proxyport']}";
+			}
+			if (!empty($config['system']['proxyuser']) && !empty($config['system']['proxypass'])) {
+				$proxy_url = "{$config['system']['proxyuser']}:{$config['system']['proxypass']}@{$proxy_url}";
+			}
+			$env['http_proxy'] = $proxy_url;
+			$env['https_proxy'] = $proxy_url;
+		}
+
 		if (is_array($envvariables)) {
 			$env = array_merge($env, $envvariables);
 		}
@@ -114,7 +129,7 @@ class acme_sh {
 		$this->debug = false;
 		$this->execacmesh(""
 				. " --home " . escapeshellarg($this->acmeconf)
-				. " --createAccountKey"
+				. " --create-account-key"
 				. " --accountkeylength 4096"
 				. " --accountconf " . escapeshellarg($this->accountconfig)
 				);
@@ -146,7 +161,7 @@ class acme_sh {
 		$this->execacmesh(""
 				. " --home " . escapeshellarg($this->acmeconf)
 				. " --accountconf " . escapeshellarg($this->accountconfig)
-				. " --createDomainKey -d " . escapeshellarg($domain)
+				. " --create-domain-key --domain " . escapeshellarg($domain)
 				. " --keylength " . escapeshellarg($keylength)
 				. " --log-level 3"
 				. " --log " . escapeshellarg($this->acmeconf."acme_createdomainkey.log")
@@ -206,7 +221,7 @@ EOF;
 		$domainstr = "";
 		foreach($domainstosign as $domain) {
 			$api = $domain->method; 
-			$domainstr .= " -d " . escapeshellarg($domain->domainname);
+			$domainstr .= " --domain " . escapeshellarg($domain->domainname);
 			if (!empty($domain->method)) {
 				$domainparameters = "";
 				if ($api && substr($api, 0, 4 ) === "dns_") {

@@ -2,11 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	mpop
-DISTVERSION=	1.4.7
+DISTVERSION=	1.4.12
 CATEGORIES=	mail
 MASTER_SITES=	https://marlam.de/mpop/releases/
 
-MAINTAINER=	jbeich@FreeBSD.org
+MAINTAINER=	neel@neelc.org
 COMMENT=	Small and fast POP3 client
 
 LICENSE=	GPLv3+
@@ -20,20 +20,23 @@ INFO=		mpop
 
 OPTIONS_DEFINE=		GSASL IDN LIBSECRET NLS
 OPTIONS_RADIO=		TLS
-OPTIONS_RADIO_TLS=	GNUTLS OPENSSL
+OPTIONS_RADIO_TLS=	GNUTLS LIBTLS OPENSSL
 OPTIONS_DEFAULT=	GNUTLS IDN
 OPTIONS_SUB=		yes
 
 GNUTLS_LIB_DEPENDS=	libgnutls.so:security/gnutls
 GNUTLS_CONFIGURE_ON=	--with-tls=gnutls
 GSASL_DESC=		${SASL_DESC} via GNU SASL
-GSASL_LIB_DEPENDS=	libgsasl.so:security/gsasl
+GSASL_LIB_DEPENDS=	libgsasl.so:security/libgsasl
 GSASL_CONFIGURE_WITH=	libgsasl
 IDN_LIB_DEPENDS=	libidn2.so:dns/libidn2
 IDN_CONFIGURE_WITH=	libidn
 LIBSECRET_DESC=		GNOME password management
 LIBSECRET_LIB_DEPENDS=	libsecret-1.so:security/libsecret
 LIBSECRET_CONFIGURE_WITH=	libsecret
+LIBTLS_DESC=		SSL/TLS support via libtls
+LIBTLS_LIB_DEPENDS=	libtls.so:security/libressl
+LIBTLS_CONFIGURE_ON=	--with-tls=libtls
 NLS_USES=		gettext
 NLS_CONFIGURE_ENABLE=	nls
 OPENSSL_USES=		ssl

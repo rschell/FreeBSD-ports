@@ -2,8 +2,7 @@
 
 PORTNAME=	gluoncv
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.5.0-72
-DISTVERSIONSUFFIX=	-gce4384f
+DISTVERSION=	0.9.0
 CATEGORIES=	misc # machine-learning
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
@@ -14,9 +13,9 @@ LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
 PY_DEPENDS=	${PYNUMPY} \
+		${PY_PILLOW} \
 		${PYTHON_PKGNAMEPREFIX}matplotlib>0:math/py-matplotlib@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}mxnet>0:misc/py-mxnet@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}pillow>0:graphics/py-pillow@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}portalocker>0:devel/py-portalocker@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}requests>0:www/py-requests@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}scipy>=1.0:science/py-scipy@${PY_FLAVOR} \
@@ -24,7 +23,7 @@ PY_DEPENDS=	${PYNUMPY} \
 BUILD_DEPENDS=	${PY_DEPENDS}
 RUN_DEPENDS=	${PY_DEPENDS}
 
-USES=		python localbase
+USES=		compiler:c11 python:3.6+ localbase
 USE_GITHUB=	yes
 GH_ACCOUNT=	dmlc
 GH_PROJECT=	gluon-cv

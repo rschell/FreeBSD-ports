@@ -7,7 +7,9 @@ PORTVERSION?=	${BASE_PORTVERSION}
 # plug-in port instead, like ${category}/gstreamer1-plugin-${PLUGIN}.
 PORTREVISION?=	2
 CATEGORIES?=	multimedia audio
-MASTER_SITES=	http://gstreamer.freedesktop.org/src/gst-plugins-base/:base \
+MASTER_SITES=	GNOME/sources/gst-plugins-base/${PORTVERSION:R}:base \
+		GNOME/sources/gst-plugins-good/${PORTVERSION:R}:good \
+		http://gstreamer.freedesktop.org/src/gst-plugins-base/:base \
 		http://gstreamer.freedesktop.org/src/gst-plugins-bad/:bad \
 		http://gstreamer.freedesktop.org/src/gst-plugins-good/:good \
 		http://gstreamer.freedesktop.org/src/gst-plugins-ugly/:ugly
@@ -15,6 +17,8 @@ PKGNAMESUFFIX?=	1-plugins${GST_PLUGIN_SUFFIX}
 
 MAINTAINER=	multimedia@FreeBSD.org
 COMMENT?=	GStreamer written collection of plugins handling several media types
+
+LICENSE=	LGPL20
 
 BUILD_DEPENDS+=	gstreamer1>=${GST1_VERSION}${GST1_MINIMAL_VERSION}:multimedia/gstreamer1 \
 		iso-codes>=0:misc/iso-codes \
@@ -26,16 +30,16 @@ RUN_DEPENDS+=	iso-codes>=0:misc/iso-codes
 
 PORTSCOUT=	limitw:1,even
 
-BASE_PORTVERSION=	1.14.4
+BASE_PORTVERSION=	1.16.2
 BASE_DISTNAME=		gst-plugins-base-${BASE_PORTVERSION}
 BASE_DISTFILE=		${BASE_DISTNAME}${EXTRACT_SUFX}
-BAD_PORTVERSION=	1.14.4
+BAD_PORTVERSION=	1.16.2
 BAD_DISTNAME=		gst-plugins-bad-${BAD_PORTVERSION}
 BAD_DISTFILE=		${BAD_DISTNAME}${EXTRACT_SUFX}
-GOOD_PORTVERSION=	1.14.4
+GOOD_PORTVERSION=	1.16.2
 GOOD_DISTNAME=		gst-plugins-good-${GOOD_PORTVERSION}
 GOOD_DISTFILE=		${GOOD_DISTNAME}${EXTRACT_SUFX}
-UGLY_PORTVERSION=	1.14.4
+UGLY_PORTVERSION=	1.16.2
 UGLY_DISTNAME=		gst-plugins-ugly-${UGLY_PORTVERSION}
 UGLY_DISTFILE=		${UGLY_DISTNAME}${EXTRACT_SUFX}
 DIST?=		base
@@ -52,6 +56,8 @@ CFLAGS+=	-Wno-format
 CPPFLAGS+=	-I${LOCALBASE}/include
 LDFLAGS+=	-lpthread -L${LOCALBASE}/lib ${EXTRA_LIBS}
 
+CONFIGURE_ARGS+=	--disable-fatal-warnings
+
 DEFAULT_AUDIOSINK?=	osssink
 DEFAULT_AUDIOSRC?=	osssrc
 
@@ -60,7 +66,7 @@ IGNORE=		DIST not specified
 .endif
 
 VERSION=	1.0
-SOVERSION=	0.1404.0
+SOVERSION=	0.1602.0
 PLIST_SUB+=	VERSION="${VERSION}" \
 		SOVERSION="${SOVERSION}"
 
@@ -133,6 +139,10 @@ post-patch:
 	@${REINPLACE_CMD} -e 's|/dev/dvd|${DEFAULT_DVD_DEVICE}|g' \
 		${WRKSRC}/ext/resindvd/resindvdbin.c \
 		${WRKSRC}/ext/resindvd/resindvdsrc.c
+# Fix dependency on neon-0.31
+	${REINPLACE_CMD} -e '/neon/s|0.30.99|0.31.99|g' \
+		${WRKSRC}/configure
+
 .endif
 .if ${DIST} != ugly
 	@${FIND} ${WRKSRC}/ext ${WRKSRC}/sys \
@@ -150,6 +160,7 @@ post-patch:
 	s|$$(top_builddir)/gst-libs/gst/adaptivedemux/libgstadaptivedemux-@GST_API_VERSION@.la|-lgstadaptivedemux-${VERSION}|; \
 	s|$$(top_builddir)/gst-libs/gst/codecparsers/libgstcodecparsers-@GST_API_VERSION@.la|-lgstcodecparsers-${VERSION}|; \
 	s|$$(top_builddir)/gst-libs/gst/allocators/libgstbadallocators-@GST_API_VERSION@.la|-lgstbadallocators-${VERSION}|; \
+	s|$$(top_builddir)/gst-libs/gst/audio/libgstbadaudio-@GST_API_VERSION@.la|-lgstbadaudio-${VERSION}|; \
 	s|$$(top_builddir)/gst-libs/gst/video/libgstbadvideo-@GST_API_VERSION@.la|-lgstbadvideo-${VERSION}|'
 
 	 @${FIND} ${WRKSRC}/ext ${WRKSRC}/sys -name Makefile.in | \
@@ -167,7 +178,11 @@ post-patch:
 	  s|$$(top_builddir)/gst-libs/gst/adaptivedemux/libgstadaptivedemux-@GST_API_VERSION@.la|-lgstadaptivedemux-${VERSION}|; \
 	  s|$$(top_builddir)/gst-libs/gst/codecparsers/libgstcodecparsers-$$(GST_API_VERSION).la|-lgstcodecparsers-${VERSION}|; \
 	  s|$$(top_builddir)/gst-libs/gst/allocators/libgstbadallocators-$$(GST_API_VERSION).la|-lgstbadallocators-${VERSION}|; \
+	  s|$$(top_builddir)/gst-libs/gst/audio/libgstbadaudio-$$(GST_API_VERSION).la|-lgstbadaudio-${VERSION}|; \
 	  s|$$(top_builddir)/gst-libs/gst/video/libgstbadvideo-$$(GST_API_VERSION).la|-lgstbadvideo-${VERSION}|'
+	@${FIND} ${WRKSRC}/ext ${WRKSRC}/gst ${WRKSRC}/gst-libs \
+		-name Makefile.in -exec ${REINPLACE_CMD} \
+		'/foreach/s/\\#include/#include/' {} +
 .endif
 
 .if ${DIST} == bad

@@ -3,7 +3,7 @@
  * netgate_coreboot_upgrade.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2012-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2012-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,7 +54,7 @@ if (is_netgate_hw()) {
 	}
 } else {
 	$input_errors[] = gettext(
-	    "This function is only available for Netgate Inc. hardware");
+	    "This function is not available for this hardware model");
 }
 
 $show_log = false;

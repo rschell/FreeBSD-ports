@@ -2,7 +2,6 @@
 
 PORTNAME=	kdepim-addons
 DISTVERSION=	${KDE_APPLICATIONS_VERSION}
-PORTREVISION=	1
 CATEGORIES=	deskutils kde kde-applications
 
 MAINTAINER=	kde@FreeBSD.org
@@ -22,14 +21,14 @@ USES=		cmake compiler:c++11-lib gettext grantlee:5 kde:5 \
 		pkgconfig qt:5 tar:xz
 USE_KDE=	archive auth codecs completion config configwidgets coreaddons \
 		dbusaddons ecm i18n iconthemes itemmodels itemviews jobwidgets \
-		kdeclarative khtml kio prison service sonnet syntaxhighlighting \
+		kdeclarative khtml kio parts prison service sonnet syntaxhighlighting \
 		textwidgets wallet widgetsaddons xmlgui
 # pim components
 USE_KDE+=	akonadi akonadicalendar akonadicontacts akonadiimportwizard \
 		akonadimime akonadinotes calendarcore calendarsupport \
 		calendarutils contacts eventviews gapi grantleetheme \
 		gravatar identitymanagement imap incidenceeditor \
-		kdepim-apps-libs kitinerary kontactinterface kpkpass libkdepim \
+		kitinerary kontactinterface kpkpass libkdepim \
 		libkleo libksieve mailcommon mailimporter mailtransport \
 		messagelib mime pimcommon pimtextedit tnef
 USE_QT=		concurrent core dbus declarative gui location network printsupport testlib \

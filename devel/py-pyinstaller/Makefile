@@ -17,7 +17,7 @@ LICENSE_FILE=	${WRKSRC}/COPYING.txt
 
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}altgraph>0:math/py-altgraph@${PY_FLAVOR}
 
-USES=		python
+USES=		python:3.6+
 USE_PYTHON=	autoplist concurrent distutils
 
 EXTRACT_AFTER_ARGS=	--exclude doc/source --no-same-owner --no-same-permissions
@@ -28,7 +28,7 @@ OPTIONS_DEFINE=		DOCS MANPAGES
 OPTIONS_DEFAULT=	MANPAGES
 OPTIONS_SUB=		yes
 
-DOCS_BUILD_DEPENDS=	${PYTHON_PKGNAMEPREFIX}sphinx>0:textproc/py-sphinx@${PY_FLAVOR}
+DOCS_BUILD_DEPENDS=	${PYTHON_PKGNAMEPREFIX}sphinx18>0:textproc/py-sphinx18@${PY_FLAVOR}
 DOCS_MAKE_ARGS=		SPHINXBUILD=sphinx-build-${PYTHON_VER}
 DOCS_USES=		gmake
 MANPAGES_BUILD_DEPENDS=	${DOCS_BUILD_DEPENDS}
@@ -56,10 +56,9 @@ pre-build:
 		${PYTHON_CMD} waf all
 
 do-install-MANPAGES-on:
-	@${MKDIR} ${STAGEDIR}${MANDIRS}/man1
 	( cd ${WRKSRC}/doc; ${SETENV} ${MAKE_ENV} ${MAKE_CMD} man ${MAKE_ARGS})
 	( cd ${WRKSRC}/doc/_build/man ; ${INSTALL_MAN} pyi-makespec.1 pyinstaller.1 \
-		${STAGEDIR}${MANDIRS}/man1 )
+		${STAGEDIR}${PREFIX}/share/man/man1 )
 
 do-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}

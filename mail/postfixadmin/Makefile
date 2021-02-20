@@ -2,10 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	postfixadmin
-PORTVERSION=	3.2
-PORTREVISION=	3
+DISTVERSIONPREFIX=	postfixadmin-
+DISTVERSION=	3.2.4
 CATEGORIES=	mail www
-MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}/${PORTNAME}-${PORTVERSION}
 
 MAINTAINER=	ports.maintainer@evilphi.com
 COMMENT=	PHP web-based management tool for Postfix virtual domains and users
@@ -21,6 +20,7 @@ RUN_DEPENDS+=	p5-DBI>=1.634:databases/p5-DBI \
 		p5-MIME-EncWords>=0.040:mail/p5-MIME-EncWords
 
 USES=		cpe perl5 shebangfix php
+USE_GITHUB=	yes
 CPE_VENDOR=	postfix_admin_project
 CPE_PRODUCT=	postfix_admin
 
@@ -37,11 +37,17 @@ OPTIONS_DEFAULT=	PGSQL
 
 USE_PERL5=	run
 
-USE_PHP=	mbstring openssl pcre phar session spl xmlrpc
+USE_PHP=	mbstring openssl pcre phar session spl
 
 MYSQL_USE=	php=mysqli
 PGSQL_USE=	php=pgsql
 SQLITE_USE=	php=sqlite3
+
+.include <bsd.port.options.mk>
+
+.if ${FLAVOR} != php80
+USE_PHP_=	xmlrpc
+.endif
 
 do-install:
 	@${MKDIR} ${STAGEDIR}${WWWDIR}

@@ -1,8 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	botan
-DISTVERSION=	2.12.1
-PORTREVISION=	1
+DISTVERSION=	2.17.2
 CATEGORIES=	security
 MASTER_SITES=	http://botan.randombit.net/releases/
 PKGNAMESUFFIX=	2
@@ -26,6 +25,7 @@ SHEBANG_FILES=	configure.py src/python/botan2.py src/scripts/install.py
 HAS_CONFIGURE=		yes
 CONFIGURE_SCRIPT=	configure.py
 CONFIGURE_ARGS=		--cc=${COMPILER_TYPE} \
+			--prefix=${PREFIX:Q} \
 			--with-boost \
 			--with-bzip2 \
 			--with-external-includedir=${LOCALBASE}/include \
@@ -36,8 +36,10 @@ LDFLAGS+=		-pthread
 
 DOCSDIR=	${LOCALBASE}/share/doc/${PORTNAME}-${PORTVERSION}
 
+_SOABIVER=	17
 _SHLIBVER=	${DISTVERSION:S/./ /g:[2]}
-PLIST_SUB=	SHLIBVER=${_SHLIBVER}
+_SHLIBVERPATCH=	${DISTVERSION:S/./ /g:[3]}
+PLIST_SUB=	SOABIVER=${_SOABIVER} SHLIBVER=${_SHLIBVER} SHLIBVERPATCH=${_SHLIBVERPATCH}
 PORTDOCS=	*
 
 OPTIONS_DEFINE=		DOCS PYTHON SQLITE3 SSL
@@ -59,7 +61,7 @@ SSL_CONFIGURE_WITH=	openssl
 
 .if ${ARCH} == aarch64
 CONFIGURE_ARGS+=	--cc-abi="-march=armv8-a+crypto"
-.elif ${ARCH} == powerpc64
+.elif ${ARCH:Mpowerpc64*}
 CONFIGURE_ARGS+=	--cpu="ppc64"
 .endif
 
@@ -73,11 +75,17 @@ PLIST_SUB+=	HAS_RDRAND_RNG=""
 PLIST_SUB+=	HAS_RDRAND_RNG="@comment "
 .endif
 
+.if ${ARCH} == i386 || ${ARCH} == amd64 || ${ARCH:Mpowerpc64*}
+PLIST_SUB+=	HAS_PROCESSOR_RNG=""
+.else
+PLIST_SUB+=	HAS_PROCESSOR_RNG="@comment "
+.endif
+
 post-patch:
 	@${REINPLACE_CMD} -e 's|^optimization_flags .*|optimization_flags "${CXXFLAGS}"|' \
 		${WRKSRC}/src/build-data/cc/clang.txt
 
 post-install:
-	${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/botan ${STAGEDIR}${PREFIX}/lib/libbotan-2.so.${_SHLIBVER}.${_SHLIBVER}.1
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/botan ${STAGEDIR}${PREFIX}/lib/libbotan-2.so.${_SOABIVER}.${_SHLIBVER}.${_SHLIBVERPATCH}
 
 .include <bsd.port.mk>

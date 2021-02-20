@@ -3,7 +3,7 @@
  * haproxy.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2009-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2009-2021 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013-2016 PiBa-NL
  * All rights reserved.
  *
@@ -40,6 +40,9 @@ $a_frontendmode['tcp'] = array('name' => "tcp", 'shortname' => "tcp");
   if anyone actually used this what was it good for with recent package versions?
 $a_frontendmode['health'] = array('name' => "health", 'shortname' => "health");
 */
+
+global $openssl111;
+$openssl111 = (OPENSSL_VERSION_NUMBER >= 269488128);
 
 global $a_acltypes;
 $a_acltypes = array();
@@ -457,11 +460,19 @@ function haproxy_expand_alias_array($address_or_alias) {
 		$alias = $aliastable[$item];
 		if ($alias_type == "url") {
 			$items = array_merge($items, explode(' ',$alias));
-		} else
-		if ($alias_type == "network") {
+		} elseif ($alias_type == "urltable") {
+			$urltable = alias_expand_urltable($item);
+			if (!empty($urltable)) {
+				$urltable_arr = array();
+				$urlfile_as_arr = file($urltable);
+				foreach ($urlfile_as_arr as $line) {
+					$urltable_arr[] = rtrim($line);
+				}
+				$items = array_merge($items, $urltable_arr);
+			}
+		} elseif ($alias_type == "network") {
 			$items = array_merge($items, explode(' ',$alias));
-		} else
-		if ($alias_type == "host") {
+		} elseif ($alias_type == "host") {
 			$items = array_merge($items, explode(' ',$alias));
 		} else {
 			$result[] = $item;
@@ -800,7 +811,7 @@ function write_backend($configpath, $fd, $name, $pool, $backendsettings) {
 		}
 
 		if ($pool["cookie_attribute_secure"] == 'yes'){
-			fwrite ($fd, "\trspirep ^(Set-Cookie:((?!;\\ secure).)*)$ \\1;\ secure if { ssl_fc }\n");
+			fwrite ($fd, "\thttp-response replace-header Set-Cookie \"^((?:(?!; [Ss]ecure\b).)*)\\$\" \"\\1; secure\" if { ssl_fc }\n");
 		}
 
 		if ($pool['stats_enabled'] == 'yes') {
@@ -1216,14 +1227,21 @@ function write_backend($configpath, $fd, $name, $pool, $backendsettings) {
 
 			$unix_socket = false;
 			$servers = array();
+			$serverprefix = haproxy_utils::haproxy_hostname_get_prefix($be['address']);
+			$serveraddress = haproxy_utils::haproxy_hostname_strip_prefix($be['address']);
+			if ($addrprefix && $serverprefix && $serverprefix !== $addrprefix) {
+				continue; // skip the server if its not 'usable' in this transparent-backend
+			}
 			if ($be['forwardto'] && $be['forwardto'] != "") {
 				$unix_socket = true;
 				$servers[] = "/{$be['forwardto']}.socket send-proxy-v2-ssl-cn";
 			} else {
-				if (is_ipaddr($be['address']) || $use_haproxyresolvers) {
-					$servers[] = $be['address'];
-				} elseif (is_hostname($be['address'])) {
-					$dnsresult_servers = haproxy_utils::query_dns($be['address'], $dnsquerytype);
+				if (in_array($serverprefix, array('unix@'))) {
+					$servers[] = $serveraddress;
+				} elseif (is_ipaddr($serveraddress) || $use_haproxyresolvers) {
+					$servers[] = $serveraddress;
+				} elseif (is_hostname($serveraddress)) {
+					$dnsresult_servers = haproxy_utils::query_dns($serveraddress, $dnsquerytype);
 					foreach($dnsresult_servers as $dnsresult_server){
 						$servers[] = $dnsresult_server['data'];
 					}
@@ -1240,14 +1258,16 @@ function write_backend($configpath, $fd, $name, $pool, $backendsettings) {
 						continue;
 					}
 				} else {
-					if (!$unix_socket) {
+					if (!$unix_socket && !$serverprefix) {
 						// place the ipv4@ or ipv6@ before the address, but not when using a unix socket
+						// or a prefix was already specified by the user.
 						$server = $addrprefix . $server;
 					}
 				}
 				if (!empty($be['port'])) {
 					$server = $server . ":" . $be['port'];
 				}
+				$server = $serverprefix . $server;
 				$servername = $be['name'];
 				$id = "";
 				if (count($servers) > 1) {
@@ -1393,16 +1413,18 @@ function haproxy_getocspurl($filename) {
 }
 
 function haproxy_updateocsp_one($socketupdate, $filename, $name) {
+	global $openssl111;
 	if (file_exists("{$filename}.ocsp")) {
 		// If the .ocsp file exists we want to use ocsp
 		syslog(LOG_NOTICE, "HAProxy Retrieving OCSP for frontend {$name}.. ");
 		$ocsp_url = haproxy_getocspurl($filename);
 		$ocsp_host = parse_url($ocsp_url, PHP_URL_HOST);
+		$ocsp_host_dm = ($openssl111) ? "=" : " ";
 		if (empty($ocsp_url)) {
 			// If cert does not have a ocsp_uri, it cannot be updated..
 			syslog(LOG_ERR, "HAProxy OCSP ERROR Cert does not have a ocsp_uri");
 		} else {
-			$retval = exec("openssl ocsp -issuer {$filename}.issuer -verify_other {$filename}.issuer -cert {$filename} -url {$ocsp_url} -header Host {$ocsp_host} -respout {$filename}.ocsp 2>&1", $output, $err);
+			$retval = exec("openssl ocsp -issuer {$filename}.issuer -verify_other {$filename}.issuer -cert {$filename} -url {$ocsp_url} -header Host{$ocsp_host_dm}{$ocsp_host} -respout {$filename}.ocsp 2>&1", $output, $err);
 			if ($socketupdate) {
 				$ocspresponse = base64_encode(file_get_contents("{$filename}.ocsp"));
 				$r = haproxy_socket_command("set ssl ocsp-response $ocspresponse");
@@ -1443,9 +1465,7 @@ function haproxy_updateocsp($socketupdate = true) {
 }
 
 function haproxy_writeconf($configpath) {
-	global $config, $a_files_cache;
-	global $aliastable;
-	global $a_action, $a_error;
+	global $config, $a_files_cache, $aliastable, $a_action, $a_error, $openssl111;
 	if (!isset($aliastable)) {
 		alias_make_table($config);
 	}
@@ -1500,6 +1520,39 @@ function haproxy_writeconf($configpath) {
 		fwrite ($fd, "\tchroot\t\t\t\t$chroot_dir\n");
 		fwrite ($fd, "\tdaemon\n");
 
+		/* ssl-default-bind-ciphersuites and ssl-default-server-ciphersuites is only available
+		 *  when support for OpenSSL was built in and OpenSSL 1.1.1 or later was used to build HAProxy. */
+		if ($a_global['sslcompatibilitymode'] == 'modern') {
+			/* https://ssl-config.mozilla.org/#server=haproxy&version=2.1&config=modern&openssl=1.1.1d&guideline=5.4 */
+			if ($openssl111) {
+				fwrite ($fd, "\tssl-default-bind-ciphersuites\tTLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\n");
+				fwrite ($fd, "\tssl-default-server-ciphersuites\tTLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\n");
+			}
+			fwrite ($fd, "\tssl-default-bind-options\tno-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets\n");
+			fwrite ($fd, "\tssl-default-server-options\tno-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets\n");
+
+		} elseif ($a_global['sslcompatibilitymode'] == 'intermediate') {
+			/* https://ssl-config.mozilla.org/#server=haproxy&version=2.1&config=intermediate&openssl=1.1.1d&guideline=5.4 */
+			if ($openssl111) {
+				fwrite ($fd, "\tssl-default-bind-ciphersuites\tTLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\n");
+				fwrite ($fd, "\tssl-default-server-ciphersuites\tTLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\n");
+			}
+			fwrite ($fd, "\tssl-default-bind-ciphers\tECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384\n");
+			fwrite ($fd, "\tssl-default-bind-options\tno-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets\n");
+			fwrite ($fd, "\tssl-default-server-ciphers\tECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384\n");
+			fwrite ($fd, "\tssl-default-server-options\tno-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets\n");
+		} elseif ($a_global['sslcompatibilitymode'] == 'old') {
+			/* https://ssl-config.mozilla.org/#server=haproxy&version=2.1&config=old&openssl=1.1.1d&guideline=5.4 */
+			if ($openssl111) {
+				fwrite ($fd, "\tssl-default-bind-ciphersuites\tTLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\n");
+				fwrite ($fd, "\tssl-default-server-ciphersuites\tTLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\n");
+			}
+			fwrite ($fd, "\tssl-default-bind-ciphers\tECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA\n");
+			fwrite ($fd, "\tssl-default-bind-options\tno-sslv3 no-tls-tickets\n");
+			fwrite ($fd, "\tssl-default-server-ciphers\tECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA\n");
+			fwrite ($fd, "\tssl-default-server-options\tno-sslv3 no-tls-tickets\n");
+
+		}
 		if ($a_global['ssldefaultdhparam']) {
 			fwrite ($fd, "\ttune.ssl.default-dh-param\t{$a_global['ssldefaultdhparam']}\n");
 		}
@@ -1568,7 +1621,8 @@ function haproxy_writeconf($configpath) {
 			$tmp = !empty($a_global['resolver_timeoutretry']) ? $a_global['resolver_timeoutretry'] : '1s';
 			fwrite ($fd, "\ttimeout retry {$tmp}\n");
 			$tmp = !empty($a_global['resolver_holdvalid']) ? $a_global['resolver_holdvalid'] : '10s';
-			fwrite ($fd, "\thold valid {$tmp}\n");
+			fwrite ($fd, "\ttimeout resolve {$tmp}\n");
+            
 			fwrite ($fd, "\n");
 		}
 	}
@@ -2236,7 +2290,7 @@ function load_ipfw_rules() {
 	$rules = "flush\n";
 	foreach($transparent_backends as $transparent_be) {
 		if (is_ipaddrv4($transparent_be["address"])) {
-			$rules .= "add $rulenum fwd localhost tcp from {$transparent_be["address"]} {$transparent_be["port"]} to any in recv {$transparent_be["interface"]}\n";
+			$rules .= "add $rulenum fwd 127.0.0.1 tcp from {$transparent_be["address"]} {$transparent_be["port"]} to any in recv {$transparent_be["interface"]}\n";
 		} elseif (is_ipaddrv6($transparent_be["address"])) {
 			list ($addr, $scope) = explode("%", $transparent_be['address']);
 			$rules .= "add $rulenum fwd ::1 tcp from {$addr} {$transparent_be["port"]} to any in recv {$transparent_be["interface"]}\n";

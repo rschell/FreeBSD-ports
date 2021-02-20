@@ -3,7 +3,7 @@
  * status_traffic_totals.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2008-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2008-2021 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -436,7 +436,7 @@ events.push(function() {
 
 						$.each(raw_json.interfaces[interface_index].traffic.hour, function(hour_index, value) {
 
-							var date = Date.UTC(value.date.year, value.date.month-1, value.date.day, value.id);
+							var date = Date.UTC(value.date.year, value.date.month-1, value.date.day, value.time.hour);
 
 							tx_series.push([date+((0-ServerUTCOffset)*3600000), value.tx]);
 							rx_series.push([date+((0-ServerUTCOffset)*3600000), value.rx]);
@@ -657,10 +657,10 @@ events.push(function() {
 
 							var date = Date.UTC(value.date.year, value.date.month-1, value.date.day);
 
-							localStorage.setItem(value.id+1, date);
+							localStorage.setItem(index, date);
 
-							tx_series.push([value.id+1, value.tx]);
-							rx_series.push([value.id+1, value.rx]);
+							tx_series.push([index, value.tx]);
+							rx_series.push([index, value.rx]);
 
 						});
 
@@ -783,7 +783,12 @@ events.push(function() {
 				//TODO units changes based on period?
 				chart.yAxis1.tickFormat(function(d) {
 
-					var dUnit = 'K';
+					var dUnit = 'B';
+
+					if(d >= 1000 || d <= -1000) {
+						d = d / 1024;
+						dUnit = 'K';
+					}
 
 					if(d >= 1000 || d <= -1000) {
 						d = d / 1024;
@@ -855,12 +860,17 @@ events.push(function() {
 
 					for ( var v = 0; v < data.series.length; v++ ){
 
-						var unit = 'KiB';
+						var unit = 'B';
 
 						if ( ($("#invert").val() === "true" && data.series[v].key.includes('(rx)')) &&  ($("#graph-type").val() != "area" && $("#graph-type").val() != "stacked")) {
 							var trueValue = 0 - data.series[v].value;
 						} else {
 							var trueValue = data.series[v].value;
+						}
+
+						if(trueValue >= 1000) {
+							trueValue = trueValue / 1024;
+							unit = 'KiB';
 						}
 
 						if(trueValue >= 1000) {
@@ -967,9 +977,14 @@ events.push(function() {
 					}
 
 					var total = tx + rx;
-					var txUnit = 'KiB';
-					var rxUnit = 'KiB';
-					var totalUnit = 'KiB';
+					var txUnit = 'B';
+					var rxUnit = 'B';
+					var totalUnit = 'B';
+
+					if(tx >= 1000) {
+						tx = tx / 1024;
+						txUnit = 'KiB';
+					}
 
 					if(tx >= 1000) {
 						tx = tx / 1024;
@@ -988,6 +1003,11 @@ events.push(function() {
 
 					if(rx >= 1000) {
 						rx = rx / 1024;
+						rxUnit = 'KiB';
+					}
+
+					if(rx >= 1000) {
+						rx = rx / 1024;
 						rxUnit = 'MiB';
 					}
 
@@ -999,6 +1019,11 @@ events.push(function() {
 					if(rx >= 1000) {
 						rx = rx / 1024;
 						rxUnit = 'TiB';
+					}
+
+					if(total >= 1000) {
+						total = total / 1024;
+						totalUnit = 'KiB';
 					}
 
 					if(total >= 1000) {
@@ -1080,9 +1105,14 @@ events.push(function() {
 					}
 
 					var total = tx + rx;
-					var txUnit = 'KiB';
-					var rxUnit = 'KiB';
-					var totalUnit = 'KiB';
+					var txUnit = 'B';
+					var rxUnit = 'B';
+					var totalUnit = 'B';
+
+					if(tx >= 1000) {
+						tx = tx / 1024;
+						txUnit = 'KiB';
+					}
 
 					if(tx >= 1000) {
 						tx = tx / 1024;
@@ -1101,6 +1131,11 @@ events.push(function() {
 
 					if(rx >= 1000) {
 						rx = rx / 1024;
+						rxUnit = 'KiB';
+					}
+
+					if(rx >= 1000) {
+						rx = rx / 1024;
 						rxUnit = 'MiB';
 					}
 
@@ -1112,6 +1147,11 @@ events.push(function() {
 					if(rx >= 1000) {
 						rx = rx / 1024;
 						rxUnit = 'TiB';
+					}
+
+					if(total >= 1000) {
+						total = total / 1024;
+						totalUnit = 'KiB';
 					}
 
 					if(total >= 1000) {

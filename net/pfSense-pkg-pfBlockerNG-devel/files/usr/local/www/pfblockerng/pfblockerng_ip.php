@@ -3,8 +3,8 @@
  * pfblockerng_ip.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016-2020 Rubicon Communications, LLC (Netgate)
- * Copyright (c) 2015-2019 BBcan177@gmail.com
+ * Copyright (c) 2016-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2021 BBcan177@gmail.com
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the \"License\");
@@ -256,8 +256,12 @@ $section->addInput(new Form_Select(
 	'asn_reporting',
 	'ASN Reporting',
 	$pconfig['asn_reporting'],
-	[	'disabled' => 'Disabled', '24hour' => 'Enabled - ASN entries cached for 24 hours', '12hour' => 'Enabled - ASN entries cached for 12 hours',
-		'4hour' => 'Enabled - ASN entries cached for 4 hours', '1hour' => 'Enabled - ASN entries cached for 1 hour' ]
+	[	'disabled'	=> 'Disabled',
+		'week'		=> 'Enabled - ASN entries cached for 1 week',
+		'24hour'	=> 'Enabled - ASN entries cached for 24 hours',
+		'12hour'	=> 'Enabled - ASN entries cached for 12 hours',
+		'4hour'		=> 'Enabled - ASN entries cached for 4 hours',
+		'1hour'		=> 'Enabled - ASN entries cached for 1 hour' ]
 ))->setHelp('Query for the ASN (BGPview.io API) for each block/reject/permit/match IP entry. ASN values are cached as per the defined selection.')
   ->setAttribute('style', 'width: auto');
 

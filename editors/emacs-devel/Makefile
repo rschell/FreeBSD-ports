@@ -2,16 +2,14 @@
 # $FreeBSD$
 
 PORTNAME=	emacs
-DISTVERSION=	27.0.50.20191215
+DISTVERSION=	28.0.50.20210101
 PORTEPOCH=	2
 CATEGORIES=	editors
 PKGNAMESUFFIX=	-devel
 
 MAINTAINER=	emacs@FreeBSD.org
-COMMENT=	GNU editing macros
-.if ${FLAVOR:U} == nox
-COMMENT+=	(No X flavor)
-.endif
+COMMENT=	GNU editing macros ${COMMENT_${FLAVOR}}
+COMMENT_nox=	(No X flavor)
 
 LICENSE=	GPLv3+
 LICENSE_FILE=	${WRKSRC}/COPYING
@@ -28,7 +26,8 @@ USES=		autoreconf:build cpe gmake localbase:ldflags ncurses pkgconfig
 CPE_VENDOR=	gnu
 USE_GITHUB=	yes
 GH_ACCOUNT=	emacs-mirror
-GH_TAGNAME=	9ee5af3
+GH_TAGNAME=	58bdfd7
+
 .if ${FLAVOR:U} != nox
 USES+=		desktop-file-utils gnome xorg
 INSTALLS_ICONS=	yes
@@ -37,7 +36,9 @@ USE_XORG=	ice sm x11 xcb xext xfixes xinerama xmu xrandr xrender xt
 
 GNU_CONFIGURE=		yes
 CONFIGURE_ARGS=		--disable-build-details \
-			--localstatedir=/var
+			--localstatedir=/var \
+			--without-libsystemd \
+			--without-selinux
 .if ${FLAVOR:U} == nox
 CONFIGURE_ARGS+=	--with-sound=no \
 			--with-x-toolkit=no \
@@ -73,10 +74,10 @@ SUB_LIST=	EMACS_VER=${DISTVERSION:R}
 INFO=		auth autotype bovine calc ccmode cl dbus dired-x ebrowse ede \
 		ediff edt efaq eieio eintr elisp emacs emacs-gnutls emacs-mime \
 		epa erc ert eshell eudc eww flymake forms gnus htmlfontify \
-		idlwave ido info mairix-el message mh-e newsticker nxml-mode \
-		octave-mode org pcl-cvs pgg rcirc reftex remember sasl sc \
-		semantic ses sieve smtpmail speedbar srecode todo-mode tramp \
-		url vhdl-mode vip viper widget wisent woman
+		idlwave ido info mairix-el message mh-e modus-themes newsticker \
+		nxml-mode octave-mode org pcl-cvs pgg rcirc reftex remember \
+		sasl sc semantic ses sieve smtpmail speedbar srecode todo-mode \
+		tramp url vhdl-mode vip viper widget wisent woman
 INFO_PATH=	${DATADIR_REL}/info
 PLIST_SUB=	EMACS_VER=${DISTVERSION:R} \
 		GNU_HOST=${CONFIGURE_TARGET}
@@ -85,9 +86,9 @@ OPTIONS_DEFINE=			ACL DBUS GCONF GNUTLS GSETTINGS HARFBUZZ JSON \
 				LCMS2 M17N MAILUTILS MODULES OTF SCROLLBARS \
 				SOURCES THREADS XFT XIM XML XWIDGETS
 OPTIONS_DEFAULT=		ACL CAIRO DBUS GIF GNUTLS GSETTINGS GTK3 \
-				HARFBUZZ JPEG JSON KQUEUE LCMS2 M17N MAGICK \
-				MAILUTILS MODULES OSS OTF PNG SCROLLBARS \
-				SOURCES SVG THREADS TIFF XFT XIM XML XPM
+				HARFBUZZ JPEG JSON KQUEUE LCMS2 M17N MAILUTILS \
+				MODULES OSS OTF PNG SCROLLBARS SOURCES SVG \
+				THREADS TIFF XFT XIM XML XPM
 OPTIONS_GROUP=			GRAPHICS
 OPTIONS_GROUP_GRAPHICS=		CAIRO GIF JPEG MAGICK PNG SVG TIFF XPM
 OPTIONS_RADIO=			FILENOTIFY SOUND X11TOOLKIT
@@ -112,6 +113,7 @@ HARFBUZZ_DESC=		HarfBuzz for text shaping
 KQUEUE_DESC=		File notification via kqueue
 #LTO_DESC=		Enable link-time optimization
 M17N_DESC=		M17N support for text-shaping [implies XFT]
+MAGICK_DESC=		ImageMagick image processing support (deprecated)
 MAILUTILS_DESC=		Mail framework via GNU Mailutils
 MODULES_DESC=		Dynamic modules support
 OTF_DESC=		Opentype fonts [implies XFT]
@@ -140,7 +142,6 @@ GIF_LIB_DEPENDS=		libgif.so:graphics/giflib
 GIF_CONFIGURE_WITH=		gif
 GNUTLS_LIB_DEPENDS=		libgnutls.so:security/gnutls
 GNUTLS_CONFIGURE_WITH=		gnutls
-GSETTINGS_IMPLIES=		DBUS
 GSETTINGS_USE=			GNOME=glib20
 GSETTINGS_CONFIGURE_WITH=	gsettings
 GTK2_LIB_DEPENDS=		libfontconfig.so:x11-fonts/fontconfig \
@@ -162,7 +163,7 @@ LCMS2_CONFIGURE_WITH=		lcms2
 M17N_IMPLIES=			XFT
 M17N_LIB_DEPENDS=		libm17n.so:devel/m17n-lib
 M17N_CONFIGURE_WITH=		m17n-flt
-MAGICK_LIB_DEPENDS=		libMagickCore-6.so:graphics/ImageMagick6
+MAGICK_LIB_DEPENDS=		libMagickCore-7.so:graphics/ImageMagick7
 MAGICK_CONFIGURE_WITH=		imagemagick
 MAILUTILS_LIB_DEPENDS=		libmailutils.so:mail/mailutils
 MAILUTILS_CONFIGURE_WITH=	mailutils
@@ -194,7 +195,8 @@ XFT_LIB_DEPENDS=		libfontconfig.so:x11-fonts/fontconfig \
 XFT_USE=			XORG=xft,xrender
 XFT_CONFIGURE_WITH=		xft
 XIM_CONFIGURE_WITH=		xim
-XML_USES=			gnome # portlint complains, but use for nox
+# keep XML_USES=gnome, because nox flavor does not have USES=gnome
+XML_USES=			gnome
 XML_USE=			GNOME=libxml2
 XML_CONFIGURE_WITH=		xml2
 XPM_USE=			XORG=xpm
@@ -206,11 +208,6 @@ XWIDGETS_USE=			XORG=xcomposite
 XWIDGETS_CONFIGURE_WITH=	xwidgets
 
 .include <bsd.port.options.mk>
-
-# has graphics/ImageMagick been compiled with OPENMP?
-.if ${PORT_OPTIONS:MMAGICK} && ${:!${GREP} -sc " \-fopenmp " ${LOCALBASE}/libdata/pkgconfig/ImageMagick.pc || true!} == "1"
-USES+=		compiler:openmp
-.endif
 
 .if !${PORT_OPTIONS:MGTK2} && !${PORT_OPTIONS:MGTK3} && !${PORT_OPTIONS:MMOTIF} \
 	&& !${PORT_OPTIONS:MXAW} && !${PORT_OPTIONS:MXAW3D}

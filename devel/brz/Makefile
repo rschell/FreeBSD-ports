@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	brz
-PORTVERSION=	3.0.1
+PORTVERSION=	3.1.0
 CATEGORIES=	devel
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -16,10 +16,11 @@ LICENSE_FILE=	${WRKSRC}/COPYING.txt
 BUILD_DEPENDS=	${PYTHON_PKGNAMEPREFIX}configobj>=0:devel/py-configobj@${PY_FLAVOR}
 RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}configobj>=0:devel/py-configobj@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}launchpadlib>=0:devel/py-launchpadlib@${PY_FLAVOR} \
+		${PYTHON_PKGNAMEPREFIX}patiencediff>=0:textproc/py-patiencediff@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}six>=0:devel/py-six@${PY_FLAVOR}
 TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}testtools>=0:devel/py-testtools@${PY_FLAVOR}
 
-USES=		gettext python shebangfix
+USES=		gettext python:3.6+ shebangfix
 USE_PYTHON=	autoplist concurrent distutils
 
 SHEBANG_FILES=		brz

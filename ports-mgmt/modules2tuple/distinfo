@@ -1,3 +1,5 @@
-TIMESTAMP = 1577103319
-SHA256 (dmgk-modules2tuple-v1.13.0_GH0.tar.gz) = 8205bb5869ebb0598f8986a158ee6744a8ebff043034b269abd5b4686e022bf8
-SIZE (dmgk-modules2tuple-v1.13.0_GH0.tar.gz) = 10956
+TIMESTAMP = 1605445774
+SHA256 (dmgk-modules2tuple-v2.2.2_GH0.tar.gz) = 6b89a67b09b066adeb8d2f31a250822104b83629a23ed502643890275a0cb134
+SIZE (dmgk-modules2tuple-v2.2.2_GH0.tar.gz) = 80466
+SHA256 (sergi-go-diff-v1.1.0_GH0.tar.gz) = 3d4362670655e970366d555418f3c8d179c217c0499ef5573ab7176352229451
+SIZE (sergi-go-diff-v1.1.0_GH0.tar.gz) = 43552
